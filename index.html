@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kids Math Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Home Screen -->
+    <div id="homeScreen" class="screen">
+        <div class="home-container">
+            <h1 class="game-title">🍎 Kids Math Game 🍊</h1>
+            <p class="game-subtitle">Welcome! Pick a game to play:</p>
+            
+            <div class="game-selection">
+                <button id="countFruitsBtn" class="game-btn">
+                    <div class="game-icon">🍎🍌🍊</div>
+                    <h3>Count the Fruits</h3>
+                    <p>Count how many fruits you see!</p>
+                </button>
+            </div>
+            
+            <div class="instructions">
+                <p>🎯 Fun math games for kids!</p>
+                <p>⭐ Learn counting and numbers!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mode Selection Screen -->
+    <div id="modeScreen" class="screen hidden">
+        <div class="home-container">
+            <h1 class="game-title">🍎 Count the Fruits 🍊</h1>
+            <p class="game-subtitle">How do you want to enter your answers?</p>
+            
+            <div class="mode-selection">
+                <div class="mode-buttons">
+                    <button id="clickModeBtn" class="mode-btn">
+                        <div class="mode-icon">
+                            <svg viewBox="0 0 100 100" style="width: 48px; height: 48px;">
+                                <circle cx="50" cy="50" r="35" fill="#4CAF50"/>
+                                <circle cx="50" cy="50" r="25" fill="#66BB6A"/>
+                                <text x="50" y="60" text-anchor="middle" fill="white" font-size="20" font-weight="bold">1</text>
+                                <path d="M30 30 L40 40 M35 25 L35 45 M25 35 L45 35" stroke="white" stroke-width="3" fill="none"/>
+                            </svg>
+                        </div>
+                        <h3>👆 Click Numbers</h3>
+                        <p>Tap the answer button</p>
+                    </button>
+                    <button id="keyboardModeBtn" class="mode-btn keyboard">
+                        <div class="mode-icon">
+                            <svg viewBox="0 0 100 100" style="width: 48px; height: 48px;">
+                                <rect x="10" y="35" width="80" height="40" rx="8" fill="#2196F3"/>
+                                <rect x="15" y="40" width="8" height="6" rx="2" fill="white"/>
+                                <rect x="27" y="40" width="8" height="6" rx="2" fill="white"/>
+                                <rect x="39" y="40" width="8" height="6" rx="2" fill="white"/>
+                                <rect x="51" y="40" width="8" height="6" rx="2" fill="white"/>
+                                <rect x="63" y="40" width="8" height="6" rx="2" fill="white"/>
+                                <rect x="75" y="40" width="8" height="6" rx="2" fill="white"/>
+                                <rect x="21" y="52" width="8" height="6" rx="2" fill="white"/>
+                                <rect x="33" y="52" width="8" height="6" rx="2" fill="white"/>
+                                <rect x="45" y="52" width="8" height="6" rx="2" fill="white"/>
+                                <rect x="57" y="52" width="8" height="6" rx="2" fill="white"/>
+                                <rect x="69" y="52" width="8" height="6" rx="2" fill="white"/>
+                                <rect x="27" y="64" width="46" height="6" rx="2" fill="white"/>
+                            </svg>
+                        </div>
+                        <h3>⌨️ Type Numbers</h3>
+                        <p>Use keyboard to type</p>
+                    </button>
+                </div>
+                <button id="backToHomeBtn" class="back-btn">← Back to Games</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="gameScreen" class="screen hidden">
+        <div class="game-header">
+            <h2>Count the Fruits!</h2>
+        </div>
+        
+        <div class="game-stats">
+            <div class="stat-box score-box">
+                <span>Score: <span id="score">0</span></span>
+            </div>
+            <div class="stat-box timer-box" id="timerBox">
+                <span>⏰ <span id="timer">20</span></span>
+            </div>
+            <div class="stat-box points-box">
+                <span>⭐ <span id="currentPoints">10</span></span>
+            </div>
+        </div>
+
+        <div class="question-container">
+            <div class="question-text">
+                <span id="questionText">How many apples do you see?</span>
+                <button id="speakBtn" class="speak-button" title="Repeat question">🔊</button>
+            </div>
+        </div>
+
+        <div class="fruits-container" id="fruitsContainer">
+            <!-- Fruits will be dynamically added here -->
+        </div>
+
+        <div class="options-container" id="optionsContainer">
+            <button class="option-btn" data-answer="1">1</button>
+            <button class="option-btn" data-answer="2">2</button>
+            <button class="option-btn" data-answer="3">3</button>
+            <button class="option-btn" data-answer="4">4</button>
+        </div>
+
+        <div class="input-container" id="keyboardContainer" style="display: none;">
+            <input type="number" id="answerInput" class="answer-input" min="1" max="10" placeholder="?">
+            <button id="submitBtn" class="submit-btn">Submit</button>
+        </div>
+
+        <button id="backHomeBtn" class="back-button">Back to Home</button>
+
+        <div id="feedbackContainer" class="feedback-container hidden">
+            <div class="feedback-message" id="feedbackMessage">
+                <h3 id="feedbackTitle">Excellent!</h3>
+                <p id="feedbackText">+10 points!</p>
+                <button id="nextQuestionBtn" class="next-question-btn" style="display: none;">Next Question</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 
