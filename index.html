@@ -19,6 +19,16 @@
                     <h3>Count the Fruits</h3>
                     <p>Count how many fruits you see!</p>
                 </button>
+                <button id="addFruitsBtn" class="game-btn">
+                    <div class="game-icon">🍎➕🍎</div>
+                    <h3>Add the Fruits</h3>
+                    <p>Solve simple addition with fruits!</p>
+                </button>
+                 <button id="compareFruitsBtn" class="game-btn">
+                     <div class="game-icon">🍎⚖️🍎</div>
+                     <h3>Which Group Has More?</h3>
+                     <p>Choose >, <, or =</p>
+                 </button>
             </div>
             
             <div class="instructions">
@@ -28,10 +38,27 @@
         </div>
     </div>
 
+    <!-- Difficulty Selection Screen -->
+    <div id="difficultyScreen" class="screen hidden">
+        <div class="home-container">
+            <h1 id="difficultyTitle" class="game-title">🍎 Count the Fruits 🍊</h1>
+            <p class="game-subtitle">Choose your difficulty</p>
+
+            <div class="mode-selection">
+                <div class="mode-buttons">
+                    <button id="easyDifficultyBtn" class="mode-btn">Easy</button>
+                    <button id="mediumDifficultyBtn" class="mode-btn">Medium</button>
+                    <button id="hardDifficultyBtn" class="mode-btn">Hard</button>
+                </div>
+                <button id="backToHomeFromDifficultyBtn" class="back-btn">← Back to Games</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Mode Selection Screen -->
     <div id="modeScreen" class="screen hidden">
         <div class="home-container">
-            <h1 class="game-title">🍎 Count the Fruits 🍊</h1>
+            <h1 id="modeTitle" class="game-title">🍎 Count the Fruits 🍊</h1>
             <p class="game-subtitle">How do you want to enter your answers?</p>
             
             <div class="mode-selection">
@@ -78,7 +105,7 @@
     <!-- Game Screen -->
     <div id="gameScreen" class="screen hidden">
         <div class="game-header">
-            <h2>Count the Fruits!</h2>
+            <h2 id="gameHeaderTitle">Count the Fruits!</h2>
         </div>
         
         <div class="game-stats">

@@ -65,25 +65,43 @@ body {
 
 #gameScreen .fruits-container {
     grid-column: 2;
-    background: white;
+    background: transparent;
     border-radius: 10px;
-    border: 2px solid #32CD32;
+    border: none;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 15px;
+    padding: 15px 24px; /* add horizontal padding to prevent clipping of side boxes */
     min-height: 280px;
     width: 450px;
     height: 300px;
     margin: 0 auto;
-    overflow: hidden;
+    overflow: visible;
 }
 
 /* When using random positioning */
 #gameScreen .fruits-container[style*="position: relative"] {
     display: block;
     position: relative;
+}
+
+/* Compare layout: two boxes with operators in the middle */
+#gameScreen .fruits-container.compare-layout {
+    display: grid !important;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 40px;
+    align-items: center;
+    justify-items: center;
+    overflow: visible;
+}
+
+.compare-box {
+    background: white;
+    border: 2px solid #32CD32;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 0 0 6px white inset; /* ensure outer white edge to avoid apparent clipping */
 }
 
 #gameScreen .options-container {
@@ -283,6 +301,49 @@ body {
     animation: fruitAppear 0.5s ease-out;
 }
 
+/* Compare game operators */
+.compare-operators {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.compare-operator {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    border: 2px solid #1E90FF;
+    background: #E6F3FF;
+    color: #0066CC;
+    font-size: 22px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.compare-operator:hover {
+    background: #d6ebff;
+    transform: translateY(-1px);
+}
+
+.compare-operator.selected {
+    background: #FFF8DC;
+    border-color: #FF8C00;
+    color: #FF8C00;
+}
+
+.compare-operator.correct {
+    background: #F0FFF0;
+    border-color: #32CD32;
+    color: #228B22;
+}
+
+.compare-operator.incorrect {
+    background: #FFE4E1;
+    border-color: #FF0000;
+    color: #DC143C;
+}
+
 @keyframes fruitAppear {
     0% {
         transform: scale(0);
@@ -311,20 +372,23 @@ body {
 
 /* Game Selection */
 .game-selection {
-    margin: 30px 0;
-    text-align: center;
+    margin: 20px 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    width: 100%;
+    max-width: 720px;
 }
 
 .game-btn {
     background: linear-gradient(135deg, #FF9999, #FFAA66);
     color: white;
     border: none;
-    padding: 25px;
-    border-radius: 20px;
+    padding: 16px 12px;
+    border-radius: 16px;
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-    min-width: 250px;
     text-align: center;
 }
 
@@ -334,18 +398,18 @@ body {
 }
 
 .game-icon {
-    font-size: 48px;
-    margin-bottom: 10px;
+    font-size: 32px;
+    margin-bottom: 6px;
 }
 
 .game-btn h3 {
-    margin: 10px 0 5px 0;
-    font-size: 24px;
+    margin: 6px 0 4px 0;
+    font-size: 18px;
 }
 
 .game-btn p {
-    margin: 5px 0 0 0;
-    font-size: 14px;
+    margin: 0;
+    font-size: 12px;
     opacity: 0.9;
 }
 
@@ -602,17 +666,19 @@ body {
         font-size: 1.25rem;
     }
     
+    .game-selection {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        max-width: 360px;
+    }
     .game-btn {
-        min-width: 200px;
-        padding: 20px 15px;
+        padding: 14px 10px;
     }
-    
     .game-icon {
-        font-size: 36px;
+        font-size: 28px;
     }
-    
     .game-btn h3 {
-        font-size: 20px;
+        font-size: 16px;
     }
     
     .mode-buttons {
@@ -687,9 +753,15 @@ body {
     
     #gameScreen .fruits-container {
         min-height: 200px;
-        padding: 10px;
+        padding: 10px 18px; /* maintain extra horizontal padding on mobile */
         width: 320px;
         height: 200px;
+        overflow: visible;
+    }
+    .compare-operator {
+        width: 44px;
+        height: 44px;
+        font-size: 20px;
     }
     
     #gameScreen .game-header {
@@ -749,5 +821,10 @@ body {
         border: 3px solid transparent;
         box-sizing: border-box;
         vertical-align: top;
+    }
+    .game-selection {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        max-width: 520px;
     }
 } 
