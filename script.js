@@ -14,7 +14,7 @@ let isHandlingTimeUp = false;
 let showFeedback = false;
 let inputMode = 'click'; // 'click' or 'keyboard'
 // Game selection and difficulty/answer ranges
-let selectedGame = null; // 'count' | 'add'
+let selectedGame = null; // 'count' | 'add' | 'compare' | 'match'
 let selectedDifficulty = null; // 'easy' | 'medium' | 'hard'
 let difficultyMin = 1;
 let difficultyMax = 5;
@@ -26,6 +26,15 @@ let addendB = 0;
 // Compare game state
 let compareLeftCount = 0;
 let compareRightCount = 0;
+// Match game state
+let matchNumbers = []; // e.g., [4,6,8]
+let matchGroups = []; // e.g., [{fruit:'apple', count:4, id:'g1'}, ...]
+let matchLinks = []; // {numId, groupId}
+let draggingLine = null; // SVG path element
+let dragSourceId = null; // starting endpoint id
+let svgLayer = null; // SVG overlay for connection lines
+let selectedNumberId = null;
+let selectedGroupId = null;
 
 // Fruit data
 const fruits = ['apple', 'banana', 'orange', 'watermelon', 'pineapple'];
@@ -56,6 +65,7 @@ const gameScreen = document.getElementById('gameScreen');
 const countFruitsBtn = document.getElementById('countFruitsBtn');
 const addFruitsBtn = document.getElementById('addFruitsBtn');
 const compareFruitsBtn = document.getElementById('compareFruitsBtn');
+const matchFruitsBtn = document.getElementById('matchFruitsBtn');
 const difficultyScreen = document.getElementById('difficultyScreen');
 const easyDifficultyBtn = document.getElementById('easyDifficultyBtn');
 const mediumDifficultyBtn = document.getElementById('mediumDifficultyBtn');
@@ -92,6 +102,7 @@ const submitBtn = document.getElementById('submitBtn');
 countFruitsBtn.addEventListener('click', () => chooseGame('count'));
 if (addFruitsBtn) addFruitsBtn.addEventListener('click', () => chooseGame('add'));
 if (compareFruitsBtn) compareFruitsBtn.addEventListener('click', () => chooseGame('compare'));
+if (matchFruitsBtn) matchFruitsBtn.addEventListener('click', () => chooseGame('match'));
 easyDifficultyBtn.addEventListener('click', () => selectDifficulty('easy'));
 mediumDifficultyBtn.addEventListener('click', () => selectDifficulty('medium'));
 hardDifficultyBtn.addEventListener('click', () => selectDifficulty('hard'));
@@ -142,6 +153,8 @@ function speakQuestion() {
         question = `Add the ${currentFruit}s. How many in total?`;
     } else if (selectedGame === 'compare') {
         question = `Which group has more? Choose greater than, less than, or equal.`;
+    } else if (selectedGame === 'match') {
+        question = `Match each number to the group with the same number of ${currentFruit}s.`;
     } else {
         question = `How many ${currentFruit}s do you see?`;
     }
@@ -152,6 +165,8 @@ function speakFeedback(correct) {
     if (correct) {
         if (selectedGame === 'compare') {
             speakText('Correct!');
+        } else if (selectedGame === 'match') {
+            speakText('Great matching!');
         } else {
             speakText("Excellent! Well done!");
         }
@@ -162,6 +177,8 @@ function speakFeedback(correct) {
             else if (correctAnswer === '<') phrase = 'the right group is greater than the left';
             else phrase = 'the groups are equal in size';
             speakText(`Time is up, ${phrase}.`);
+        } else if (selectedGame === 'match') {
+            speakText("Time's up!");
         } else if (selectedGame === 'add') {
             speakText(`Time's up! The answer was ${correctAnswer}`);
         } else {
@@ -169,6 +186,8 @@ function speakFeedback(correct) {
         }
     } else {
         if (selectedGame === 'compare') {
+            speakText('Oops! Try again!');
+        } else if (selectedGame === 'match') {
             speakText('Oops! Try again!');
         } else {
             speakText(`Oops! Try again! The correct answer is ${correctAnswer}`);
@@ -178,7 +197,7 @@ function speakFeedback(correct) {
 
 // Input mode management
 function updateInputMode() {
-    if (selectedGame === 'compare') {
+    if (selectedGame === 'compare' || selectedGame === 'match') {
         // Compare game uses custom operator buttons inside fruits container
         optionsContainer.style.display = 'none';
         keyboardContainer.style.display = 'none';
@@ -231,13 +250,23 @@ function chooseGame(game) {
     isGeneratingQuestion = false;
     isHandlingTimeUp = false;
     showFeedback = false;
-    selectedGame = game; // 'count' | 'add' | 'compare'
+    // Reset match state
+    matchNumbers = [];
+    matchGroups = [];
+    matchLinks = [];
+    selectedNumberId = null;
+    selectedGroupId = null;
+    if (svgLayer && svgLayer.parentNode) { svgLayer.parentNode.removeChild(svgLayer); }
+    svgLayer = null;
+    selectedGame = game; // 'count' | 'add' | 'compare' | 'match'
     if (game === 'count') {
         difficultyTitle.textContent = '🍎 Count the Fruits 🍊';
     } else if (game === 'add') {
         difficultyTitle.textContent = '🍎 Add the Fruits 🍊';
-    } else {
+    } else if (game === 'compare') {
         difficultyTitle.textContent = '🍎 Which Group Has More? 🍊';
+    } else if (game === 'match') {
+        difficultyTitle.textContent = '🍎 Match Number to Fruits 🍊';
     }
     showDifficultySelection();
 }
@@ -263,21 +292,28 @@ function selectDifficulty(level) {
         if (level === 'easy') { difficultyMin = 1; difficultyMax = 5; }
         else if (level === 'medium') { difficultyMin = 5; difficultyMax = 10; }
         else if (level === 'hard') { difficultyMin = 5; difficultyMax = 15; }
+    } else if (selectedGame === 'match') {
+        // Match game difficulty
+        if (level === 'easy') { difficultyMin = 1; difficultyMax = 5; }
+        else if (level === 'medium') { difficultyMin = 1; difficultyMax = 10; }
+        else if (level === 'hard') { difficultyMin = 5; difficultyMax = 15; }
     }
     // Update titles for next screens
     if (modeTitle) {
         if (selectedGame === 'count') modeTitle.textContent = '🍎 Count the Fruits 🍊';
         else if (selectedGame === 'add') modeTitle.textContent = '🍎 Add the Fruits 🍊';
-        else modeTitle.textContent = '🍎 Which Group Has More? 🍊';
+    else if (selectedGame === 'compare') modeTitle.textContent = '🍎 Which Group Has More? 🍊';
+    else modeTitle.textContent = '🍎 Match Number to Fruits 🍊';
     }
     if (gameHeaderTitle) {
         if (selectedGame === 'count') gameHeaderTitle.textContent = 'Count the Fruits!';
         else if (selectedGame === 'add') gameHeaderTitle.textContent = 'Add the Fruits!';
-        else gameHeaderTitle.textContent = 'Which Group Has More?';
+        else if (selectedGame === 'compare') gameHeaderTitle.textContent = 'Which Group Has More?';
+        else gameHeaderTitle.textContent = 'Match Number to Fruits';
     }
     difficultyScreen.classList.add('hidden');
-    if (selectedGame === 'compare') {
-        // Skip mode selection for compare game, always click mode
+    if (selectedGame === 'compare' || selectedGame === 'match') {
+        // Skip mode selection for compare and match games, they have custom UI
         startGame('click');
     } else {
         modeScreen.classList.remove('hidden');
@@ -307,6 +343,9 @@ function goHome() {
     // Reset game state
     score = 0;
     updateScore();
+    // Cleanup match SVG
+    if (svgLayer && svgLayer.parentNode) { svgLayer.parentNode.removeChild(svgLayer); }
+    svgLayer = null;
 }
 
 // Timer functions
@@ -393,6 +432,23 @@ function generateQuestion() {
         compareLeftCount = getRandomIntInclusive(difficultyMin, difficultyMax);
         compareRightCount = getRandomIntInclusive(difficultyMin, difficultyMax);
         correctAnswer = compareLeftCount > compareRightCount ? '>' : (compareLeftCount < compareRightCount ? '<' : '=');
+    } else if (selectedGame === 'match') {
+        // Build 4 distinct counts within difficulty range
+        const used = new Set();
+        matchNumbers = [];
+        while (matchNumbers.length < 4) {
+            const val = getRandomIntInclusive(difficultyMin, difficultyMax);
+            if (!used.has(val)) { used.add(val); matchNumbers.push(val); }
+        }
+        // Build 3 fruit groups with the same counts but shuffled order
+        const shuffledCounts = [...matchNumbers].sort(() => Math.random() - 0.5);
+        matchGroups = shuffledCounts.map((count, idx) => {
+            return { fruit: currentFruit, count, id: `group_${Date.now()}_${idx}` };
+        });
+        matchLinks = [];
+        selectedNumberId = null;
+        selectedGroupId = null;
+        correctAnswer = null; // not used in match mode
     } else {
         correctAnswer = getRandomIntInclusive(difficultyMin, difficultyMax);
     }
@@ -422,10 +478,12 @@ function generateQuestion() {
         arrangeAdditionFruits();
     } else if (selectedGame === 'compare') {
         arrangeCompareFruits();
+    } else if (selectedGame === 'match') {
+        arrangeMatchLayout();
     } else {
         arrangeFruits();
     }
-    if (selectedGame !== 'compare') {
+    if (selectedGame !== 'compare' && selectedGame !== 'match') {
         updateOptions();
     }
     updateInputMode(); // Setup correct input mode and auto-focus
@@ -447,6 +505,8 @@ function updateQuestion() {
         const left = compareLeftCount;
         const right = compareRightCount;
         questionText.textContent = `Which group has more?`;
+    } else if (selectedGame === 'match') {
+        questionText.textContent = `Match the numbers to the ${currentFruit} groups!`;
     } else {
         questionText.textContent = `How many ${currentFruit}s do you see?`;
     }
@@ -698,7 +758,9 @@ function isPositionTooClose(newPos, existingPositions, minDistance) {
 // Answer checking
 function checkAnswer(selectedAnswer) {
     if (showFeedback) return;
-    
+    // Match mode handles correctness per-link, not a single answer
+    if (selectedGame === 'match') return;
+
     const isCorrect = selectedGame === 'compare' ? (String(selectedAnswer) === String(correctAnswer)) : (selectedAnswer === correctAnswer);
     
     if (isCorrect) {
@@ -783,6 +845,8 @@ function showFeedbackMessage(isCorrect, timeUp) {
         feedbackTitle.textContent = 'Excellent!';
         if (selectedGame === 'compare') {
             feedbackText.textContent = `Correct!`;
+        } else if (selectedGame === 'match') {
+            feedbackText.textContent = `All matches correct! +${earnedPoints} points!`;
         } else {
             feedbackText.textContent = `+${earnedPoints} points!`;
         }
@@ -800,12 +864,217 @@ function showFeedbackMessage(isCorrect, timeUp) {
             else if (correctAnswer === '<') phrase = 'Left < Right';
             else phrase = 'Left = Right';
             feedbackText.textContent = phrase;
+        } else if (selectedGame === 'match') {
+            feedbackText.textContent = 'Try again next time!';
         } else {
             feedbackText.textContent = `The correct answer is ${correctAnswer}`;
         }
         nextQuestionBtn.style.display = 'block'; // Show button when time is up
     }
 }
+
+// Match game layout and interactions
+function arrangeMatchLayout() {
+    fruitsContainer.innerHTML = '';
+    fruitsContainer.style.position = 'relative';
+    fruitsContainer.classList.remove('compare-layout');
+    fruitsContainer.classList.add('match-layout');
+
+    ensureSvgLayer();
+    // Clear SVG
+    while (svgLayer.firstChild) svgLayer.removeChild(svgLayer.firstChild);
+
+    // Create rows: top groups, bottom numbers
+    const groupsRow = document.createElement('div');
+    groupsRow.className = 'match-row groups-row';
+    const numbersRow = document.createElement('div');
+    numbersRow.className = 'match-row numbers-row';
+
+    // Numbers
+    matchNumbers.forEach((num, idx) => {
+        const id = `num_${num}_${idx}`;
+        const item = document.createElement('div');
+        item.className = 'match-item match-number';
+        item.id = id;
+        item.dataset.value = String(num);
+        item.textContent = String(num);
+        item.addEventListener('click', () => handleNumberClick(item));
+        numbersRow.appendChild(item);
+    });
+
+    // Groups
+    const isMobile = window.innerWidth <= 768;
+    const boxWidth = isMobile ? 150 : 180;
+    const boxHeight = isMobile ? 100 : 120;
+    const fruitSize = isMobile ? 36 : 40;
+
+    matchGroups.forEach((g) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'match-item match-group';
+        wrapper.id = g.id;
+        wrapper.dataset.count = String(g.count);
+        wrapper.addEventListener('click', () => handleGroupClick(wrapper));
+
+        const box = document.createElement('div');
+        box.className = 'group-box';
+        box.style.width = boxWidth + 'px';
+        box.style.height = boxHeight + 'px';
+        box.style.position = 'relative';
+
+        // Render fruit symbols inside box
+        const positions = generateRandomPositionsInArea(g.count, 0, 0, boxWidth, boxHeight, fruitSize);
+        for (let i = 0; i < g.count; i++) {
+            const f = document.createElement('div');
+            f.className = 'fruit-item';
+            f.style.position = 'absolute';
+            f.style.left = positions[i].x + 'px';
+            f.style.top = positions[i].y + 'px';
+            f.style.width = fruitSize + 'px';
+            f.style.height = fruitSize + 'px';
+            f.style.fontSize = Math.round(fruitSize * 0.6) + 'px';
+            f.innerHTML = fruitSymbols[currentFruit];
+            box.appendChild(f);
+        }
+
+        wrapper.appendChild(box);
+        groupsRow.appendChild(wrapper);
+    });
+
+    fruitsContainer.appendChild(groupsRow);
+    fruitsContainer.appendChild(numbersRow);
+}
+
+function handleNumberClick(el) {
+    if (el.classList.contains('matched')) return;
+    const prev = fruitsContainer.querySelector('.match-number.selected');
+    if (prev && prev !== el) prev.classList.remove('selected');
+    el.classList.toggle('selected');
+    selectedNumberId = el.classList.contains('selected') ? el.id : null;
+    // If a group already selected, attempt match
+    if (selectedNumberId && selectedGroupId) {
+        const numEl = document.getElementById(selectedNumberId);
+        const grpEl = document.getElementById(selectedGroupId);
+        tryAttemptMatch(numEl, grpEl);
+    }
+}
+
+function handleGroupClick(el) {
+    if (el.classList.contains('matched')) return;
+    const prev = fruitsContainer.querySelector('.match-group.selected');
+    if (prev && prev !== el) prev.classList.remove('selected');
+    el.classList.toggle('selected');
+    selectedGroupId = el.classList.contains('selected') ? el.id : null;
+    if (selectedNumberId && selectedGroupId) {
+        const numEl = document.getElementById(selectedNumberId);
+        const grpEl = document.getElementById(selectedGroupId);
+        tryAttemptMatch(numEl, grpEl);
+    }
+}
+
+function tryAttemptMatch(numEl, grpEl) {
+    if (!numEl || !grpEl) return;
+    const num = parseInt(numEl.dataset.value);
+    const cnt = parseInt(grpEl.dataset.count);
+    // Coordinates
+    const a = getRelativeCenter(numEl);
+    const b = getRelativeCenter(grpEl);
+    const success = num === cnt;
+    const line = createMatchLine(a.x, a.y, b.x, b.y, success);
+    if (success) {
+        // Persist line and mark matched
+        numEl.classList.add('matched');
+        grpEl.classList.add('matched');
+        numEl.classList.remove('selected');
+        grpEl.classList.remove('selected');
+        matchLinks.push({ numId: numEl.id, groupId: grpEl.id });
+        playSuccessSound();
+        // Clear selections
+        selectedNumberId = null;
+        selectedGroupId = null;
+        // If all matched -> complete
+        if (matchLinks.length >= matchGroups.length) {
+            clearTimer();
+            showFeedback = true;
+            earnedPoints = currentPoints;
+            score += earnedPoints;
+            updateScore();
+            showFeedbackMessage(true, false);
+            speakFeedback(true);
+            advanceTimeout = setTimeout(() => {
+                advanceTimeout = null;
+                generateQuestion();
+            }, 3000);
+        }
+    } else {
+        // Temporary line for failure
+        playFailSound();
+        setTimeout(() => {
+            if (line && line.parentNode) line.parentNode.removeChild(line);
+        }, 600);
+        // Keep selections but flash
+        numEl.classList.remove('selected');
+        grpEl.classList.remove('selected');
+        selectedNumberId = null;
+        selectedGroupId = null;
+    }
+}
+
+function ensureSvgLayer() {
+    if (!svgLayer) {
+        svgLayer = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svgLayer.classList.add('match-svg');
+        fruitsContainer.appendChild(svgLayer);
+    }
+    // Resize to container
+    svgLayer.setAttribute('width', fruitsContainer.clientWidth);
+    svgLayer.setAttribute('height', fruitsContainer.clientHeight);
+}
+
+function getRelativeCenter(el) {
+    const rect = el.getBoundingClientRect();
+    const parentRect = fruitsContainer.getBoundingClientRect();
+    return {
+        x: rect.left - parentRect.left + rect.width / 2,
+        y: rect.top - parentRect.top + rect.height / 2
+    };
+}
+
+function createMatchLine(x1, y1, x2, y2, success) {
+    ensureSvgLayer();
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    const dx = Math.abs(x2 - x1) * 0.3;
+    const c1x = x1 + dx;
+    const c2x = x2 - dx;
+    const d = `M ${x1} ${y1} C ${c1x} ${y1}, ${c2x} ${y2}, ${x2} ${y2}`;
+    path.setAttribute('d', d);
+    path.classList.add('match-line');
+    path.classList.add(success ? 'success' : 'fail');
+    svgLayer.appendChild(path);
+    return path;
+}
+
+// Simple WebAudio beeps
+function playBeep(frequency, durationMs, type = 'sine') {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = type;
+        o.frequency.value = frequency;
+        o.connect(g);
+        g.connect(ctx.destination);
+        g.gain.setValueAtTime(0.0001, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + 0.02);
+        o.start();
+        setTimeout(() => {
+            g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.05);
+            setTimeout(() => { o.stop(); ctx.close(); }, 60);
+        }, durationMs);
+    } catch (_) {}
+}
+
+function playSuccessSound() { playBeep(880, 150, 'triangle'); setTimeout(() => playBeep(1320, 150, 'triangle'), 160); }
+function playFailSound() { playBeep(220, 200, 'sawtooth'); }
 
 function tryMergeAnimation() {
     const items = Array.from(fruitsContainer.querySelectorAll('.fruit-item'));
