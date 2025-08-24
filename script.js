@@ -13,6 +13,14 @@ let isGeneratingQuestion = false;
 let isHandlingTimeUp = false;
 let showFeedback = false;
 let inputMode = 'click'; // 'click' or 'keyboard'
+// Play mode state
+let playMode = null; // 'time' | 'questions'
+let questionsAsked = 0;
+let questionTarget = 10;
+let attemptsThisQuestion = 0;
+let runEnded = false;
+let hasAnnouncedQuestion = false;
+let questionsRemaining = 0;
 // Game selection and difficulty/answer ranges
 let selectedGame = null; // 'count' | 'add' | 'compare' | 'match'
 let selectedDifficulty = null; // 'easy' | 'medium' | 'hard'
@@ -80,6 +88,7 @@ const speakBtn = document.getElementById('speakBtn');
 const scoreElement = document.getElementById('score');
 const timerElement = document.getElementById('timer');
 const timerBox = document.getElementById('timerBox');
+const pointsBoxEl = document.querySelector('.points-box');
 const currentPointsElement = document.getElementById('currentPoints');
 const questionText = document.getElementById('questionText');
 const fruitsContainer = document.getElementById('fruitsContainer');
@@ -88,6 +97,19 @@ const feedbackContainer = document.getElementById('feedbackContainer');
 const feedbackTitle = document.getElementById('feedbackTitle');
 const feedbackText = document.getElementById('feedbackText');
 const nextQuestionBtn = document.getElementById('nextQuestionBtn');
+// Play Mode screen elements
+const playModeScreen = document.getElementById('playModeScreen');
+const timeModeBtn = document.getElementById('timeModeBtn');
+const questionsModeBtn = document.getElementById('questionsModeBtn');
+const backToHomeFromPlayModeBtn = document.getElementById('backToHomeFromPlayModeBtn');
+// Settings UI elements
+const settingsPanel = document.getElementById('settingsPanel');
+const settingsClickMode = document.getElementById('settingsClickMode');
+const settingsKeyboardMode = document.getElementById('settingsKeyboardMode');
+const settingsDiffEasy = document.getElementById('settingsDiffEasy');
+const settingsDiffMedium = document.getElementById('settingsDiffMedium');
+const settingsDiffHard = document.getElementById('settingsDiffHard');
+const settingsSaved = document.getElementById('settingsSaved');
 // Dynamic titles
 const difficultyTitle = document.getElementById('difficultyTitle');
 const modeTitle = document.getElementById('modeTitle');
@@ -97,6 +119,12 @@ const gameHeaderTitle = document.getElementById('gameHeaderTitle');
 const keyboardContainer = document.getElementById('keyboardContainer');
 const answerInput = document.getElementById('answerInput');
 const submitBtn = document.getElementById('submitBtn');
+// Result screen elements
+const resultScreen = document.getElementById('resultScreen');
+const resultTitle = document.getElementById('resultTitle');
+const resultScore = document.getElementById('resultScore');
+const resultStars = document.getElementById('resultStars');
+const resultBackBtn = document.getElementById('resultBackBtn');
 
 // Event listeners
 countFruitsBtn.addEventListener('click', () => chooseGame('count'));
@@ -114,6 +142,61 @@ backHomeBtn.addEventListener('click', goHome);
 speakBtn.addEventListener('click', speakQuestion);
 submitBtn.addEventListener('click', submitKeyboardAnswer);
 nextQuestionBtn.addEventListener('click', generateQuestion);
+// Play mode listeners
+if (timeModeBtn) timeModeBtn.addEventListener('click', () => selectPlayMode('time'));
+if (questionsModeBtn) questionsModeBtn.addEventListener('click', () => selectPlayMode('questions'));
+if (backToHomeFromPlayModeBtn) backToHomeFromPlayModeBtn.addEventListener('click', goHome);
+if (resultBackBtn) resultBackBtn.addEventListener('click', goHome);
+
+// Settings management
+const SETTINGS_KEYS = { mode: 'km_inputMode', difficulty: 'km_difficulty' };
+
+function loadSettings() {
+    try {
+        const mode = localStorage.getItem(SETTINGS_KEYS.mode);
+        const difficulty = localStorage.getItem(SETTINGS_KEYS.difficulty);
+        return { mode, difficulty };
+    } catch (_) {
+        return { mode: null, difficulty: null };
+    }
+}
+
+function persistSettings(partial) {
+    const current = loadSettings();
+    const next = { ...current, ...partial };
+    try {
+        if (next.mode) localStorage.setItem(SETTINGS_KEYS.mode, next.mode);
+        if (next.difficulty) localStorage.setItem(SETTINGS_KEYS.difficulty, next.difficulty);
+    } catch (_) {}
+    showSettingsSaved();
+    updateSettingsUI();
+}
+
+function updateSettingsUI() {
+    const { mode, difficulty } = loadSettings();
+    // Mode buttons
+    [settingsClickMode, settingsKeyboardMode].forEach(btn => btn && btn.classList.remove('active'));
+    if (mode === 'click' && settingsClickMode) settingsClickMode.classList.add('active');
+    if (mode === 'keyboard' && settingsKeyboardMode) settingsKeyboardMode.classList.add('active');
+    // Difficulty buttons
+    [settingsDiffEasy, settingsDiffMedium, settingsDiffHard].forEach(btn => btn && btn.classList.remove('active'));
+    if (difficulty === 'easy' && settingsDiffEasy) settingsDiffEasy.classList.add('active');
+    if (difficulty === 'medium' && settingsDiffMedium) settingsDiffMedium.classList.add('active');
+    if (difficulty === 'hard' && settingsDiffHard) settingsDiffHard.classList.add('active');
+}
+
+function showSettingsSaved() {
+    if (!settingsSaved) return;
+    settingsSaved.classList.remove('hidden');
+    setTimeout(() => settingsSaved.classList.add('hidden'), 900);
+}
+
+// Settings button listeners
+if (settingsClickMode) settingsClickMode.addEventListener('click', () => persistSettings({ mode: 'click' }));
+if (settingsKeyboardMode) settingsKeyboardMode.addEventListener('click', () => persistSettings({ mode: 'keyboard' }));
+if (settingsDiffEasy) settingsDiffEasy.addEventListener('click', () => persistSettings({ difficulty: 'easy' }));
+if (settingsDiffMedium) settingsDiffMedium.addEventListener('click', () => persistSettings({ difficulty: 'medium' }));
+if (settingsDiffHard) settingsDiffHard.addEventListener('click', () => persistSettings({ difficulty: 'hard' }));
 
 // Add option button click listeners
 optionsContainer.addEventListener('click', (e) => {
@@ -154,7 +237,8 @@ function speakQuestion() {
     } else if (selectedGame === 'compare') {
         question = `Which group has more? Choose greater than, less than, or equal.`;
     } else if (selectedGame === 'match') {
-        question = `Match each number to the group with the same number of ${currentFruit}s.`;
+        // Generic phrasing so it remains correct across changing fruits
+        question = `Match each number to the group with the same number of fruits.`;
     } else {
         question = `How many ${currentFruit}s do you see?`;
     }
@@ -226,10 +310,30 @@ function submitKeyboardAnswer() {
 // Screen management
 function startGame(mode) {
     inputMode = mode;
+    // Persist chosen mode so future games can start immediately
+    try { localStorage.setItem('km_inputMode', mode); } catch (_) {}
+    // Ensure other screens are hidden when starting
+    homeScreen.classList.add('hidden');
+    difficultyScreen.classList.add('hidden');
+    playModeScreen.classList.add('hidden');
     modeScreen.classList.add('hidden');
     gameScreen.classList.remove('hidden');
     answerInput.min = String(answerMin);
     answerInput.max = String(answerMax);
+    // Initialize mode-specific state
+    questionsAsked = 0;
+    runEnded = false;
+    hasAnnouncedQuestion = false;
+    if (playMode === 'questions') {
+        questionsRemaining = questionTarget;
+    }
+    // Hide or show timer depending on mode
+    if (playMode === 'questions') {
+        // Hide timer box in questions mode
+        timerBox.style.display = 'none';
+    } else {
+        timerBox.style.display = '';
+    }
     generateQuestion();
 }
 
@@ -241,6 +345,35 @@ function showModeSelection() {
 function showDifficultySelection() {
     homeScreen.classList.add('hidden');
     difficultyScreen.classList.remove('hidden');
+}
+
+function showPlayModeSelection() {
+    homeScreen.classList.add('hidden');
+    playModeScreen.classList.remove('hidden');
+}
+
+function selectPlayMode(mode) {
+    playMode = mode; // 'time' | 'questions'
+    // Reset counters
+    questionsAsked = 0;
+    questionsRemaining = (mode === 'questions') ? questionTarget : 0;
+    earnedPoints = 0;
+    score = 0;
+    updateScore();
+    // Proceed to difficulty selection
+    playModeScreen.classList.add('hidden');
+    // Auto-apply saved difficulty and input mode from Settings and start immediately
+    const saved = loadSettings();
+    if (saved && saved.difficulty) {
+        configureDifficulty(saved.difficulty);
+    }
+    // Hide timer in questions mode; show in time mode
+    if (playMode === 'questions') { if (timerBox) timerBox.style.display = 'none'; } else { if (timerBox) timerBox.style.display = ''; }
+    // Hide current points box as stars system is removed
+    if (pointsBoxEl) pointsBoxEl.style.display = 'none';
+    // For compare/match, there's no input mode choice; for count/add, use saved mode
+    const modeToUse = (selectedGame === 'compare' || selectedGame === 'match') ? 'click' : (saved.mode === 'keyboard' ? 'keyboard' : 'click');
+    startGame(modeToUse);
 }
 
 function chooseGame(game) {
@@ -268,10 +401,11 @@ function chooseGame(game) {
     } else if (game === 'match') {
         difficultyTitle.textContent = '🍎 Match Number to Fruits 🍊';
     }
-    showDifficultySelection();
+    // Always show Play Mode selection first; difficulty and input mode are read from Settings
+    showPlayModeSelection();
 }
 
-function selectDifficulty(level) {
+function configureDifficulty(level) {
     selectedDifficulty = level;
     if (selectedGame === 'count') {
         if (level === 'easy') { difficultyMin = 1; difficultyMax = 5; }
@@ -311,13 +445,14 @@ function selectDifficulty(level) {
         else if (selectedGame === 'compare') gameHeaderTitle.textContent = 'Which Group Has More?';
         else gameHeaderTitle.textContent = 'Match Number to Fruits';
     }
+}
+
+function selectDifficulty(level) {
+    configureDifficulty(level);
+    // Persist chosen difficulty so future games can start immediately
+    try { localStorage.setItem('km_difficulty', level); } catch (_) {}
+    // Not used anymore; flow uses settings to start directly
     difficultyScreen.classList.add('hidden');
-    if (selectedGame === 'compare' || selectedGame === 'match') {
-        // Skip mode selection for compare and match games, they have custom UI
-        startGame('click');
-    } else {
-        modeScreen.classList.remove('hidden');
-    }
 }
 
 function goHome() {
@@ -336,6 +471,7 @@ function goHome() {
     
     // Switch screens
     gameScreen.classList.add('hidden');
+    resultScreen.classList.add('hidden');
     difficultyScreen.classList.add('hidden');
     modeScreen.classList.add('hidden');
     homeScreen.classList.remove('hidden');
@@ -381,6 +517,23 @@ function startTimer() {
     }, 1000);
 }
 
+// Global timer for time mode
+function startGlobalTimer() {
+    clearTimer();
+    timeLeft = 20;
+    elapsedSeconds = 0;
+    updateTimer();
+    gameTimer = setInterval(() => {
+        timeLeft--;
+        elapsedSeconds++;
+        updateTimer();
+        if (timeLeft <= 0) {
+            clearTimer();
+            endRun();
+        }
+    }, 1000);
+}
+
 function clearTimer() {
     if (gameTimer) {
         clearInterval(gameTimer);
@@ -393,17 +546,21 @@ function handleTimeUp() {
     
     isHandlingTimeUp = true;
     clearTimer();
-    
+    if (playMode === 'time') {
+        // End of run for time mode
+        endRun();
+        return;
+    }
     showFeedback = true;
     showFeedbackMessage(false, true);
     speakFeedback(false);
-    
     // Don't auto-advance when time is up - show next question button
 }
 
 // Question generation
 function generateQuestion() {
     if (isGeneratingQuestion) return;
+    if (runEnded) return;
     // Only generate if game screen is visible
     if (gameScreen.classList.contains('hidden')) {
         isGeneratingQuestion = false;
@@ -411,7 +568,16 @@ function generateQuestion() {
     }
     
     isGeneratingQuestion = true;
-    clearTimer();
+    // Questions mode: ensure we ask exactly questionTarget
+    if (playMode === 'questions') {
+        if (questionsRemaining <= 0) {
+            endRun();
+            isGeneratingQuestion = false;
+            return;
+        }
+    }
+    // In time mode we don't clear global timer here
+    if (playMode !== 'time') clearTimer();
     
     showFeedback = false;
     feedbackContainer.classList.add('hidden');
@@ -486,16 +652,69 @@ function generateQuestion() {
     if (selectedGame !== 'compare' && selectedGame !== 'match') {
         updateOptions();
     }
+    // End conditions handled at the top before generating
     updateInputMode(); // Setup correct input mode and auto-focus
     
-    // Start timer
-    startTimer();
+    // Start timer: per-mode behavior
+    if (playMode === 'time') {
+        // Global timer: only start on first question of run
+        if (!gameTimer) {
+            startGlobalTimer();
+        }
+    } else {
+        // Questions mode: no timer
+        clearTimer();
+    }
     
-    // Speak question after a short delay
-        setTimeout(() => {
-        speakQuestion();
+    // Increment counters
+    if (playMode === 'time') {
+        questionsAsked++;
+    } else {
+        // questions mode
+        questionsAsked++;
+        questionsRemaining--;
+    }
+    // Speak question only at the beginning of the run
+    setTimeout(() => {
+        if (!hasAnnouncedQuestion) {
+            speakQuestion();
+            hasAnnouncedQuestion = true;
+        }
         isGeneratingQuestion = false;
-    }, 500);
+    }, 300);
+}
+
+function endRun() {
+    runEnded = true;
+    // Show a dedicated result screen
+    gameScreen.classList.add('hidden');
+    resultScreen.classList.remove('hidden');
+    let stars = 0;
+    if (playMode === 'time') {
+        // time mode thresholds
+        if (score >= 16) stars = 3; else if (score >= 10) stars = 2; else if (score >= 1) stars = 1; else stars = 0;
+        resultTitle.textContent = 'Time Up!';
+        resultScore.textContent = `Correct: ${score}`;
+    } else {
+        // questions mode thresholds
+        if (score >= 9) stars = 3; else if (score >= 5) stars = 2; else if (score >= 1) stars = 1; else stars = 0;
+        resultTitle.textContent = 'All Questions Done!';
+        resultScore.textContent = `Correct: ${score}/${questionTarget}`;
+    }
+    // Render stars under score
+    if (resultStars) {
+        resultStars.innerHTML = '';
+        for (let i = 0; i < 3; i++) {
+            const s = document.createElement('span');
+            s.className = 'star' + (i < stars ? '' : ' empty');
+            s.textContent = '★';
+            resultStars.appendChild(s);
+        }
+    }
+    nextQuestionBtn.style.display = 'none';
+    // Offer a simple way back to home via back button
+    // Stop any timers
+    clearTimer();
 }
 
 function updateQuestion() {
@@ -506,7 +725,7 @@ function updateQuestion() {
         const right = compareRightCount;
         questionText.textContent = `Which group has more?`;
     } else if (selectedGame === 'match') {
-        questionText.textContent = `Match the numbers to the ${currentFruit} groups!`;
+        questionText.textContent = `Match the numbers to the groups!`;
     } else {
         questionText.textContent = `How many ${currentFruit}s do you see?`;
     }
@@ -631,6 +850,11 @@ function arrangeCompareFruits() {
         b.dataset.answer = sym;
         ops.appendChild(b);
     });
+    // Ensure operators column is centered between boxes
+    ops.style.display = 'flex';
+    ops.style.flexDirection = 'column';
+    ops.style.alignItems = 'center';
+    ops.style.justifyContent = 'center';
     
     // Assemble layout
     fruitsContainer.appendChild(leftBox);
@@ -666,6 +890,9 @@ function arrangeCompareFruits() {
 
 function generateRandomPositionsInArea(count, offsetX, offsetY, areaWidth, areaHeight, fruitSize) {
     const positions = [];
+    // Account for the 2px border on .fruit-item so the full element stays inside
+    const fruitBorder = 2;
+    const effectiveSize = fruitSize + fruitBorder * 2;
     const minDistance = Math.min(areaWidth, areaHeight) / 4;
     for (let i = 0; i < count; i++) {
         let attempts = 0;
@@ -673,15 +900,29 @@ function generateRandomPositionsInArea(count, offsetX, offsetY, areaWidth, areaH
         let ok = false;
         do {
             pos = {
-                x: offsetX + Math.random() * (areaWidth - fruitSize),
-                y: offsetY + Math.random() * (areaHeight - fruitSize)
+                x: offsetX + Math.random() * Math.max(0, areaWidth - effectiveSize),
+                y: offsetY + Math.random() * Math.max(0, areaHeight - effectiveSize)
             };
             attempts++;
             ok = !isPositionTooClose(pos, positions, minDistance);
         } while (attempts < 100 && !ok);
         if (!ok) {
-            pos = { x: offsetX + (i % 3) * (fruitSize + 10), y: offsetY + Math.floor(i / 3) * (fruitSize + 10) };
+            // Grid fallback entirely within bounds
+            const cols = Math.max(1, Math.floor(areaWidth / effectiveSize));
+            const rows = Math.max(1, Math.ceil(count / cols));
+            const spacingX = cols > 1 ? (areaWidth - effectiveSize) / (cols - 1) : 0;
+            const spacingY = rows > 1 ? (areaHeight - effectiveSize) / (rows - 1) : 0;
+            const col = i % cols;
+            const row = Math.floor(i / cols);
+            pos = { x: offsetX + col * spacingX, y: offsetY + row * spacingY };
         }
+        // Clamp within area bounds to avoid overflow
+        const maxX = offsetX + Math.max(0, areaWidth - effectiveSize);
+        const maxY = offsetY + Math.max(0, areaHeight - effectiveSize);
+        if (pos.x < offsetX) pos.x = offsetX;
+        if (pos.y < offsetY) pos.y = offsetY;
+        if (pos.x > maxX) pos.x = maxX;
+        if (pos.y > maxY) pos.y = maxY;
         positions.push(pos);
     }
     return positions;
@@ -764,31 +1005,27 @@ function checkAnswer(selectedAnswer) {
     const isCorrect = selectedGame === 'compare' ? (String(selectedAnswer) === String(correctAnswer)) : (selectedAnswer === correctAnswer);
     
     if (isCorrect) {
-        // Stop timer and show success feedback
-        clearTimer();
+        // In per-question timer (legacy) clear; in time mode, keep global timer running
+        if (playMode !== 'time') clearTimer();
         showFeedback = true;
-        earnedPoints = currentPoints;
-        score += earnedPoints;
+        // Count correct answers
+        score += 1;
         updateScore();
+        // No popup or speech on correct answers
+        feedbackContainer.classList.add('hidden');
         
-        showFeedbackMessage(true, false);
-        speakFeedback(true);
-        
-        // Auto-advance after 3 seconds for correct answers
-        advanceTimeout = setTimeout(() => {
-            advanceTimeout = null;
-            generateQuestion();
-        }, 3000);
+        // In time mode, advance immediately; in questions mode, also advance immediately
+        if (!runEnded) {
+            advanceTimeout = setTimeout(() => {
+                advanceTimeout = null;
+                if (!runEnded) generateQuestion();
+            }, 50);
+        }
     } else {
         // For incorrect answers, show brief feedback but keep timer running
         if (selectedGame === 'compare') {
-            // Immediate short feedback for compare
-            feedbackContainer.classList.remove('hidden', 'correct', 'incorrect');
-            feedbackContainer.classList.add('incorrect');
-            feedbackTitle.textContent = 'Oops! Try again!';
-            feedbackText.textContent = 'Keep trying...';
-            nextQuestionBtn.style.display = 'none';
-            setTimeout(() => feedbackContainer.classList.add('hidden'), 1200);
+            // No lingering feedback; compare advances immediately
+            feedbackContainer.classList.add('hidden');
         } else {
             showBriefIncorrectFeedback();
             speakText("Oops! Try again!");
@@ -817,10 +1054,16 @@ fruitsContainer.addEventListener('click', (e) => {
     const wasCorrect = symbol === correctAnswer;
     if (wasCorrect) {
         target.classList.add('correct');
+        // Immediately advance to next question on any answer in compare
+        checkAnswer(symbol);
     } else {
         target.classList.add('incorrect');
+        // On incorrect, go to next question immediately
+        checkAnswer(symbol);
+        if (!runEnded) {
+            setTimeout(() => { if (!runEnded) generateQuestion(); }, 150);
+        }
     }
-    checkAnswer(symbol);
 });
 
 function showBriefIncorrectFeedback() {
@@ -841,20 +1084,13 @@ function showFeedbackMessage(isCorrect, timeUp) {
     feedbackContainer.classList.remove('hidden', 'correct', 'incorrect');
     
     if (isCorrect) {
+        // In new flows we don't show any prolonged message for correct answers
         feedbackContainer.classList.add('correct');
-        feedbackTitle.textContent = 'Excellent!';
-        if (selectedGame === 'compare') {
-            feedbackText.textContent = `Correct!`;
-        } else if (selectedGame === 'match') {
-            feedbackText.textContent = `All matches correct! +${earnedPoints} points!`;
-        } else {
-            feedbackText.textContent = `+${earnedPoints} points!`;
-        }
-        nextQuestionBtn.style.display = 'none'; // Hide button for correct answers (auto-advance)
+        feedbackTitle.textContent = '';
+        feedbackText.textContent = '';
+        nextQuestionBtn.style.display = 'none';
         // Addition merge animation on correct
-        if (selectedGame === 'add') {
-            tryMergeAnimation();
-        }
+        // No merge or celebratory animations to keep flow instant
     } else if (timeUp) {
         feedbackContainer.classList.add('incorrect');
         feedbackTitle.textContent = "Time's up!";
@@ -920,9 +1156,18 @@ function arrangeMatchLayout() {
         box.style.width = boxWidth + 'px';
         box.style.height = boxHeight + 'px';
         box.style.position = 'relative';
+        box.style.overflow = 'hidden';
 
         // Render fruit symbols inside box
-        const positions = generateRandomPositionsInArea(g.count, 0, 0, boxWidth, boxHeight, fruitSize);
+        const inset = Math.max(2, Math.round(fruitSize * 0.2));
+        const positions = generateRandomPositionsInArea(
+            g.count,
+            inset,
+            inset,
+            Math.max(0, boxWidth - inset * 2),
+            Math.max(0, boxHeight - inset * 2),
+            fruitSize
+        );
         for (let i = 0; i < g.count; i++) {
             const f = document.createElement('div');
             f.className = 'fruit-item';
@@ -935,7 +1180,7 @@ function arrangeMatchLayout() {
             f.innerHTML = fruitSymbols[currentFruit];
             box.appendChild(f);
         }
-
+        // Keep answers hidden; do not render a visible count label
         wrapper.appendChild(box);
         groupsRow.appendChild(wrapper);
     });
@@ -987,27 +1232,22 @@ function tryAttemptMatch(numEl, grpEl) {
         numEl.classList.remove('selected');
         grpEl.classList.remove('selected');
         matchLinks.push({ numId: numEl.id, groupId: grpEl.id });
-        playSuccessSound();
+        // Keep global timer running in time mode; do not stop or clear on correct
         // Clear selections
         selectedNumberId = null;
         selectedGroupId = null;
         // If all matched -> complete
         if (matchLinks.length >= matchGroups.length) {
-            clearTimer();
-            showFeedback = true;
-            earnedPoints = currentPoints;
-            score += earnedPoints;
+            // Count one correct for the fully completed match puzzle
+            score += 1;
             updateScore();
-            showFeedbackMessage(true, false);
-            speakFeedback(true);
-            advanceTimeout = setTimeout(() => {
-                advanceTimeout = null;
-                generateQuestion();
-            }, 3000);
+            // Immediately go to next question if run not ended
+            if (!runEnded) {
+                setTimeout(() => { if (!runEnded) generateQuestion(); }, 50);
+            }
         }
     } else {
         // Temporary line for failure
-        playFailSound();
         setTimeout(() => {
             if (line && line.parentNode) line.parentNode.removeChild(line);
         }, 600);
@@ -1170,6 +1410,7 @@ function init() {
     updateScore();
     updateTimer();
     updatePoints();
+    updateSettingsUI();
 }
 
 // Start the app

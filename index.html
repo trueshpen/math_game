@@ -36,6 +36,27 @@
                   </button>
             </div>
             
+            <div class="settings-panel" id="settingsPanel">
+                <h3 class="settings-title">Settings</h3>
+                <div class="settings-group">
+                    <div class="settings-label">Input Mode</div>
+                    <div class="settings-options">
+                        <button id="settingsClickMode" class="settings-btn" data-mode="click">👆 Click Numbers</button>
+                        <button id="settingsKeyboardMode" class="settings-btn" data-mode="keyboard">⌨️ Type Numbers</button>
+                    </div>
+                </div>
+                <div class="settings-group">
+                    <div class="settings-label">Difficulty</div>
+                    <div class="settings-options">
+                        <button id="settingsDiffEasy" class="settings-btn" data-diff="easy">Easy</button>
+                        <button id="settingsDiffMedium" class="settings-btn" data-diff="medium">Medium</button>
+                        <button id="settingsDiffHard" class="settings-btn" data-diff="hard">Hard</button>
+                    </div>
+                </div>
+                <div id="settingsSaved" class="settings-saved hidden">Saved ✓</div>
+                <p class="settings-hint">Games will use these settings and start immediately.</p>
+            </div>
+            
             <div class="instructions">
                 <p>🎯 Fun math games for kids!</p>
                 <p>⭐ Learn counting and numbers!</p>
@@ -56,6 +77,28 @@
                     <button id="hardDifficultyBtn" class="mode-btn">Hard</button>
                 </div>
                 <button id="backToHomeFromDifficultyBtn" class="back-btn">← Back to Games</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Play Mode Selection Screen -->
+    <div id="playModeScreen" class="screen hidden">
+        <div class="home-container">
+            <h1 id="playModeTitle" class="game-title">Pick Play Mode</h1>
+            <p class="game-subtitle">Choose how you want to play</p>
+
+            <div class="mode-selection">
+                <div class="mode-buttons">
+                    <button id="timeModeBtn" class="mode-btn">
+                        <h3>⏱️ Time Mode</h3>
+                        <p>20 seconds</p>
+                    </button>
+                    <button id="questionsModeBtn" class="mode-btn keyboard">
+                        <h3>❓ Questions Mode</h3>
+                        <p>10 questions</p>
+                    </button>
+                </div>
+                <button id="backToHomeFromPlayModeBtn" class="back-btn">← Back to Games</button>
             </div>
         </div>
     </div>
@@ -155,6 +198,23 @@
                 <h3 id="feedbackTitle">Excellent!</h3>
                 <p id="feedbackText">+10 points!</p>
                 <button id="nextQuestionBtn" class="next-question-btn" style="display: none;">Next Question</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result Screen -->
+    <div id="resultScreen" class="screen hidden">
+        <div class="home-container">
+            <h1 id="resultTitle" class="game-title">Results</h1>
+            <div class="mode-selection" style="max-width: 480px;">
+                <div class="settings-group" style="justify-content:center;">
+                    <div class="settings-label">Your Score</div>
+                </div>
+                <p id="resultScore" class="game-subtitle" style="margin-bottom:16px;">0</p>
+                <div id="resultStars" class="stars" aria-label="stars"></div>
+                <div style="margin-top:18px;">
+                    <button id="resultBackBtn" class="back-btn">← Back to Games</button>
+                </div>
             </div>
         </div>
     </div>

@@ -146,7 +146,9 @@ body {
     background: #ffffff;
     border: 2px dashed #a5d6a7;
     border-radius: 12px;
+    overflow: hidden;
 }
+.match-group .fruit-item { margin: 0 !important; box-sizing: border-box; }
 
 /* SVG Lines */
 .match-svg {
@@ -498,6 +500,55 @@ body {
     max-width: 400px;
     margin: 20px auto;
 }
+/* Reuse for Play Mode screen: allow two large buttons */
+.screen #playModeScreen .mode-buttons { gap: 20px; }
+
+/* Settings Panel */
+.settings-panel {
+    background: rgba(255, 255, 255, 0.3);
+    padding: 16px;
+    border-radius: 15px;
+    text-align: center;
+    max-width: 720px;
+    width: 100%;
+    margin: 8px auto 20px auto;
+    color: white;
+}
+.settings-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+.settings-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 8px 0 12px 0;
+}
+.settings-label {
+    font-weight: 700;
+    padding: 6px 10px;
+    background: rgba(0,0,0,0.15);
+    border-radius: 10px;
+}
+.settings-options { display: flex; gap: 8px; flex-wrap: wrap; }
+.settings-btn {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    border: none;
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+.settings-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+.settings-btn.active { outline: 3px solid #FFF8DC; filter: brightness(1.05); }
+.settings-saved { margin-top: 6px; font-weight: 800; color: #FFF8DC; }
+.settings-hint { margin-top: 4px; font-size: 0.9rem; color: #fff; opacity: 0.9; }
 
 .mode-selection h3 {
     color: white;
@@ -642,6 +693,15 @@ body {
     font-weight: 600;
     margin-bottom: 12px;
 }
+.stars {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    margin-top: 6px;
+    font-size: 20px;
+}
+.star { color: #FFD700; }
+.star.empty { color: #ddd; }
 
 .next-question-btn {
     background: #32CD32;
