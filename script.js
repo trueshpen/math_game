@@ -310,8 +310,8 @@ function updateInputMode() {
         optionsContainer.style.display = 'none';
         keyboardContainer.style.display = 'none';
     } else if (selectedGame === 'addsub' && inputMode === 'keyboard') {
-        // Add/Subtract: prefer keyboard input but support click too
-        optionsContainer.style.display = 'grid';
+        // Add/Subtract with keyboard: hide options, show keyboard input
+        optionsContainer.style.display = 'none';
         keyboardContainer.style.display = 'block';
         setTimeout(() => {
             answerInput.focus();
@@ -319,7 +319,7 @@ function updateInputMode() {
         answerInput.min = String(answerMin);
         answerInput.max = String(answerMax);
     } else if (selectedGame === 'addsub' && inputMode === 'click') {
-        // Add/Subtract with click mode
+        // Add/Subtract with click mode: show options, hide keyboard
         optionsContainer.style.display = 'grid';
         keyboardContainer.style.display = 'none';
     } else if (inputMode === 'keyboard') {
@@ -1212,20 +1212,31 @@ function checkAnswer(selectedAnswer) {
             }, 50);
         }
     } else {
-        // For incorrect answers, show brief feedback but keep timer running
-        if (selectedGame === 'compare') {
-            // No lingering feedback; compare advances immediately
+        // For incorrect answers
+        if (playMode === 'questions') {
+            // Questions mode: don't allow retries, move to next question immediately
+            showFeedback = true;
+            speakText(`Incorrect! The answer was ${correctAnswer}.`);
+            // Advance to next question after brief feedback
+            if (!runEnded) {
+                setTimeout(() => {
+                    if (!runEnded) generateQuestion();
+                }, 1500);
+            }
+        } else if (selectedGame === 'compare') {
+            // Compare game: no lingering feedback; advances immediately
             feedbackContainer.classList.add('hidden');
         } else {
+            // Time mode: allow retries, show brief feedback
             showBriefIncorrectFeedback();
             speakText("Oops! Try again!");
-        }
-        
-        // Clear input for next attempt
-        if (inputMode === 'keyboard') {
-            answerInput.value = '';
-            submitBtn.disabled = true;
-            setTimeout(() => answerInput.focus(), 100);
+            
+            // Clear input for next attempt
+            if (inputMode === 'keyboard') {
+                answerInput.value = '';
+                submitBtn.disabled = true;
+                setTimeout(() => answerInput.focus(), 100);
+            }
         }
     }
 }
