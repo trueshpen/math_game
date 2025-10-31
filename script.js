@@ -21,8 +21,11 @@ let attemptsThisQuestion = 0;
 let runEnded = false;
 let hasAnnouncedQuestion = false;
 let questionsRemaining = 0;
+// Age group selection
+let selectedAgeGroup = null; // 'little' | 'bigger'
+
 // Game selection and difficulty/answer ranges
-let selectedGame = null; // 'count' | 'add' | 'compare' | 'match'
+let selectedGame = null; // 'count' | 'add' | 'compare' | 'match' | 'subtract' | 'multiply' | 'divide'
 let selectedDifficulty = null; // 'easy' | 'medium' | 'hard'
 let difficultyMin = 1;
 let difficultyMax = 5;
@@ -31,6 +34,10 @@ let answerMax = 5;
 // Addition game state
 let addendA = 0;
 let addendB = 0;
+// Add/Subtract game state
+let addSubOperator = '+'; // '+' or '-'
+let addSubNum1 = 0;
+let addSubNum2 = 0;
 // Compare game state
 let compareLeftCount = 0;
 let compareRightCount = 0;
@@ -67,6 +74,9 @@ const fruitSymbols = {
 let speechSynthesis = window.speechSynthesis;
 
 // DOM elements
+const ageSelectionScreen = document.getElementById('ageSelectionScreen');
+const littleKidsBtn = document.getElementById('littleKidsBtn');
+const biggerKidsBtn = document.getElementById('biggerKidsBtn');
 const homeScreen = document.getElementById('homeScreen');
 const modeScreen = document.getElementById('modeScreen');
 const gameScreen = document.getElementById('gameScreen');
@@ -74,6 +84,7 @@ const countFruitsBtn = document.getElementById('countFruitsBtn');
 const addFruitsBtn = document.getElementById('addFruitsBtn');
 const compareFruitsBtn = document.getElementById('compareFruitsBtn');
 const matchFruitsBtn = document.getElementById('matchFruitsBtn');
+const addSubBtn = document.getElementById('addSubBtn');
 const difficultyScreen = document.getElementById('difficultyScreen');
 const easyDifficultyBtn = document.getElementById('easyDifficultyBtn');
 const mediumDifficultyBtn = document.getElementById('mediumDifficultyBtn');
@@ -125,12 +136,16 @@ const resultTitle = document.getElementById('resultTitle');
 const resultScore = document.getElementById('resultScore');
 const resultStars = document.getElementById('resultStars');
 const resultBackBtn = document.getElementById('resultBackBtn');
+const changeAgeGroupBtn = document.getElementById('changeAgeGroupBtn');
 
 // Event listeners
+if (littleKidsBtn) littleKidsBtn.addEventListener('click', () => selectAgeGroup('little'));
+if (biggerKidsBtn) biggerKidsBtn.addEventListener('click', () => selectAgeGroup('bigger'));
 countFruitsBtn.addEventListener('click', () => chooseGame('count'));
 if (addFruitsBtn) addFruitsBtn.addEventListener('click', () => chooseGame('add'));
 if (compareFruitsBtn) compareFruitsBtn.addEventListener('click', () => chooseGame('compare'));
 if (matchFruitsBtn) matchFruitsBtn.addEventListener('click', () => chooseGame('match'));
+if (addSubBtn) addSubBtn.addEventListener('click', () => chooseGame('addsub'));
 easyDifficultyBtn.addEventListener('click', () => selectDifficulty('easy'));
 mediumDifficultyBtn.addEventListener('click', () => selectDifficulty('medium'));
 hardDifficultyBtn.addEventListener('click', () => selectDifficulty('hard'));
@@ -147,6 +162,7 @@ if (timeModeBtn) timeModeBtn.addEventListener('click', () => selectPlayMode('tim
 if (questionsModeBtn) questionsModeBtn.addEventListener('click', () => selectPlayMode('questions'));
 if (backToHomeFromPlayModeBtn) backToHomeFromPlayModeBtn.addEventListener('click', goHome);
 if (resultBackBtn) resultBackBtn.addEventListener('click', goHome);
+if (changeAgeGroupBtn) changeAgeGroupBtn.addEventListener('click', goToAgeSelection);
 
 // Settings management
 const SETTINGS_KEYS = { mode: 'km_inputMode', difficulty: 'km_difficulty' };
@@ -232,7 +248,13 @@ function speakText(text) {
 
 function speakQuestion() {
     let question;
-    if (selectedGame === 'add') {
+    if (selectedGame === 'addsub') {
+        if (addSubOperator === '+') {
+            question = `${addSubNum1} plus ${addSubNum2} equals what?`;
+        } else {
+            question = `${addSubNum1} minus ${addSubNum2} equals what?`;
+        }
+    } else if (selectedGame === 'add') {
         question = `Add the ${currentFruit}s. How many in total?`;
     } else if (selectedGame === 'compare') {
         question = `Which group has more? Choose greater than, less than, or equal.`;
@@ -263,6 +285,8 @@ function speakFeedback(correct) {
             speakText(`Time is up, ${phrase}.`);
         } else if (selectedGame === 'match') {
             speakText("Time's up!");
+        } else if (selectedGame === 'addsub') {
+            speakText(`Time's up! The answer was ${correctAnswer}`);
         } else if (selectedGame === 'add') {
             speakText(`Time's up! The answer was ${correctAnswer}`);
         } else {
@@ -284,6 +308,19 @@ function updateInputMode() {
     if (selectedGame === 'compare' || selectedGame === 'match') {
         // Compare game uses custom operator buttons inside fruits container
         optionsContainer.style.display = 'none';
+        keyboardContainer.style.display = 'none';
+    } else if (selectedGame === 'addsub' && inputMode === 'keyboard') {
+        // Add/Subtract: prefer keyboard input but support click too
+        optionsContainer.style.display = 'grid';
+        keyboardContainer.style.display = 'block';
+        setTimeout(() => {
+            answerInput.focus();
+        }, 100);
+        answerInput.min = String(answerMin);
+        answerInput.max = String(answerMax);
+    } else if (selectedGame === 'addsub' && inputMode === 'click') {
+        // Add/Subtract with click mode
+        optionsContainer.style.display = 'grid';
         keyboardContainer.style.display = 'none';
     } else if (inputMode === 'keyboard') {
         optionsContainer.style.display = 'none';
@@ -348,7 +385,14 @@ function showDifficultySelection() {
 }
 
 function showPlayModeSelection() {
+    // Hide all other screens first
     homeScreen.classList.add('hidden');
+    gameScreen.classList.add('hidden');
+    resultScreen.classList.add('hidden');
+    difficultyScreen.classList.add('hidden');
+    modeScreen.classList.add('hidden');
+    ageSelectionScreen.classList.add('hidden');
+    // Show play mode selection screen
     playModeScreen.classList.remove('hidden');
 }
 
@@ -391,7 +435,7 @@ function chooseGame(game) {
     selectedGroupId = null;
     if (svgLayer && svgLayer.parentNode) { svgLayer.parentNode.removeChild(svgLayer); }
     svgLayer = null;
-    selectedGame = game; // 'count' | 'add' | 'compare' | 'match'
+    selectedGame = game; // 'count' | 'add' | 'compare' | 'match' | 'addsub'
     if (game === 'count') {
         difficultyTitle.textContent = '🍎 Count the Fruits 🍊';
     } else if (game === 'add') {
@@ -400,6 +444,8 @@ function chooseGame(game) {
         difficultyTitle.textContent = '🍎 Which Group Has More? 🍊';
     } else if (game === 'match') {
         difficultyTitle.textContent = '🍎 Match Number to Fruits 🍊';
+    } else if (game === 'addsub') {
+        difficultyTitle.textContent = '➕ Add & Subtract ➖';
     }
     // Always show Play Mode selection first; difficulty and input mode are read from Settings
     showPlayModeSelection();
@@ -431,18 +477,39 @@ function configureDifficulty(level) {
         if (level === 'easy') { difficultyMin = 1; difficultyMax = 5; }
         else if (level === 'medium') { difficultyMin = 1; difficultyMax = 10; }
         else if (level === 'hard') { difficultyMin = 5; difficultyMax = 15; }
+    } else if (selectedGame === 'addsub') {
+        // Add & Subtract game difficulty
+        // Easy: 1-20, Medium: 1-50, Hard: 1-100
+        if (level === 'easy') {
+            difficultyMin = 1;
+            difficultyMax = 20;
+            answerMin = 1;
+            answerMax = 20;
+        } else if (level === 'medium') {
+            difficultyMin = 1;
+            difficultyMax = 50;
+            answerMin = 1;
+            answerMax = 50;
+        } else if (level === 'hard') {
+            difficultyMin = 10;
+            difficultyMax = 100;
+            answerMin = 1;
+            answerMax = 100;
+        }
     }
     // Update titles for next screens
     if (modeTitle) {
         if (selectedGame === 'count') modeTitle.textContent = '🍎 Count the Fruits 🍊';
         else if (selectedGame === 'add') modeTitle.textContent = '🍎 Add the Fruits 🍊';
-    else if (selectedGame === 'compare') modeTitle.textContent = '🍎 Which Group Has More? 🍊';
-    else modeTitle.textContent = '🍎 Match Number to Fruits 🍊';
+        else if (selectedGame === 'compare') modeTitle.textContent = '🍎 Which Group Has More? 🍊';
+        else if (selectedGame === 'addsub') modeTitle.textContent = '➕ Add & Subtract ➖';
+        else modeTitle.textContent = '🍎 Match Number to Fruits 🍊';
     }
     if (gameHeaderTitle) {
         if (selectedGame === 'count') gameHeaderTitle.textContent = 'Count the Fruits!';
         else if (selectedGame === 'add') gameHeaderTitle.textContent = 'Add the Fruits!';
         else if (selectedGame === 'compare') gameHeaderTitle.textContent = 'Which Group Has More?';
+        else if (selectedGame === 'addsub') gameHeaderTitle.textContent = 'Add & Subtract!';
         else gameHeaderTitle.textContent = 'Match Number to Fruits';
     }
 }
@@ -453,6 +520,67 @@ function selectDifficulty(level) {
     try { localStorage.setItem('km_difficulty', level); } catch (_) {}
     // Not used anymore; flow uses settings to start directly
     difficultyScreen.classList.add('hidden');
+}
+
+// Age group selection
+function selectAgeGroup(ageGroup) {
+    selectedAgeGroup = ageGroup; // 'little' | 'bigger'
+    
+    // Hide age selection screen
+    if (ageSelectionScreen) ageSelectionScreen.classList.add('hidden');
+    
+    // Show home screen with filtered games
+    homeScreen.classList.remove('hidden');
+    filterGamesByAgeGroup();
+}
+
+function filterGamesByAgeGroup() {
+    const instructionsPanel = document.getElementById('instructionsPanel');
+    
+    // Show/hide games based on age group
+    if (selectedAgeGroup === 'little') {
+        // Little kids: show count, add, compare, match
+        if (countFruitsBtn) countFruitsBtn.style.display = '';
+        if (addFruitsBtn) addFruitsBtn.style.display = '';
+        if (compareFruitsBtn) compareFruitsBtn.style.display = '';
+        if (matchFruitsBtn) matchFruitsBtn.style.display = '';
+        if (addSubBtn) addSubBtn.style.display = 'none';
+        // Change body background to green (little kids theme)
+        document.body.className = 'little-kids-theme';
+        // Show little kids instructions
+        if (instructionsPanel) {
+            instructionsPanel.innerHTML = '<p>🎯 Fun math games for kids!</p><p>⭐ Learn counting and numbers!</p>';
+            instructionsPanel.style.display = '';
+        }
+    } else if (selectedAgeGroup === 'bigger') {
+        // Bigger kids: hide all old games, show only new bigger kids games
+        if (countFruitsBtn) countFruitsBtn.style.display = 'none';
+        if (addFruitsBtn) addFruitsBtn.style.display = 'none';
+        if (compareFruitsBtn) compareFruitsBtn.style.display = 'none';
+        if (matchFruitsBtn) matchFruitsBtn.style.display = 'none';
+        if (addSubBtn) addSubBtn.style.display = '';
+        // Change body background to blue/purple (bigger kids theme)
+        document.body.className = 'bigger-kids-theme';
+        // Hide instructions for bigger kids (cleaner look)
+        if (instructionsPanel) {
+            instructionsPanel.style.display = 'none';
+        }
+    }
+}
+
+function goToAgeSelection() {
+    // Reset age group selection
+    selectedAgeGroup = null;
+    
+    // Hide all screens
+    gameScreen.classList.add('hidden');
+    resultScreen.classList.add('hidden');
+    difficultyScreen.classList.add('hidden');
+    modeScreen.classList.add('hidden');
+    homeScreen.classList.add('hidden');
+    
+    // Show age selection screen
+    if (ageSelectionScreen) ageSelectionScreen.classList.remove('hidden');
 }
 
 function goHome() {
@@ -474,7 +602,12 @@ function goHome() {
     resultScreen.classList.add('hidden');
     difficultyScreen.classList.add('hidden');
     modeScreen.classList.add('hidden');
+    playModeScreen.classList.add('hidden');
+    ageSelectionScreen.classList.add('hidden');
     homeScreen.classList.remove('hidden');
+    
+    // Reset age group if going back to age selection
+    // For now, keep selected age group so games stay filtered
     
     // Reset game state
     score = 0;
@@ -588,7 +721,30 @@ function generateQuestion() {
     
     // Generate random fruit and answer based on selected game
     currentFruit = fruits[Math.floor(Math.random() * fruits.length)];
-    if (selectedGame === 'add') {
+    if (selectedGame === 'addsub') {
+        // Randomly choose addition or subtraction
+        addSubOperator = Math.random() < 0.5 ? '+' : '-';
+        
+        if (addSubOperator === '+') {
+            // Addition: num1 + num2 = answer
+            const sum = getRandomIntInclusive(answerMin, answerMax);
+            addSubNum1 = getRandomIntInclusive(Math.max(1, Math.floor(sum * 0.3)), Math.min(sum - 1, Math.floor(sum * 0.7)));
+            addSubNum2 = sum - addSubNum1;
+            correctAnswer = sum;
+        } else {
+            // Subtraction: num1 - num2 = answer (num1 >= num2, answer >= 0)
+            addSubNum1 = getRandomIntInclusive(difficultyMin, difficultyMax);
+            const maxSub = Math.min(addSubNum1 - 1, Math.floor(addSubNum1 * 0.8)); // Don't subtract too much
+            addSubNum2 = getRandomIntInclusive(1, Math.max(1, maxSub));
+            correctAnswer = addSubNum1 - addSubNum2;
+            // Ensure answer is positive and within range
+            if (correctAnswer < answerMin || correctAnswer > answerMax) {
+                // Adjust to ensure valid answer
+                addSubNum2 = addSubNum1 - getRandomIntInclusive(answerMin, Math.min(answerMax, addSubNum1 - 1));
+                correctAnswer = addSubNum1 - addSubNum2;
+            }
+        }
+    } else if (selectedGame === 'add') {
         const sum = getRandomIntInclusive(answerMin, answerMax);
         // ensure two positive addends that sum to 'sum'
         addendA = getRandomIntInclusive(1, sum - 1);
@@ -620,7 +776,9 @@ function generateQuestion() {
     }
     
     // Generate options for count and add games as 4 consecutive numbers around the correct answer
-    if (selectedGame === 'add') {
+    if (selectedGame === 'addsub') {
+        options = buildConsecutiveOptions(correctAnswer, answerMin, answerMax);
+    } else if (selectedGame === 'add') {
         const minSum = answerMin;
         const maxSum = answerMax;
         options = buildConsecutiveOptions(correctAnswer, minSum, maxSum);
@@ -640,7 +798,9 @@ function generateQuestion() {
     
     // Update UI
     updateQuestion();
-    if (selectedGame === 'add') {
+    if (selectedGame === 'addsub') {
+        arrangeAddSubDisplay();
+    } else if (selectedGame === 'add') {
         arrangeAdditionFruits();
     } else if (selectedGame === 'compare') {
         arrangeCompareFruits();
@@ -718,7 +878,9 @@ function endRun() {
 }
 
 function updateQuestion() {
-    if (selectedGame === 'add') {
+    if (selectedGame === 'addsub') {
+        questionText.textContent = `Solve: ${addSubNum1} ${addSubOperator} ${addSubNum2} = ?`;
+    } else if (selectedGame === 'add') {
         questionText.textContent = `How many ${currentFruit}s in total?`;
     } else if (selectedGame === 'compare') {
         const left = compareLeftCount;
@@ -759,6 +921,34 @@ function arrangeFruits() {
         
         fruitsContainer.appendChild(fruitItem);
     }
+}
+
+// Arrange math problem display for Add/Subtract game (numbers only, no fruits)
+function arrangeAddSubDisplay() {
+    fruitsContainer.innerHTML = '';
+    fruitsContainer.style.position = 'static';
+    fruitsContainer.classList.remove('compare-layout', 'match-layout');
+    
+    // Create a large math problem display
+    const mathProblem = document.createElement('div');
+    mathProblem.className = 'math-problem-display';
+    mathProblem.style.textAlign = 'center';
+    mathProblem.style.fontSize = '4rem';
+    mathProblem.style.fontWeight = 'bold';
+    mathProblem.style.color = '#1e3c72';
+    mathProblem.style.padding = '40px';
+    mathProblem.style.background = 'white';
+    mathProblem.style.borderRadius = '20px';
+    mathProblem.style.boxShadow = '0 8px 20px rgba(0,0,0,0.2)';
+    mathProblem.style.margin = '20px auto';
+    mathProblem.style.maxWidth = '400px';
+    
+    // Display the problem: num1 operator num2 = ?
+    const operatorSymbol = addSubOperator === '+' ? '+' : '−';
+    const problemText = `${addSubNum1} ${operatorSymbol} ${addSubNum2} = ?`;
+    mathProblem.textContent = problemText;
+    
+    fruitsContainer.appendChild(mathProblem);
 }
 
 // Arrange two groups of fruits with a plus sign between for addition game
@@ -1411,6 +1601,10 @@ function init() {
     updateTimer();
     updatePoints();
     updateSettingsUI();
+    
+    // Show age selection screen first, hide home screen
+    if (ageSelectionScreen) ageSelectionScreen.classList.remove('hidden');
+    homeScreen.classList.add('hidden');
 }
 
 // Start the app

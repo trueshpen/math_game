@@ -7,8 +7,58 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- Age Selection Screen -->
+    <div id="ageSelectionScreen" class="screen">
+        <div class="age-split-container">
+            <!-- Little Kids Section -->
+            <button id="littleKidsBtn" class="age-section little-kids-section">
+                <div class="age-content">
+                    <div class="age-emoji-container">
+                        <span class="bounce-emoji">🍎</span>
+                        <span class="bounce-emoji delay-1">🐻</span>
+                        <span class="bounce-emoji delay-2">🌻</span>
+                        <span class="bounce-emoji delay-3">🎈</span>
+                        <span class="bounce-emoji delay-4">🦋</span>
+                        <span class="bounce-emoji delay-5">🐰</span>
+                    </div>
+                    <h2 class="age-title fun-font">Little Kids</h2>
+                    <p class="age-subtitle fun-font">Ages 3-6</p>
+                    <div class="age-icons-row">
+                        <span>🍎🍌🍊🍇🍓</span>
+                    </div>
+                    <div class="age-description">
+                        <p>Fun counting & matching!</p>
+                        <p>🌈 Colorful & Playful 🌈</p>
+                    </div>
+                </div>
+            </button>
+            
+            <!-- Bigger Kids Section -->
+            <button id="biggerKidsBtn" class="age-section bigger-kids-section">
+                <div class="age-content">
+                    <div class="math-symbols-container">
+                        <span class="math-symbol">×</span>
+                        <span class="math-symbol">÷</span>
+                        <span class="math-symbol">+</span>
+                        <span class="math-symbol">−</span>
+                        <span class="math-symbol">=</span>
+                    </div>
+                    <h2 class="age-title cool-font">Bigger Kids</h2>
+                    <p class="age-subtitle cool-font">Ages 7-10</p>
+                    <div class="age-icons-row math-style">
+                        <span>📐📊🔢💡⚡</span>
+                    </div>
+                    <div class="age-description cool-text">
+                        <p>Advanced Math Challenges!</p>
+                        <p>🚀 Level Up Your Skills 🚀</p>
+                    </div>
+                </div>
+            </button>
+        </div>
+    </div>
+
     <!-- Home Screen -->
-    <div id="homeScreen" class="screen">
+    <div id="homeScreen" class="screen hidden">
         <div class="home-container">
             <h1 class="game-title">🍎 Kids Math Game 🍊</h1>
             <p class="game-subtitle">Welcome! Pick a game to play:</p>
@@ -34,6 +84,12 @@
                       <h3>Match Number to Fruits</h3>
                       <p>Connect numbers to matching fruit groups</p>
                   </button>
+                  <!-- Bigger Kids Games -->
+                  <button id="addSubBtn" class="game-btn bigger-kids-game">
+                      <div class="game-icon">➕➖</div>
+                      <h3>Add & Subtract</h3>
+                      <p>Practice addition and subtraction!</p>
+                  </button>
             </div>
             
             <div class="settings-panel" id="settingsPanel">
@@ -57,10 +113,11 @@
                 <p class="settings-hint">Games will use these settings and start immediately.</p>
             </div>
             
-            <div class="instructions">
+            <div class="instructions" id="instructionsPanel">
                 <p>🎯 Fun math games for kids!</p>
                 <p>⭐ Learn counting and numbers!</p>
             </div>
+            <button id="changeAgeGroupBtn" class="back-btn" style="margin-top: 20px;">🔄 Change Age Group</button>
         </div>
     </div>
 

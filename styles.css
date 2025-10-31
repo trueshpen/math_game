@@ -10,6 +10,17 @@ body {
     background: linear-gradient(135deg, #90EE90, #32CD32);
     min-height: 100vh;
     overflow: hidden;
+    transition: background 0.5s ease;
+}
+
+/* Little Kids Theme (default) */
+body.little-kids-theme {
+    background: linear-gradient(135deg, #90EE90, #32CD32);
+}
+
+/* Bigger Kids Theme - matches age selection screen */
+body.bigger-kids-theme {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #4a90e2 100%);
 }
 
 /* Screen management */
@@ -215,6 +226,279 @@ body {
     justify-self: center;
     max-width: 160px;
     margin-top: 2px;
+}
+
+/* Age Selection Screen Styles */
+#ageSelectionScreen {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    overflow: hidden;
+}
+
+.age-split-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.age-section {
+    flex: 1;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.age-section:hover {
+    flex: 1.1;
+    z-index: 10;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.3);
+}
+
+.age-section:active {
+    transform: scale(0.98);
+}
+
+/* Little Kids Section - Playful & Colorful */
+.little-kids-section {
+    background: linear-gradient(135deg, #FFB347 0%, #FF6B6B 50%, #FF8C94 100%);
+    border-right: 4px solid rgba(255, 255, 255, 0.3);
+}
+
+.little-kids-section:hover {
+    background: linear-gradient(135deg, #FFC966 0%, #FF8080 50%, #FFA0A6 100%);
+}
+
+.age-emoji-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.bounce-emoji {
+    position: absolute;
+    font-size: 3rem;
+    animation: bounceFloat 3s ease-in-out infinite;
+    opacity: 0.7;
+}
+
+.bounce-emoji.delay-1 { animation-delay: 0.5s; top: 15%; left: 10%; }
+.bounce-emoji.delay-2 { animation-delay: 1s; top: 60%; left: 80%; }
+.bounce-emoji.delay-3 { animation-delay: 1.5s; top: 30%; left: 70%; }
+.bounce-emoji.delay-4 { animation-delay: 2s; top: 75%; left: 20%; }
+.bounce-emoji.delay-5 { animation-delay: 2.5s; top: 45%; left: 5%; }
+
+@keyframes bounceFloat {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-20px) rotate(10deg);
+    }
+}
+
+/* Bigger Kids Section - Cool & Math-Focused */
+.bigger-kids-section {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #4a90e2 100%);
+    border-left: 4px solid rgba(255, 255, 255, 0.3);
+}
+
+.bigger-kids-section:hover {
+    background: linear-gradient(135deg, #2a4a7a 0%, #3a62a8 50%, #5aa0f2 100%);
+}
+
+.math-symbols-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.math-symbol {
+    position: absolute;
+    font-size: 4rem;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.15);
+    animation: floatRotate 4s ease-in-out infinite;
+}
+
+.math-symbol:nth-child(1) { top: 10%; left: 15%; animation-delay: 0s; }
+.math-symbol:nth-child(2) { top: 25%; right: 20%; animation-delay: 0.8s; }
+.math-symbol:nth-child(3) { bottom: 30%; left: 25%; animation-delay: 1.6s; }
+.math-symbol:nth-child(4) { bottom: 15%; right: 15%; animation-delay: 2.4s; }
+.math-symbol:nth-child(5) { top: 50%; left: 50%; transform: translate(-50%, -50%); animation-delay: 3.2s; }
+
+@keyframes floatRotate {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg) scale(1);
+        opacity: 0.15;
+    }
+    50% {
+        transform: translateY(-15px) rotate(180deg) scale(1.1);
+        opacity: 0.25;
+    }
+}
+
+.age-content {
+    position: relative;
+    z-index: 5;
+    text-align: center;
+    padding: 40px;
+    color: white;
+}
+
+/* Fun Font for Little Kids */
+@keyframes wiggle {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-3deg); }
+    75% { transform: rotate(3deg); }
+}
+
+.fun-font {
+    font-family: 'Comic Sans MS', 'Chalkboard SE', 'Marker Felt', cursive, sans-serif;
+    text-shadow: 3px 3px 0px rgba(255, 255, 255, 0.5),
+                 5px 5px 10px rgba(0, 0, 0, 0.3);
+    animation: wiggle 2s ease-in-out infinite;
+}
+
+.age-title.fun-font {
+    font-size: 4rem;
+    font-weight: 900;
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+    color: #FFF8DC;
+    text-transform: uppercase;
+}
+
+.age-subtitle.fun-font {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 30px;
+    color: #FFE4B5;
+}
+
+/* Cool Font for Bigger Kids */
+.cool-font {
+    font-family: 'Arial Black', 'Impact', 'Helvetica', sans-serif;
+    font-weight: 900;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.3),
+                 0 0 40px rgba(255, 255, 255, 0.2),
+                 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.age-title.cool-font {
+    font-size: 4.5rem;
+    margin-bottom: 10px;
+    color: #E0F7FA;
+    background: linear-gradient(135deg, #ffffff 0%, #E0F7FA 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+}
+
+.age-subtitle.cool-font {
+    font-size: 2.8rem;
+    margin-bottom: 30px;
+    color: #B3E5FC;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+}
+
+.age-icons-row {
+    font-size: 2.5rem;
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.age-icons-row.math-style {
+    font-size: 2.2rem;
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4));
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+.age-description {
+    margin-top: 30px;
+    font-size: 1.4rem;
+    font-weight: 600;
+    line-height: 1.8;
+}
+
+.age-description.cool-text {
+    font-family: 'Arial', sans-serif;
+    color: #E1F5FE;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.age-description p {
+    margin: 10px 0;
+}
+
+/* Responsive Design for Age Selection */
+@media (max-width: 768px) {
+    .age-split-container {
+        flex-direction: column;
+    }
+    
+    .age-section {
+        flex: 1;
+    }
+    
+    .age-section:hover {
+        flex: 1;
+    }
+    
+    .little-kids-section {
+        border-right: none;
+        border-bottom: 4px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .bigger-kids-section {
+        border-left: none;
+        border-top: 4px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .age-title.fun-font,
+    .age-title.cool-font {
+        font-size: 2.5rem;
+    }
+    
+    .age-subtitle.fun-font,
+    .age-subtitle.cool-font {
+        font-size: 1.8rem;
+    }
+    
+    .age-content {
+        padding: 30px 20px;
+    }
+    
+    .bounce-emoji,
+    .math-symbol {
+        font-size: 2rem;
+    }
 }
 
 /* Home Screen Styles */
@@ -468,6 +752,19 @@ body {
     transition: all 0.3s ease;
     box-shadow: 0 6px 15px rgba(0,0,0,0.2);
     text-align: center;
+}
+
+/* Bigger Kids Game Buttons - Cool Blue Theme */
+.bigger-kids-game {
+    background: linear-gradient(135deg, #2a5298 0%, #4a90e2 50%, #5aa0f2 100%);
+    box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.bigger-kids-game:hover {
+    background: linear-gradient(135deg, #3a62a8 0%, #5aa0f2 50%, #6ab0ff 100%);
+    box-shadow: 0 8px 25px rgba(74, 144, 226, 0.6);
+    transform: translateY(-3px);
 }
 
 .game-btn:hover {
