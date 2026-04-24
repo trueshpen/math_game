@@ -69,13 +69,13 @@ body.bigger-kids-theme {
     display: none !important;
 }
 
-/* Game Screen Layout - 5 Part Grid */
+/* Game Screen Layout */
 #gameScreen {
     display: grid;
-    grid-template-columns: 1fr 2fr 1fr;
+    grid-template-columns: 1fr minmax(320px, 640px) 1fr;
     grid-template-rows: min-content min-content min-content auto auto;
-    gap: 6px; /* consistent spacing between sections, ~30% larger than ultra-tight */
-    padding: 4px;
+    gap: 12px;
+    padding: 14px 16px 16px;
     max-height: 100vh;
     overflow-y: auto;
 }
@@ -85,42 +85,48 @@ body.bigger-kids-theme {
     background: #32CD32;
     color: white;
     text-align: center;
-    padding: 0 6px;
-    border-radius: 10px;
-    min-height: 24px;
+    padding: 10px 16px;
+    border-radius: 14px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.12);
 }
 
 #gameScreen .game-stats {
     grid-column: 1 / 4;
     display: flex;
-    gap: 4px;
-    padding: 0 4px;
-    background: #F0FFF0;
-    border-radius: 8px;
+    gap: 10px;
+    padding: 8px 10px;
+    background: rgba(240, 255, 240, 0.95);
+    border-radius: 12px;
     justify-content: center;
     align-items: center;
-    min-height: 28px;
+    min-height: 52px;
+    flex-wrap: wrap;
 }
 
 #gameScreen .question-container {
     grid-column: 2;
     padding: 0;
     margin: 0;
-    min-height: 28px;
+    min-height: 44px;
 }
 
 #gameScreen .fruits-container {
     grid-column: 2;
     background: transparent;
-    border-radius: 10px;
+    border-radius: 14px;
     border: none;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 4px 12px; /* tighter to free vertical space */
+    padding: 8px 16px;
     min-height: 260px;
-    width: 600px;
+    width: 100%;
+    max-width: 640px;
     height: 300px;
     margin: 0 auto;
     overflow: visible;
@@ -226,10 +232,11 @@ body.bigger-kids-theme {
     grid-column: 2;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 6px;
-    padding: 0;
-    justify-items: center;
-    max-width: 280px;
+    gap: 14px;
+    padding: 4px 0;
+    justify-items: stretch;
+    width: 100%;
+    max-width: 420px;
     justify-self: center;
 }
 
@@ -239,7 +246,7 @@ body.bigger-kids-theme {
     justify-content: center;
     align-items: center;
     padding: 8px;
-    gap: 15px;
+    gap: 16px;
     justify-self: center;
 }
 
@@ -248,15 +255,21 @@ body.bigger-kids-theme {
     background: #FF8C00;
     color: white;
     border: none;
-    padding: 6px 14px;
-    font-size: 0.95rem;
+    padding: 12px 24px;
+    font-size: 1rem;
     font-weight: bold;
     border-radius: 12px;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background 0.2s, transform 0.15s;
     justify-self: center;
-    max-width: 160px;
-    margin-top: 2px;
+    max-width: 220px;
+    margin-top: 6px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+#gameScreen .back-button:hover {
+    background: #FF7F00;
+    transform: translateY(-1px);
 }
 
 /* Age Selection Screen Styles */
@@ -536,27 +549,30 @@ body.bigger-kids-theme {
 .home-container {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
-    height: 100%;
-    padding: 20px;
+    min-height: 100%;
+    padding: 48px 24px 32px;
+    overflow-y: auto;
 }
 
 .game-title {
     font-size: 2.5rem;
-    font-weight: bold;
+    font-weight: 800;
     color: white;
     text-align: center;
-    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
-    margin-bottom: 20px;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.25);
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
 }
 
 .game-subtitle {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     color: white;
     font-weight: 500;
     text-align: center;
-    margin-bottom: 50px;
+    margin-bottom: 24px;
+    opacity: 0.95;
 }
 
 .start-button {
@@ -584,36 +600,38 @@ body.bigger-kids-theme {
 }
 
 .instructions {
-    background: rgba(255, 255, 255, 0.2);
-    padding: 20px;
-    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.18);
+    padding: 14px 20px;
+    border-radius: 14px;
     text-align: center;
     max-width: 600px;
+    margin-top: 8px;
 }
 
 .instructions p {
-    font-size: 1.125rem;
+    font-size: 1rem;
     color: white;
     font-weight: 500;
-    margin: 8px 0;
+    margin: 4px 0;
 }
 
 /* Game Screen Styles */
 .game-header h2 {
-    font-size: 1.1rem;
-    line-height: 1.05;
+    font-size: 1.5rem;
+    line-height: 1.1;
     margin: 0;
+    font-weight: 800;
+    letter-spacing: 0.3px;
 }
 
 .stat-box {
-    padding: 4px 8px;
-    border-radius: 8px;
+    padding: 8px 14px;
+    border-radius: 10px;
     text-align: center;
     font-weight: bold;
-    font-size: 0.85rem;
+    font-size: 1rem;
     border: 2px solid;
-    min-width: 90px;
-    max-width: 120px;
+    min-width: 110px;
     white-space: nowrap;
 }
 
@@ -643,25 +661,31 @@ body.bigger-kids-theme {
 
 .question-text {
     background: white;
-    padding: 6px 10px;
-    border-radius: 8px;
+    padding: 12px 18px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-size: 0.95rem;
-    font-weight: bold;
-    color: #32CD32;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #228B22;
+    gap: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    min-height: 48px;
 }
 
 .speak-button {
     background: none;
     border: none;
-    font-size: 1.25rem;
+    font-size: 1.5rem;
     cursor: pointer;
-    padding: 5px;
-    border-radius: 5px;
-    transition: background 0.2s;
+    padding: 6px 10px;
+    border-radius: 8px;
+    transition: background 0.2s, transform 0.15s;
+    flex-shrink: 0;
 }
+
+.speak-button:active { transform: scale(0.92); }
 
 .speak-button:hover {
     background: #F0FFF0;
@@ -765,24 +789,29 @@ body.bigger-kids-theme {
 
 /* Game Selection */
 .game-selection {
-    margin: 20px 0;
+    margin: 16px 0 20px;
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
     width: 100%;
-    max-width: 720px;
+    max-width: 780px;
 }
 
 .game-btn {
     background: linear-gradient(135deg, #FF9999, #FFAA66);
     color: white;
     border: none;
-    padding: 16px 12px;
-    border-radius: 16px;
+    padding: 22px 18px;
+    border-radius: 18px;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease, box-shadow 0.25s ease, filter 0.2s ease;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.2);
     text-align: center;
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Bigger Kids Game Buttons - Cool Blue Theme */
@@ -793,90 +822,101 @@ body.bigger-kids-theme {
 }
 
 .bigger-kids-game:hover {
-    background: linear-gradient(135deg, #3a62a8 0%, #5aa0f2 50%, #6ab0ff 100%);
-    box-shadow: 0 8px 25px rgba(74, 144, 226, 0.6);
+    filter: brightness(1.06);
+    box-shadow: 0 10px 28px rgba(74, 144, 226, 0.5);
     transform: translateY(-3px);
 }
 
 .game-btn:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.28);
+    filter: brightness(1.04);
 }
 
+.game-btn:active { transform: scale(0.98); }
+
 .game-icon {
-    font-size: 32px;
-    margin-bottom: 6px;
+    font-size: 40px;
+    margin-bottom: 10px;
+    line-height: 1;
 }
 
 .game-btn h3 {
-    margin: 6px 0 4px 0;
-    font-size: 18px;
+    margin: 6px 0 6px 0;
+    font-size: 1.15rem;
+    font-weight: 800;
+    line-height: 1.15;
 }
 
 .game-btn p {
     margin: 0;
-    font-size: 12px;
-    opacity: 0.9;
+    font-size: 0.9rem;
+    opacity: 0.95;
+    line-height: 1.35;
 }
 
 /* Game Mode Selection */
 .mode-selection {
     background: rgba(255, 255, 255, 0.2);
-    padding: 20px;
-    border-radius: 15px;
+    padding: 28px 24px;
+    border-radius: 18px;
     text-align: center;
-    max-width: 400px;
-    margin: 20px auto;
+    max-width: 560px;
+    width: 100%;
+    margin: 24px auto;
 }
-/* Reuse for Play Mode screen: allow two large buttons */
-.screen #playModeScreen .mode-buttons { gap: 20px; }
 
 /* Settings Panel */
 .settings-panel {
-    background: rgba(255, 255, 255, 0.3);
-    padding: 16px;
-    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.22);
+    padding: 18px 20px;
+    border-radius: 16px;
     text-align: center;
-    max-width: 720px;
+    max-width: 760px;
     width: 100%;
-    margin: 8px auto 20px auto;
+    margin: 12px auto 16px auto;
     color: white;
+    backdrop-filter: blur(4px);
 }
 .settings-title {
-    font-size: 1.25rem;
-    font-weight: 700;
+    font-size: 1.3rem;
+    font-weight: 800;
     margin-bottom: 10px;
+    letter-spacing: 0.3px;
 }
 .settings-group {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 12px;
     flex-wrap: wrap;
-    margin: 8px 0 12px 0;
+    margin: 10px 0 14px 0;
 }
 .settings-label {
     font-weight: 700;
-    padding: 6px 10px;
-    background: rgba(0,0,0,0.15);
+    padding: 8px 14px;
+    background: rgba(0,0,0,0.2);
     border-radius: 10px;
+    font-size: 0.95rem;
+    min-width: 140px;
 }
-.settings-options { display: flex; gap: 8px; flex-wrap: wrap; }
+.settings-options { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
 .settings-btn {
     background: linear-gradient(135deg, #4CAF50, #45a049);
     color: white;
     border: none;
-    padding: 10px 12px;
+    padding: 10px 16px;
     border-radius: 10px;
     cursor: pointer;
-    font-size: 0.95rem;
+    font-size: 1rem;
     font-weight: 700;
-    transition: all 0.2s ease;
+    transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    white-space: nowrap;
 }
-.settings-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-.settings-btn.active { outline: 3px solid #FFF8DC; filter: brightness(1.05); }
-.settings-saved { margin-top: 6px; font-weight: 800; color: #FFF8DC; }
-.settings-hint { margin-top: 4px; font-size: 0.9rem; color: #fff; opacity: 0.9; }
+.settings-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,0.22); filter: brightness(1.05); }
+.settings-btn.active { outline: 3px solid #FFF8DC; filter: brightness(1.08); }
+.settings-saved { margin-top: 8px; font-weight: 800; color: #FFF8DC; font-size: 1rem; }
+.settings-hint { margin-top: 6px; font-size: 0.9rem; color: #fff; opacity: 0.85; }
 
 .mode-selection h3 {
     color: white;
@@ -896,27 +936,27 @@ body.bigger-kids-theme {
     background: linear-gradient(135deg, #4CAF50, #45a049);
     color: white;
     border: none;
-    padding: 20px 15px;
-    border-radius: 15px;
+    padding: 22px 28px;
+    border-radius: 16px;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    min-width: 160px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    box-shadow: 0 5px 14px rgba(0,0,0,0.22);
+    min-width: 200px;
     text-align: center;
+    font-size: 1.05rem;
+    font-weight: 700;
 }
 
 .mode-btn:hover {
-    background: linear-gradient(135deg, #45a049, #4CAF50);
+    filter: brightness(1.06);
     transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.28);
 }
+
+.mode-btn:active { transform: scale(0.98); }
 
 .mode-btn.keyboard {
     background: linear-gradient(135deg, #2196F3, #1976D2);
-}
-
-.mode-btn.keyboard:hover {
-    background: linear-gradient(135deg, #1976D2, #2196F3);
 }
 
 .mode-icon {
@@ -926,70 +966,75 @@ body.bigger-kids-theme {
 }
 
 .mode-btn h3 {
-    margin: 10px 0 5px 0;
-    font-size: 18px;
+    margin: 10px 0 6px 0;
+    font-size: 1.15rem;
+    font-weight: 800;
 }
 
 .mode-btn p {
-    margin: 5px 0 0 0;
-    font-size: 12px;
-    opacity: 0.9;
+    margin: 4px 0 0 0;
+    font-size: 0.95rem;
+    opacity: 0.95;
 }
 
 .back-btn {
     background: linear-gradient(135deg, #757575, #616161);
     color: white;
     border: none;
-    padding: 12px 20px;
-    border-radius: 10px;
+    padding: 12px 24px;
+    border-radius: 12px;
     cursor: pointer;
-    font-size: 14px;
-    transition: all 0.3s ease;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+    font-size: 1rem;
+    font-weight: 700;
+    transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
 }
 
 .back-btn:hover {
-    background: linear-gradient(135deg, #616161, #757575);
+    filter: brightness(1.1);
     transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+    box-shadow: 0 5px 12px rgba(0,0,0,0.25);
 }
 
 .option-btn {
-    width: 80px;
-    height: 50px;
-    background: #1E90FF;
+    width: 100%;
+    min-height: 72px;
+    background: linear-gradient(135deg, #1E90FF, #1976D2);
     color: white;
     border: none;
-    border-radius: 12px;
-    font-size: 1.25rem;
-    font-weight: bold;
+    border-radius: 14px;
+    font-size: 1.7rem;
+    font-weight: 800;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    box-shadow: 0 4px 12px rgba(30,144,255,0.3);
+    letter-spacing: 0.5px;
 }
 
 .option-btn:hover {
-    background: #0080FF;
-    transform: scale(1.05);
+    filter: brightness(1.08);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(30,144,255,0.4);
 }
 
-.option-btn:active {
-    transform: scale(0.95);
-}
+.option-btn:active { transform: scale(0.96); }
+.option-btn:focus-visible { outline: 3px solid #FFF8DC; outline-offset: 3px; }
 
-/* Feedback positioning - next to fruits */
+/* Feedback: centered over the game area (no brittle calc position) */
 .feedback-container {
     position: fixed;
-    left: calc(66.66% + 20px);
+    left: 50%;
     top: 50%;
-    transform: translateY(-50%);
+    transform: translate(-50%, -50%);
     background: white;
-    padding: 15px;
-    border-radius: 12px;
+    padding: 18px 22px;
+    border-radius: 14px;
     border: 3px solid;
     text-align: center;
-    width: 200px;
+    min-width: 240px;
+    max-width: 360px;
     z-index: 1000;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
 }
 
 .feedback-container.correct {
@@ -1023,13 +1068,14 @@ body.bigger-kids-theme {
 }
 .stars {
     display: flex;
-    gap: 6px;
+    gap: 10px;
     justify-content: center;
-    margin-top: 6px;
-    font-size: 20px;
+    margin-top: 10px;
+    font-size: 32px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
 }
 .star { color: #FFD700; }
-.star.empty { color: #ddd; }
+.star.empty { color: rgba(255,255,255,0.35); }
 
 .next-question-btn {
     background: #32CD32;
@@ -1049,19 +1095,20 @@ body.bigger-kids-theme {
 
 /* Add styles for keyboard input */
 .answer-input {
-    width: 140px;
-    height: 60px;
-    font-size: 2rem;
-    font-weight: bold;
+    width: 160px;
+    height: 72px;
+    font-size: 2.25rem;
+    font-weight: 800;
     text-align: center;
     border: 3px solid #1E90FF;
-    border-radius: 12px;
+    border-radius: 14px;
     margin: 0;
     background: white;
     color: #1E90FF;
-    -moz-appearance: textfield; /* Remove spinner arrows in Firefox */
+    -moz-appearance: textfield;
     box-sizing: border-box;
     vertical-align: top;
+    box-shadow: 0 3px 10px rgba(30,144,255,0.15);
 }
 
 /* Remove spinner arrows in Chrome, Safari, Edge */
@@ -1078,18 +1125,24 @@ body.bigger-kids-theme {
 }
 
 .submit-btn {
-    width: 140px;
-    height: 60px;
-    background: #32CD32;
+    width: 160px;
+    height: 72px;
+    background: linear-gradient(135deg, #32CD32, #228B22);
     color: white;
     border: 3px solid transparent;
-    border-radius: 12px;
-    font-size: 1.5rem;
-    font-weight: bold;
+    border-radius: 14px;
+    font-size: 1.4rem;
+    font-weight: 800;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
     box-sizing: border-box;
     vertical-align: top;
+    box-shadow: 0 4px 12px rgba(50,205,50,0.3);
+}
+
+.submit-btn:hover:not(:disabled) {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
 }
 
 .submit-btn:hover {
@@ -1122,173 +1175,120 @@ body.bigger-kids-theme {
 
 /* Responsive design */
 @media (max-width: 480px) {
-    .game-title {
-        font-size: 2rem;
-    }
-    
-    .game-subtitle {
-        font-size: 1.25rem;
-    }
-    
+    .game-title { font-size: 2rem; }
+    .game-subtitle { font-size: 1.1rem; }
+
     .game-selection {
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 10px;
-        max-width: 360px;
+        gap: 12px;
+        max-width: 420px;
     }
     .game-btn {
-        padding: 14px 10px;
+        padding: 16px 12px;
+        min-height: 130px;
     }
-    .game-icon {
-        font-size: 28px;
-    }
-    .game-btn h3 {
-        font-size: 16px;
-    }
-    
+    .game-icon { font-size: 32px; }
+    .game-btn h3 { font-size: 1rem; }
+    .game-btn p { font-size: 0.8rem; }
+
     .mode-buttons {
         flex-direction: column;
-        align-items: center;
-        gap: 15px;
+        align-items: stretch;
+        gap: 14px;
     }
-    
     .mode-btn {
-        min-width: 140px;
-        padding: 15px 10px;
+        min-width: 0;
+        width: 100%;
+        padding: 18px 20px;
     }
-    
-    .mode-btn h3 {
-        font-size: 16px;
-    }
-    
-    .option-btn {
-        width: 80px;
-        height: 50px;
-        font-size: 1.25rem;
-    }
+    .mode-btn h3 { font-size: 1.05rem; }
+    .option-btn { min-height: 64px; font-size: 1.5rem; }
+
+    .settings-label { min-width: 0; }
+    .home-container { padding: 32px 18px 20px; }
 }
 
-@media (max-height: 600px) {
+@media (max-height: 640px) {
     #gameScreen {
-        gap: 5px;
-        padding: 5px;
+        gap: 8px;
+        padding: 8px 12px 12px;
     }
-    
     #gameScreen .fruits-container {
-        min-height: 200px;
+        min-height: 190px;
         height: 200px;
     }
-    
-    #gameScreen .game-header {
-        padding: 6px;
-    }
-    
-    #gameScreen .back-button {
-        padding: 6px 12px;
-        font-size: 0.9rem;
-    }
-    
-    .stat-box {
-        padding: 8px 12px;
-        font-size: 0.9rem;
-        min-width: 90px;
-        max-width: 110px;
-    }
-    
-    .game-title {
-        font-size: 2rem;
-        margin-bottom: 15px;
-    }
-    
-    .game-subtitle {
-        margin-bottom: 30px;
-    }
-} 
+    #gameScreen .game-header { padding: 6px 12px; min-height: 36px; }
+    .game-header h2 { font-size: 1.2rem; }
+    #gameScreen .back-button { padding: 8px 16px; font-size: 0.9rem; }
+    .stat-box { padding: 6px 12px; font-size: 0.9rem; min-width: 90px; }
+    .option-btn { min-height: 56px; font-size: 1.4rem; }
+    .question-text { padding: 8px 12px; font-size: 1.05rem; min-height: 40px; }
+    .home-container { padding: 24px 20px 16px; }
+    .game-title { font-size: 2rem; margin-bottom: 6px; }
+    .game-subtitle { margin-bottom: 16px; font-size: 1.05rem; }
+    .game-btn { min-height: 120px; padding: 14px 12px; }
+    .game-icon { font-size: 28px; margin-bottom: 4px; }
+    .settings-panel { padding: 12px 16px; }
+    .settings-title { margin-bottom: 6px; }
+    .settings-group { margin: 6px 0 10px; }
+}
+
 
 /* Mobile adjustments */
 @media (max-width: 768px) {
     #gameScreen {
         display: flex;
         flex-direction: column;
-        padding: 5px;
-        gap: 5px;
+        padding: 10px 12px 12px;
+        gap: 10px;
         max-height: 100vh;
         overflow-y: auto;
     }
-    
     #gameScreen .fruits-container {
         min-height: 200px;
-        padding: 10px 18px; /* maintain extra horizontal padding on mobile */
-        width: 320px;
-        height: 200px;
+        padding: 10px 18px;
+        width: 100%;
+        max-width: 560px;
+        height: 220px;
         overflow: visible;
     }
-    .compare-operator {
-        width: 44px;
-        height: 44px;
-        font-size: 20px;
-    }
-    
-    #gameScreen .game-header {
-        padding: 8px;
-    }
-    
+    .compare-operator { width: 48px; height: 48px; font-size: 22px; }
+
+    #gameScreen .game-header { padding: 10px 14px; }
+
     #gameScreen .back-button {
-        padding: 8px 16px;
-        font-size: 0.9rem;
-        max-width: 150px;
-        margin: 5px auto;
+        padding: 10px 20px;
+        font-size: 0.95rem;
+        max-width: 220px;
+        margin: 6px auto;
     }
-    
+
     .stat-box {
-        padding: 10px 16px;
-        font-size: 0.9rem;
-        min-width: 100px;
-        max-width: 120px;
+        padding: 8px 14px;
+        font-size: 0.95rem;
+        min-width: 90px;
     }
-    
+
     .feedback-container {
         position: fixed;
-        right: 10px;
-        left: 10px;
+        left: 16px;
+        right: 16px;
         top: auto;
-        bottom: 80px;
+        bottom: 90px;
         transform: none;
-        width: auto;
+        max-width: none;
+        min-width: 0;
     }
-    
-    .fruit-item {
-        width: 50px;
-        height: 50px;
-        margin: 0 3px;
-    }
-    
-    .fruit-item {
-        font-size: 24px;
-    }
-    
-    .fruit-item .fruit-letter {
-        font-size: 20px;
-    }
-    
-    .answer-input {
-        width: 120px;
-        height: 50px;
-        font-size: 1.5rem;
-        box-sizing: border-box;
-        vertical-align: top;
-    }
-    
-    .submit-btn {
-        width: 120px;
-        height: 50px;
-        font-size: 1.2rem;
-        border: 3px solid transparent;
-        box-sizing: border-box;
-        vertical-align: top;
-    }
+
+    .fruit-item { width: 50px; height: 50px; margin: 0 3px; font-size: 24px; }
+    .fruit-item .fruit-letter { font-size: 20px; }
+
+    .answer-input { width: 140px; height: 60px; font-size: 1.8rem; }
+    .submit-btn { width: 140px; height: 60px; font-size: 1.15rem; }
+
     .game-selection {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
         gap: 12px;
-        max-width: 520px;
+        max-width: 560px;
     }
-} 
+}

@@ -817,9 +817,8 @@ function selectPlayMode(mode) {
     playModeScreen.classList.add('hidden');
     // Auto-apply saved difficulty and input mode from Settings and start immediately
     const saved = loadSettings();
-    if (saved && saved.difficulty) {
-        configureDifficulty(saved.difficulty);
-    }
+    // Always configure difficulty so titles/ranges reflect the current language
+    configureDifficulty((saved && saved.difficulty) || 'easy');
     // Stat boxes: questions mode shows progress, time mode shows question counter
     if (playMode === 'questions') {
         if (timerBox) timerBox.style.display = 'none';
@@ -1991,29 +1990,39 @@ function pickDistinctFruits(n) {
     return pool.slice(0, Math.min(n, pool.length));
 }
 
-// Build four options spread around the correct answer.
-// Wrong options use a random offset proportional to the range, not just ±1,
-// so the correct number isn't obvious in wide ranges (e.g. hard addsub, multiply).
+// Build four options clustered around the correct answer.
+// Spread is proportional to the CORRECT ANSWER (not to the whole bound range)
+// so for 25+38=63 we get options like 55-75, not 40/120/500.
+// Mixes one close distractor, one medium, one further — so kids still reason
+// instead of just spotting "the big number".
 function buildSpreadOptions(correct, minBound, maxBound) {
     const options = new Set([correct]);
-    const range = Math.max(1, maxBound - minBound);
-    const baseDelta = Math.max(2, Math.floor(range / 8));
-    let attempts = 0;
-    while (options.size < 4 && attempts < 200) {
-        const mag = getRandomIntInclusive(1, baseDelta * 3);
-        const sign = Math.random() < 0.5 ? -1 : 1;
-        const candidate = correct + sign * mag;
-        if (candidate >= minBound && candidate <= maxBound && candidate !== correct) {
-            options.add(candidate);
+    const maxSpread = Math.max(3, Math.min(Math.floor(correct * 0.35), 30));
+    // Three bands: close / medium / far, roughly thirds of maxSpread.
+    const bands = [
+        [1, Math.max(1, Math.floor(maxSpread / 3))],
+        [Math.max(1, Math.floor(maxSpread / 3) + 1), Math.max(2, Math.floor(2 * maxSpread / 3))],
+        [Math.max(2, Math.floor(2 * maxSpread / 3) + 1), maxSpread],
+    ];
+    for (const [lo, hi] of bands) {
+        let tries = 0;
+        while (tries < 20 && options.size < 4) {
+            const mag = getRandomIntInclusive(lo, Math.max(lo, hi));
+            const sign = Math.random() < 0.5 ? -1 : 1;
+            const candidate = correct + sign * mag;
+            if (candidate >= minBound && candidate <= maxBound && candidate !== correct && !options.has(candidate)) {
+                options.add(candidate);
+                break;
+            }
+            tries++;
         }
-        attempts++;
     }
-    // Fallback: fill with adjacent numbers if we couldn't find 4 spread values
+    // Fallback: fill with adjacent numbers if we still don't have 4
     if (options.size < 4) {
-        for (let d = 1; d <= 10 && options.size < 4; d++) {
+        for (let d = 1; d <= 20 && options.size < 4; d++) {
             for (const offset of [-d, d]) {
                 const v = correct + offset;
-                if (v >= minBound && v <= maxBound) options.add(v);
+                if (v >= minBound && v <= maxBound && !options.has(v)) options.add(v);
                 if (options.size >= 4) break;
             }
         }
