@@ -117,6 +117,18 @@ const translations = {
         'result.newBest': '🏆 New best!',
         'result.best': 'Best: {n}',
         'result.playAgain': '🔄 Play Again',
+        'result.comeback': '🎁 Comeback bonus! 2× stars',
+        'result.streakUp': '🔥 Streak: {n} days in a row!',
+        'result.streakNew': '🔥 New streak started!',
+        // Progress panel
+        'progress.title': 'My Progress',
+        'progress.today': 'Today',
+        'progress.streak': 'Streak',
+        'progress.todayPlay': '⬜ Play 1 game',
+        'progress.todayDone': '✅ Done! Great job!',
+        'progress.streakZero': 'Start today!',
+        'progress.streakDays': '🔥 {n} days',
+        'progress.streakDay': '🔥 {n} day',
         // Fruit plurals for question templates
         'fruit.apple': 'apples',
         'fruit.banana': 'bananas',
@@ -229,6 +241,17 @@ const translations = {
         'result.newBest': '🏆 Nové nejlepší skóre!',
         'result.best': 'Nejlepší: {n}',
         'result.playAgain': '🔄 Hrát znovu',
+        'result.comeback': '🎁 Vítej zpátky! 2× hvězdy',
+        'result.streakUp': '🔥 Série: {n} dní v řadě!',
+        'result.streakNew': '🔥 Nová série začala!',
+        'progress.title': 'Můj pokrok',
+        'progress.today': 'Dnes',
+        'progress.streak': 'Série',
+        'progress.todayPlay': '⬜ Zahraj 1 hru',
+        'progress.todayDone': '✅ Hotovo! Skvělá práce!',
+        'progress.streakZero': 'Začni dnes!',
+        'progress.streakDays': '🔥 {n} dní',
+        'progress.streakDay': '🔥 {n} den',
         'fruit.apple': 'jablek',
         'fruit.banana': 'banánů',
         'fruit.orange': 'pomerančů',
@@ -550,6 +573,182 @@ function showSettingsSaved() {
     setTimeout(() => settingsSaved.classList.add('hidden'), 900);
 }
 
+// ============================================================
+// Progress tracking (streak, daily goal, calendar, totals)
+// ============================================================
+const PROGRESS_KEYS = {
+    streakCurrent: 'km_streak_current',
+    streakBest: 'km_streak_best',
+    lastPlay: 'km_last_play_date',
+    playedDays: 'km_played_days',
+    totalStars: 'km_total_stars',
+    totalCorrect: 'km_total_correct',
+    comebackPending: 'km_comeback_pending',
+};
+const CALENDAR_DAYS = 14;
+let lastSessionBonusApplied = false; // remembered for result screen UI
+
+function todayKey(date) {
+    const d = date || new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+}
+function daysBetween(aKey, bKey) {
+    if (!aKey || !bKey) return null;
+    const a = new Date(aKey + 'T00:00:00');
+    const b = new Date(bKey + 'T00:00:00');
+    return Math.round((b - a) / (1000 * 60 * 60 * 24));
+}
+function lsGetInt(k, def) {
+    try { const v = parseInt(localStorage.getItem(k)); return Number.isFinite(v) ? v : def; }
+    catch (_) { return def; }
+}
+function lsSetInt(k, v) { try { localStorage.setItem(k, String(v)); } catch (_) {} }
+function lsGet(k) { try { return localStorage.getItem(k); } catch (_) { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (_) {} }
+function getPlayedDaysSet() {
+    const raw = lsGet(PROGRESS_KEYS.playedDays) || '';
+    const s = new Set();
+    if (raw) raw.split(',').forEach(d => { if (d) s.add(d); });
+    return s;
+}
+function savePlayedDaysSet(set) {
+    // Cap to ~400 days to avoid unbounded growth
+    const arr = [...set].sort();
+    const trimmed = arr.slice(-400);
+    lsSet(PROGRESS_KEYS.playedDays, trimmed.join(','));
+}
+
+// Call this when the user STARTS a run — detects if they're coming back
+// from a gap so the session can get a 2x comeback bonus.
+function checkComebackOnStart() {
+    const last = lsGet(PROGRESS_KEYS.lastPlay);
+    const today = todayKey();
+    if (!last) return; // first ever play — no comeback
+    const gap = daysBetween(last, today);
+    if (gap !== null && gap >= 2 && !getPlayedDaysSet().has(today)) {
+        lsSet(PROGRESS_KEYS.comebackPending, '1');
+    }
+}
+
+// Call this when a run ENDS with real play (questionsAsked > 0).
+// Updates streak, played days, totals. Returns a summary for the result screen.
+function recordPlaySession(starsEarned, correctCount) {
+    const today = todayKey();
+    const playedDays = getPlayedDaysSet();
+    const alreadyPlayedToday = playedDays.has(today);
+
+    let streak = lsGetInt(PROGRESS_KEYS.streakCurrent, 0);
+    let best = lsGetInt(PROGRESS_KEYS.streakBest, 0);
+    const last = lsGet(PROGRESS_KEYS.lastPlay);
+    let streakChanged = false;
+    let newStreakStarted = false;
+
+    if (!alreadyPlayedToday) {
+        const gap = last ? daysBetween(last, today) : null;
+        if (gap === null) {
+            streak = 1;
+            newStreakStarted = true;
+        } else if (gap === 1) {
+            streak += 1;
+            streakChanged = true;
+        } else if (gap === 0) {
+            // Should not happen (alreadyPlayedToday covers it) but be safe
+        } else {
+            streak = 1;
+            newStreakStarted = true;
+        }
+        if (streak > best) best = streak;
+        lsSetInt(PROGRESS_KEYS.streakCurrent, streak);
+        lsSetInt(PROGRESS_KEYS.streakBest, best);
+        lsSet(PROGRESS_KEYS.lastPlay, today);
+        playedDays.add(today);
+        savePlayedDaysSet(playedDays);
+    }
+
+    // Comeback bonus: 2x stars if the flag was set at run start
+    const comeback = lsGet(PROGRESS_KEYS.comebackPending) === '1';
+    const effectiveStars = comeback ? starsEarned * 2 : starsEarned;
+    if (comeback) {
+        lsSet(PROGRESS_KEYS.comebackPending, '0');
+        lastSessionBonusApplied = true;
+    } else {
+        lastSessionBonusApplied = false;
+    }
+
+    const totalStars = lsGetInt(PROGRESS_KEYS.totalStars, 0) + effectiveStars;
+    const totalCorrect = lsGetInt(PROGRESS_KEYS.totalCorrect, 0) + (correctCount || 0);
+    lsSetInt(PROGRESS_KEYS.totalStars, totalStars);
+    lsSetInt(PROGRESS_KEYS.totalCorrect, totalCorrect);
+
+    return {
+        streak,
+        best,
+        totalStars,
+        totalCorrect,
+        comebackApplied: comeback,
+        starsEarned: effectiveStars,
+        streakChanged,
+        newStreakStarted,
+        firstPlayToday: !alreadyPlayedToday,
+    };
+}
+
+function updateProgressPanel() {
+    const streak = lsGetInt(PROGRESS_KEYS.streakCurrent, 0);
+    const best = lsGetInt(PROGRESS_KEYS.streakBest, 0);
+    const totalStars = lsGetInt(PROGRESS_KEYS.totalStars, 0);
+    const totalCorrect = lsGetInt(PROGRESS_KEYS.totalCorrect, 0);
+    const playedDays = getPlayedDaysSet();
+    const today = todayKey();
+    const doneToday = playedDays.has(today);
+
+    const dailyEl = document.getElementById('dailyGoalStatus');
+    const dailyCard = document.getElementById('dailyGoalCard');
+    if (dailyEl) dailyEl.textContent = doneToday ? t('progress.todayDone') : t('progress.todayPlay');
+    if (dailyCard) dailyCard.classList.toggle('done', doneToday);
+
+    const streakEl = document.getElementById('streakDisplay');
+    const streakCard = document.getElementById('streakCard');
+    if (streakEl) {
+        if (streak <= 0) streakEl.textContent = t('progress.streakZero');
+        else if (streak === 1) streakEl.textContent = t('progress.streakDay', { n: streak });
+        else streakEl.textContent = t('progress.streakDays', { n: streak });
+    }
+    if (streakCard) streakCard.classList.toggle('active', streak > 0);
+
+    const starsEl = document.getElementById('totalStarsDisplay');
+    if (starsEl) starsEl.textContent = String(totalStars);
+    const correctEl = document.getElementById('totalCorrectDisplay');
+    if (correctEl) correctEl.textContent = String(totalCorrect);
+    const bestEl = document.getElementById('bestStreakDisplay');
+    if (bestEl) bestEl.textContent = String(best);
+
+    renderCalendar();
+}
+
+function renderCalendar() {
+    const cal = document.getElementById('calendar');
+    if (!cal) return;
+    cal.innerHTML = '';
+    const played = getPlayedDaysSet();
+    const today = new Date();
+    // Show last CALENDAR_DAYS days ending today
+    for (let i = CALENDAR_DAYS - 1; i >= 0; i--) {
+        const d = new Date(today);
+        d.setDate(today.getDate() - i);
+        const key = todayKey(d);
+        const cell = document.createElement('div');
+        cell.className = 'calendar-cell';
+        cell.title = key;
+        if (played.has(key)) cell.classList.add('played');
+        if (i === 0) cell.classList.add('today');
+        cal.appendChild(cell);
+    }
+}
+
 // Settings button listeners
 if (settingsClickMode) settingsClickMode.addEventListener('click', () => persistSettings({ mode: 'click' }));
 if (settingsKeyboardMode) settingsKeyboardMode.addEventListener('click', () => persistSettings({ mode: 'keyboard' }));
@@ -807,6 +1006,8 @@ function showPlayModeSelection() {
 
 function selectPlayMode(mode) {
     playMode = mode; // 'time' | 'questions'
+    // Comeback bonus detection happens at the start of a run
+    checkComebackOnStart();
     // Reset counters
     questionsAsked = 0;
     questionsRemaining = (mode === 'questions') ? questionTarget : 0;
@@ -985,12 +1186,12 @@ function goHome() {
     isGeneratingQuestion = false;
     isHandlingTimeUp = false;
     showFeedback = false;
-    
+
     // Hide feedback and reset input
     feedbackContainer.classList.add('hidden');
     answerInput.value = '';
     submitBtn.disabled = true;
-    
+
     // Switch screens
     gameScreen.classList.add('hidden');
     resultScreen.classList.add('hidden');
@@ -999,6 +1200,8 @@ function goHome() {
     playModeScreen.classList.add('hidden');
     ageSelectionScreen.classList.add('hidden');
     homeScreen.classList.remove('hidden');
+    // Refresh progress panel (streak/totals may have just updated)
+    updateProgressPanel();
     
     // Reset age group if going back to age selection
     // For now, keep selected age group so games stay filtered
@@ -1282,6 +1485,26 @@ function endRun() {
         } else {
             const best = Math.max(previousBest, score);
             resultBest.textContent = best > 0 ? t('result.best', { n: best }) : '';
+        }
+    }
+    // Progress: record session (counts toward streak/totals only if real play)
+    const comebackEl = document.getElementById('resultComeback');
+    const streakUpdateEl = document.getElementById('resultStreakUpdate');
+    if (comebackEl) comebackEl.classList.add('hidden');
+    if (streakUpdateEl) streakUpdateEl.classList.add('hidden');
+    if (questionsAsked > 0) {
+        const session = recordPlaySession(stars, score);
+        if (comebackEl && session.comebackApplied) {
+            comebackEl.textContent = t('result.comeback');
+            comebackEl.classList.remove('hidden');
+        }
+        if (streakUpdateEl && session.firstPlayToday) {
+            if (session.newStreakStarted && session.streak === 1) {
+                streakUpdateEl.textContent = t('result.streakNew');
+            } else {
+                streakUpdateEl.textContent = t('result.streakUp', { n: session.streak });
+            }
+            streakUpdateEl.classList.remove('hidden');
         }
     }
     // Render stars under score
@@ -2076,6 +2299,7 @@ function init() {
     updateTimer();
     updatePoints();
     updateSettingsUI();
+    updateProgressPanel();
 
     // Show age selection screen first, hide home screen
     if (ageSelectionScreen) ageSelectionScreen.classList.remove('hidden');

@@ -855,6 +855,124 @@ body.bigger-kids-theme {
     line-height: 1.35;
 }
 
+/* Progress panel (streak, daily goal, calendar, totals) */
+.progress-panel {
+    background: rgba(255, 255, 255, 0.22);
+    padding: 18px 20px 16px;
+    border-radius: 16px;
+    max-width: 780px;
+    width: 100%;
+    margin: 4px auto 18px;
+    color: white;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+.progress-title {
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 800;
+    margin-bottom: 12px;
+    letter-spacing: 0.3px;
+}
+.progress-top {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+.progress-card {
+    background: rgba(255,255,255,0.25);
+    border-radius: 12px;
+    padding: 10px 14px;
+    text-align: center;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+.progress-card.daily-goal.done {
+    background: rgba(76, 175, 80, 0.55);
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.5) inset;
+}
+.progress-card.streak.active {
+    background: rgba(255, 140, 0, 0.45);
+    box-shadow: 0 0 0 2px rgba(255,215,0,0.65) inset;
+}
+.progress-card-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    opacity: 0.85;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+.progress-card-value {
+    font-size: 1.15rem;
+    font-weight: 800;
+    line-height: 1.2;
+}
+.calendar {
+    display: grid;
+    grid-template-columns: repeat(14, 1fr);
+    gap: 4px;
+    margin: 10px 0 12px;
+}
+.calendar-cell {
+    aspect-ratio: 1 / 1;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.15);
+    position: relative;
+    transition: background 0.2s ease;
+}
+.calendar-cell.played {
+    background: linear-gradient(135deg, #FFD700, #FF8C00);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.calendar-cell.today {
+    outline: 2px solid #FFF8DC;
+    outline-offset: 1px;
+}
+.calendar-cell.future {
+    opacity: 0.25;
+}
+.progress-bottom {
+    display: flex;
+    justify-content: space-around;
+    gap: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    flex-wrap: wrap;
+}
+.progress-stat {
+    font-size: 1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.progress-stat-icon { font-size: 1.1rem; }
+
+.result-comeback {
+    background: linear-gradient(135deg, #FFD700, #FF8C00);
+    color: white;
+    padding: 8px 14px;
+    border-radius: 10px;
+    display: inline-block;
+    margin: 4px auto 8px;
+    font-weight: 800;
+    box-shadow: 0 3px 10px rgba(255,140,0,0.35);
+}
+.result-streak {
+    color: #FFF8DC;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+@media (max-width: 480px) {
+    .progress-panel { padding: 14px 14px 12px; }
+    .calendar { grid-template-columns: repeat(14, 1fr); gap: 3px; }
+    .progress-top { gap: 8px; }
+    .progress-card { padding: 8px 10px; }
+    .progress-card-value { font-size: 1rem; }
+}
+
 /* Game Mode Selection */
 .mode-selection {
     background: rgba(255, 255, 255, 0.2);

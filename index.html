@@ -69,6 +69,26 @@
             <h1 class="game-title" data-i18n="home.title">🍎 Kids Math Game 🍊</h1>
             <p class="game-subtitle" data-i18n="home.welcome">Welcome! Pick a game to play:</p>
 
+            <div class="progress-panel" id="progressPanel" aria-label="Your progress">
+                <h3 class="progress-title" data-i18n="progress.title">My Progress</h3>
+                <div class="progress-top">
+                    <div class="progress-card daily-goal" id="dailyGoalCard">
+                        <div class="progress-card-label" data-i18n="progress.today">Today</div>
+                        <div class="progress-card-value" id="dailyGoalStatus">⬜ Play 1 game</div>
+                    </div>
+                    <div class="progress-card streak" id="streakCard">
+                        <div class="progress-card-label" data-i18n="progress.streak">Streak</div>
+                        <div class="progress-card-value" id="streakDisplay">🔥 0</div>
+                    </div>
+                </div>
+                <div class="calendar" id="calendar" aria-label="Last 14 days"></div>
+                <div class="progress-bottom">
+                    <div class="progress-stat" title="Total stars"><span class="progress-stat-icon">🌟</span> <span id="totalStarsDisplay">0</span></div>
+                    <div class="progress-stat" title="Total correct"><span class="progress-stat-icon">✅</span> <span id="totalCorrectDisplay">0</span></div>
+                    <div class="progress-stat" title="Best streak"><span class="progress-stat-icon">🏆</span> <span id="bestStreakDisplay">0</span></div>
+                </div>
+            </div>
+
             <div class="game-selection">
                 <button id="countFruitsBtn" class="game-btn">
                     <div class="game-icon">🍎🍌🍊</div>
@@ -305,7 +325,9 @@
                     <div class="settings-label" data-i18n="result.yourScore">Your Score</div>
                 </div>
                 <p id="resultScore" class="game-subtitle" style="margin-bottom:8px;">0</p>
-                <p id="resultBest" class="settings-hint" style="margin-bottom:16px;"></p>
+                <p id="resultBest" class="settings-hint" style="margin-bottom:8px;"></p>
+                <p id="resultComeback" class="result-comeback hidden" data-i18n="result.comeback">🎁 Comeback bonus! 2× stars</p>
+                <p id="resultStreakUpdate" class="result-streak hidden"></p>
                 <div id="resultStars" class="stars" aria-label="stars"></div>
                 <div style="margin-top:18px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
                     <button id="resultPlayAgainBtn" class="mode-btn" data-i18n="result.playAgain" aria-label="Play again">🔄 Play Again</button>
