@@ -90,6 +90,16 @@
                       <h3>Add & Subtract</h3>
                       <p>Practice addition and subtraction!</p>
                   </button>
+                  <button id="multiplyBtn" class="game-btn bigger-kids-game">
+                      <div class="game-icon">✖️</div>
+                      <h3>Multiply</h3>
+                      <p>Practice multiplication!</p>
+                  </button>
+                  <button id="divideBtn" class="game-btn bigger-kids-game">
+                      <div class="game-icon">➗</div>
+                      <h3>Divide</h3>
+                      <p>Practice division!</p>
+                  </button>
             </div>
             
             <div class="settings-panel" id="settingsPanel">
@@ -223,6 +233,9 @@
             <div class="stat-box points-box">
                 <span>⭐ <span id="currentPoints">10</span></span>
             </div>
+            <div class="stat-box progress-box hidden" id="progressBox">
+                <span>❓ <span id="progressText">1/10</span></span>
+            </div>
         </div>
 
         <div class="question-container">
@@ -244,7 +257,7 @@
         </div>
 
         <div class="input-container" id="keyboardContainer" style="display: none;">
-            <input type="number" id="answerInput" class="answer-input" min="1" max="10" placeholder="?">
+            <input type="number" id="answerInput" class="answer-input" min="1" placeholder="?">
             <button id="submitBtn" class="submit-btn">Submit</button>
         </div>
 

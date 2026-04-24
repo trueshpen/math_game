@@ -25,7 +25,7 @@ let questionsRemaining = 0;
 let selectedAgeGroup = null; // 'little' | 'bigger'
 
 // Game selection and difficulty/answer ranges
-let selectedGame = null; // 'count' | 'add' | 'compare' | 'match' | 'subtract' | 'multiply' | 'divide'
+let selectedGame = null; // 'count' | 'add' | 'compare' | 'match' | 'addsub' | 'multiply' | 'divide'
 let selectedDifficulty = null; // 'easy' | 'medium' | 'hard'
 let difficultyMin = 1;
 let difficultyMax = 5;
@@ -34,8 +34,8 @@ let answerMax = 5;
 // Addition game state
 let addendA = 0;
 let addendB = 0;
-// Add/Subtract game state
-let addSubOperator = '+'; // '+' or '-'
+// Math problem state (addsub, multiply, divide)
+let addSubOperator = '+'; // '+' | '-' | '×' | '÷'
 let addSubNum1 = 0;
 let addSubNum2 = 0;
 // Compare game state
@@ -85,6 +85,8 @@ const addFruitsBtn = document.getElementById('addFruitsBtn');
 const compareFruitsBtn = document.getElementById('compareFruitsBtn');
 const matchFruitsBtn = document.getElementById('matchFruitsBtn');
 const addSubBtn = document.getElementById('addSubBtn');
+const multiplyBtn = document.getElementById('multiplyBtn');
+const divideBtn = document.getElementById('divideBtn');
 const difficultyScreen = document.getElementById('difficultyScreen');
 const easyDifficultyBtn = document.getElementById('easyDifficultyBtn');
 const mediumDifficultyBtn = document.getElementById('mediumDifficultyBtn');
@@ -101,6 +103,8 @@ const timerElement = document.getElementById('timer');
 const timerBox = document.getElementById('timerBox');
 const pointsBoxEl = document.querySelector('.points-box');
 const currentPointsElement = document.getElementById('currentPoints');
+const progressBox = document.getElementById('progressBox');
+const progressText = document.getElementById('progressText');
 const questionText = document.getElementById('questionText');
 const fruitsContainer = document.getElementById('fruitsContainer');
 const optionsContainer = document.getElementById('optionsContainer');
@@ -146,6 +150,8 @@ if (addFruitsBtn) addFruitsBtn.addEventListener('click', () => chooseGame('add')
 if (compareFruitsBtn) compareFruitsBtn.addEventListener('click', () => chooseGame('compare'));
 if (matchFruitsBtn) matchFruitsBtn.addEventListener('click', () => chooseGame('match'));
 if (addSubBtn) addSubBtn.addEventListener('click', () => chooseGame('addsub'));
+if (multiplyBtn) multiplyBtn.addEventListener('click', () => chooseGame('multiply'));
+if (divideBtn) divideBtn.addEventListener('click', () => chooseGame('divide'));
 easyDifficultyBtn.addEventListener('click', () => selectDifficulty('easy'));
 mediumDifficultyBtn.addEventListener('click', () => selectDifficulty('medium'));
 hardDifficultyBtn.addEventListener('click', () => selectDifficulty('hard'));
@@ -248,12 +254,9 @@ function speakText(text) {
 
 function speakQuestion() {
     let question;
-    if (selectedGame === 'addsub') {
-        if (addSubOperator === '+') {
-            question = `${addSubNum1} plus ${addSubNum2} equals what?`;
-        } else {
-            question = `${addSubNum1} minus ${addSubNum2} equals what?`;
-        }
+    if (selectedGame === 'addsub' || selectedGame === 'multiply' || selectedGame === 'divide') {
+        const word = operatorWord(addSubOperator);
+        question = `${addSubNum1} ${word} ${addSubNum2} equals what?`;
     } else if (selectedGame === 'add') {
         question = `Add the ${currentFruit}s. How many in total?`;
     } else if (selectedGame === 'compare') {
@@ -267,40 +270,21 @@ function speakQuestion() {
     speakText(question);
 }
 
-function speakFeedback(correct) {
-    if (correct) {
-        if (selectedGame === 'compare') {
-            speakText('Correct!');
-        } else if (selectedGame === 'match') {
-            speakText('Great matching!');
-        } else {
-            speakText("Excellent! Well done!");
-        }
-    } else if (timeLeft <= 0) {
-        if (selectedGame === 'compare') {
-            let phrase;
-            if (correctAnswer === '>') phrase = 'the left group is greater than the right';
-            else if (correctAnswer === '<') phrase = 'the right group is greater than the left';
-            else phrase = 'the groups are equal in size';
-            speakText(`Time is up, ${phrase}.`);
-        } else if (selectedGame === 'match') {
-            speakText("Time's up!");
-        } else if (selectedGame === 'addsub') {
-            speakText(`Time's up! The answer was ${correctAnswer}`);
-        } else if (selectedGame === 'add') {
-            speakText(`Time's up! The answer was ${correctAnswer}`);
-        } else {
-            speakText(`Time's up! The answer was ${correctAnswer}`);
-        }
-    } else {
-        if (selectedGame === 'compare') {
-            speakText('Oops! Try again!');
-        } else if (selectedGame === 'match') {
-            speakText('Oops! Try again!');
-        } else {
-            speakText(`Oops! Try again! The correct answer is ${correctAnswer}`);
-        }
+function operatorWord(op) {
+    if (op === '+') return 'plus';
+    if (op === '-' || op === '−') return 'minus';
+    if (op === '×' || op === '*') return 'times';
+    if (op === '÷' || op === '/') return 'divided by';
+    return op;
+}
+
+function formatAnswerForSpeech(answer) {
+    if (selectedGame === 'compare') {
+        if (answer === '>') return 'left is more';
+        if (answer === '<') return 'right is more';
+        if (answer === '=') return 'they are equal';
     }
+    return String(answer);
 }
 
 // Input mode management
@@ -309,8 +293,8 @@ function updateInputMode() {
         // Compare game uses custom operator buttons inside fruits container
         optionsContainer.style.display = 'none';
         keyboardContainer.style.display = 'none';
-    } else if (selectedGame === 'addsub' && inputMode === 'keyboard') {
-        // Add/Subtract with keyboard: hide options, show keyboard input
+    } else if ((selectedGame === 'addsub' || selectedGame === 'multiply' || selectedGame === 'divide') && inputMode === 'keyboard') {
+        // Math games with keyboard: hide options, show keyboard input
         optionsContainer.style.display = 'none';
         keyboardContainer.style.display = 'block';
         setTimeout(() => {
@@ -318,8 +302,8 @@ function updateInputMode() {
         }, 100);
         answerInput.min = String(answerMin);
         answerInput.max = String(answerMax);
-    } else if (selectedGame === 'addsub' && inputMode === 'click') {
-        // Add/Subtract with click mode: show options, hide keyboard
+    } else if ((selectedGame === 'addsub' || selectedGame === 'multiply' || selectedGame === 'divide') && inputMode === 'click') {
+        // Math games with click mode: show options, hide keyboard
         optionsContainer.style.display = 'grid';
         keyboardContainer.style.display = 'none';
     } else if (inputMode === 'keyboard') {
@@ -364,12 +348,13 @@ function startGame(mode) {
     if (playMode === 'questions') {
         questionsRemaining = questionTarget;
     }
-    // Hide or show timer depending on mode
+    // Hide or show timer/progress depending on mode
     if (playMode === 'questions') {
-        // Hide timer box in questions mode
         timerBox.style.display = 'none';
+        if (progressBox) progressBox.classList.remove('hidden');
     } else {
         timerBox.style.display = '';
+        if (progressBox) progressBox.classList.add('hidden');
     }
     generateQuestion();
 }
@@ -411,8 +396,14 @@ function selectPlayMode(mode) {
     if (saved && saved.difficulty) {
         configureDifficulty(saved.difficulty);
     }
-    // Hide timer in questions mode; show in time mode
-    if (playMode === 'questions') { if (timerBox) timerBox.style.display = 'none'; } else { if (timerBox) timerBox.style.display = ''; }
+    // Hide timer in questions mode; show progress instead
+    if (playMode === 'questions') {
+        if (timerBox) timerBox.style.display = 'none';
+        if (progressBox) progressBox.classList.remove('hidden');
+    } else {
+        if (timerBox) timerBox.style.display = '';
+        if (progressBox) progressBox.classList.add('hidden');
+    }
     // Hide current points box as stars system is removed
     if (pointsBoxEl) pointsBoxEl.style.display = 'none';
     // For compare/match, there's no input mode choice; for count/add, use saved mode
@@ -435,7 +426,7 @@ function chooseGame(game) {
     selectedGroupId = null;
     if (svgLayer && svgLayer.parentNode) { svgLayer.parentNode.removeChild(svgLayer); }
     svgLayer = null;
-    selectedGame = game; // 'count' | 'add' | 'compare' | 'match' | 'addsub'
+    selectedGame = game; // 'count' | 'add' | 'compare' | 'match' | 'addsub' | 'multiply' | 'divide'
     if (game === 'count') {
         difficultyTitle.textContent = '🍎 Count the Fruits 🍊';
     } else if (game === 'add') {
@@ -446,6 +437,10 @@ function chooseGame(game) {
         difficultyTitle.textContent = '🍎 Match Number to Fruits 🍊';
     } else if (game === 'addsub') {
         difficultyTitle.textContent = '➕ Add & Subtract ➖';
+    } else if (game === 'multiply') {
+        difficultyTitle.textContent = '✖️ Multiply';
+    } else if (game === 'divide') {
+        difficultyTitle.textContent = '➗ Divide';
     }
     // Always show Play Mode selection first; difficulty and input mode are read from Settings
     showPlayModeSelection();
@@ -478,40 +473,34 @@ function configureDifficulty(level) {
         else if (level === 'medium') { difficultyMin = 1; difficultyMax = 10; }
         else if (level === 'hard') { difficultyMin = 5; difficultyMax = 15; }
     } else if (selectedGame === 'addsub') {
-        // Add & Subtract game difficulty
-        // Easy: 1-20, Medium: 1-50, Hard: 1-100
-        if (level === 'easy') {
-            difficultyMin = 1;
-            difficultyMax = 20;
-            answerMin = 1;
-            answerMax = 20;
-        } else if (level === 'medium') {
-            difficultyMin = 1;
-            difficultyMax = 50;
-            answerMin = 1;
-            answerMax = 50;
-        } else if (level === 'hard') {
-            difficultyMin = 10;
-            difficultyMax = 100;
-            answerMin = 1;
-            answerMax = 100;
-        }
+        // Add & Subtract: Easy 1-20, Medium 1-50, Hard 10-100
+        if (level === 'easy') { difficultyMin = 1; difficultyMax = 20; answerMin = 1; answerMax = 20; }
+        else if (level === 'medium') { difficultyMin = 1; difficultyMax = 50; answerMin = 1; answerMax = 50; }
+        else if (level === 'hard') { difficultyMin = 10; difficultyMax = 100; answerMin = 1; answerMax = 100; }
+    } else if (selectedGame === 'multiply') {
+        // Multiplication: easy up to 5×5, medium up to 10×10, hard up to 12×12
+        if (level === 'easy') { difficultyMin = 1; difficultyMax = 5; answerMin = 1; answerMax = 25; }
+        else if (level === 'medium') { difficultyMin = 1; difficultyMax = 10; answerMin = 1; answerMax = 100; }
+        else if (level === 'hard') { difficultyMin = 2; difficultyMax = 12; answerMin = 1; answerMax = 144; }
+    } else if (selectedGame === 'divide') {
+        // Division: always clean (no remainders). Difficulty controls divisor/quotient.
+        if (level === 'easy') { difficultyMin = 1; difficultyMax = 5; answerMin = 1; answerMax = 5; }
+        else if (level === 'medium') { difficultyMin = 2; difficultyMax = 10; answerMin = 1; answerMax = 10; }
+        else if (level === 'hard') { difficultyMin = 2; difficultyMax = 12; answerMin = 1; answerMax = 12; }
     }
     // Update titles for next screens
-    if (modeTitle) {
-        if (selectedGame === 'count') modeTitle.textContent = '🍎 Count the Fruits 🍊';
-        else if (selectedGame === 'add') modeTitle.textContent = '🍎 Add the Fruits 🍊';
-        else if (selectedGame === 'compare') modeTitle.textContent = '🍎 Which Group Has More? 🍊';
-        else if (selectedGame === 'addsub') modeTitle.textContent = '➕ Add & Subtract ➖';
-        else modeTitle.textContent = '🍎 Match Number to Fruits 🍊';
-    }
-    if (gameHeaderTitle) {
-        if (selectedGame === 'count') gameHeaderTitle.textContent = 'Count the Fruits!';
-        else if (selectedGame === 'add') gameHeaderTitle.textContent = 'Add the Fruits!';
-        else if (selectedGame === 'compare') gameHeaderTitle.textContent = 'Which Group Has More?';
-        else if (selectedGame === 'addsub') gameHeaderTitle.textContent = 'Add & Subtract!';
-        else gameHeaderTitle.textContent = 'Match Number to Fruits';
-    }
+    const gameTitles = {
+        count: ['🍎 Count the Fruits 🍊', 'Count the Fruits!'],
+        add: ['🍎 Add the Fruits 🍊', 'Add the Fruits!'],
+        compare: ['🍎 Which Group Has More? 🍊', 'Which Group Has More?'],
+        match: ['🍎 Match Number to Fruits 🍊', 'Match Number to Fruits'],
+        addsub: ['➕ Add & Subtract ➖', 'Add & Subtract!'],
+        multiply: ['✖️ Multiply', 'Multiply!'],
+        divide: ['➗ Divide', 'Divide!'],
+    };
+    const titles = gameTitles[selectedGame] || gameTitles.count;
+    if (modeTitle) modeTitle.textContent = titles[0];
+    if (gameHeaderTitle) gameHeaderTitle.textContent = titles[1];
 }
 
 function selectDifficulty(level) {
@@ -545,23 +534,23 @@ function filterGamesByAgeGroup() {
         if (compareFruitsBtn) compareFruitsBtn.style.display = '';
         if (matchFruitsBtn) matchFruitsBtn.style.display = '';
         if (addSubBtn) addSubBtn.style.display = 'none';
-        // Change body background to green (little kids theme)
+        if (multiplyBtn) multiplyBtn.style.display = 'none';
+        if (divideBtn) divideBtn.style.display = 'none';
         document.body.className = 'little-kids-theme';
-        // Show little kids instructions
         if (instructionsPanel) {
             instructionsPanel.innerHTML = '<p>🎯 Fun math games for kids!</p><p>⭐ Learn counting and numbers!</p>';
             instructionsPanel.style.display = '';
         }
     } else if (selectedAgeGroup === 'bigger') {
-        // Bigger kids: hide all old games, show only new bigger kids games
+        // Bigger kids: hide kid-friendly games, show advanced math games
         if (countFruitsBtn) countFruitsBtn.style.display = 'none';
         if (addFruitsBtn) addFruitsBtn.style.display = 'none';
         if (compareFruitsBtn) compareFruitsBtn.style.display = 'none';
         if (matchFruitsBtn) matchFruitsBtn.style.display = 'none';
         if (addSubBtn) addSubBtn.style.display = '';
-        // Change body background to blue/purple (bigger kids theme)
+        if (multiplyBtn) multiplyBtn.style.display = '';
+        if (divideBtn) divideBtn.style.display = '';
         document.body.className = 'bigger-kids-theme';
-        // Hide instructions for bigger kids (cleaner look)
         if (instructionsPanel) {
             instructionsPanel.style.display = 'none';
         }
@@ -618,42 +607,17 @@ function goHome() {
 }
 
 // Timer functions
-function startTimer() {
-    clearTimer();
-    timeLeft = 20;
-    currentPoints = 10;
-    elapsedSeconds = 0;
-    isHandlingTimeUp = false;
-    
-    updateTimer();
-    updatePoints();
-    
-    gameTimer = setInterval(() => {
-        timeLeft--;
-        elapsedSeconds++;
-        
-        // Decrease points every 2 seconds
-        if (elapsedSeconds % 2 === 0 && currentPoints > 1) {
-            currentPoints--;
-            updatePoints();
-        }
-        
-        updateTimer();
-        
-        // Check if time is up
-        if (timeLeft <= 0) {
-            clearTimer();
-            if (!isHandlingTimeUp) {
-                handleTimeUp();
-            }
-        }
-    }, 1000);
+// Global timer for time mode. Duration scales with difficulty so harder problems
+// aren't penalized by the same 20s budget as easy ones.
+function getTimeModeDuration() {
+    if (selectedDifficulty === 'hard') return 30;
+    if (selectedDifficulty === 'medium') return 25;
+    return 20;
 }
 
-// Global timer for time mode
 function startGlobalTimer() {
     clearTimer();
-    timeLeft = 20;
+    timeLeft = getTimeModeDuration();
     elapsedSeconds = 0;
     updateTimer();
     gameTimer = setInterval(() => {
@@ -676,18 +640,14 @@ function clearTimer() {
 
 function handleTimeUp() {
     if (isHandlingTimeUp) return;
-    
+
     isHandlingTimeUp = true;
     clearTimer();
     if (playMode === 'time') {
-        // End of run for time mode
         endRun();
         return;
     }
-    showFeedback = true;
-    showFeedbackMessage(false, true);
-    speakFeedback(false);
-    // Don't auto-advance when time is up - show next question button
+    // Questions mode has no per-question timer; no other mode expected here.
 }
 
 // Question generation
@@ -724,26 +684,39 @@ function generateQuestion() {
     if (selectedGame === 'addsub') {
         // Randomly choose addition or subtraction
         addSubOperator = Math.random() < 0.5 ? '+' : '-';
-        
+        const minAns = Math.max(1, answerMin);
+
         if (addSubOperator === '+') {
-            // Addition: num1 + num2 = answer
-            const sum = getRandomIntInclusive(answerMin, answerMax);
-            addSubNum1 = getRandomIntInclusive(Math.max(1, Math.floor(sum * 0.3)), Math.min(sum - 1, Math.floor(sum * 0.7)));
+            // Addition: num1 + num2 = answer, both addends >= 1
+            const sum = getRandomIntInclusive(Math.max(2, minAns), answerMax);
+            addSubNum1 = getRandomIntInclusive(1, sum - 1);
             addSubNum2 = sum - addSubNum1;
             correctAnswer = sum;
         } else {
-            // Subtraction: num1 - num2 = answer (num1 >= num2, answer >= 0)
-            addSubNum1 = getRandomIntInclusive(difficultyMin, difficultyMax);
-            const maxSub = Math.min(addSubNum1 - 1, Math.floor(addSubNum1 * 0.8)); // Don't subtract too much
-            addSubNum2 = getRandomIntInclusive(1, Math.max(1, maxSub));
+            // Subtraction: num1 - num2 = answer, all values >= 1
+            const safeMin = Math.max(2, difficultyMin);
+            addSubNum1 = getRandomIntInclusive(safeMin, difficultyMax);
+            addSubNum2 = getRandomIntInclusive(1, addSubNum1 - 1);
             correctAnswer = addSubNum1 - addSubNum2;
-            // Ensure answer is positive and within range
-            if (correctAnswer < answerMin || correctAnswer > answerMax) {
-                // Adjust to ensure valid answer
-                addSubNum2 = addSubNum1 - getRandomIntInclusive(answerMin, Math.min(answerMax, addSubNum1 - 1));
-                correctAnswer = addSubNum1 - addSubNum2;
+            if (correctAnswer < minAns || correctAnswer > answerMax) {
+                const desired = getRandomIntInclusive(minAns, Math.min(answerMax, addSubNum1 - 1));
+                addSubNum2 = addSubNum1 - desired;
+                correctAnswer = desired;
             }
         }
+    } else if (selectedGame === 'multiply') {
+        addSubOperator = '×';
+        addSubNum1 = getRandomIntInclusive(difficultyMin, difficultyMax);
+        addSubNum2 = getRandomIntInclusive(difficultyMin, difficultyMax);
+        correctAnswer = addSubNum1 * addSubNum2;
+    } else if (selectedGame === 'divide') {
+        addSubOperator = '÷';
+        // Build clean division: pick quotient and divisor, compute dividend
+        const quotient = getRandomIntInclusive(Math.max(1, answerMin), answerMax);
+        const divisor = getRandomIntInclusive(Math.max(2, difficultyMin), difficultyMax);
+        addSubNum1 = quotient * divisor;
+        addSubNum2 = divisor;
+        correctAnswer = quotient;
     } else if (selectedGame === 'add') {
         const sum = getRandomIntInclusive(answerMin, answerMax);
         // ensure two positive addends that sum to 'sum'
@@ -762,7 +735,7 @@ function generateQuestion() {
             const val = getRandomIntInclusive(difficultyMin, difficultyMax);
             if (!used.has(val)) { used.add(val); matchNumbers.push(val); }
         }
-        // Build 3 fruit groups with the same counts but shuffled order
+        // Build 4 fruit groups with the same counts but shuffled order
         const shuffledCounts = [...matchNumbers].sort(() => Math.random() - 0.5);
         matchGroups = shuffledCounts.map((count, idx) => {
             return { fruit: currentFruit, count, id: `group_${Date.now()}_${idx}` };
@@ -775,13 +748,16 @@ function generateQuestion() {
         correctAnswer = getRandomIntInclusive(difficultyMin, difficultyMax);
     }
     
-    // Generate options for count and add games as 4 consecutive numbers around the correct answer
-    if (selectedGame === 'addsub') {
-        options = buildConsecutiveOptions(correctAnswer, answerMin, answerMax);
+    // Generate 4 options. Use spread options for larger answer ranges (e.g. hard addsub, multiply)
+    // so click mode isn't trivial from adjacent numbers.
+    const useSpread = (selectedGame === 'multiply' || selectedGame === 'divide') ||
+        (selectedGame === 'addsub' && (answerMax - answerMin) > 15);
+    if (selectedGame === 'addsub' || selectedGame === 'multiply' || selectedGame === 'divide') {
+        options = useSpread
+            ? buildSpreadOptions(correctAnswer, Math.max(1, answerMin), answerMax)
+            : buildConsecutiveOptions(correctAnswer, Math.max(1, answerMin), answerMax);
     } else if (selectedGame === 'add') {
-        const minSum = answerMin;
-        const maxSum = answerMax;
-        options = buildConsecutiveOptions(correctAnswer, minSum, maxSum);
+        options = buildConsecutiveOptions(correctAnswer, answerMin, answerMax);
     } else if (selectedGame === 'count') {
         options = buildConsecutiveOptions(correctAnswer, difficultyMin, difficultyMax);
     } else {
@@ -798,8 +774,8 @@ function generateQuestion() {
     
     // Update UI
     updateQuestion();
-    if (selectedGame === 'addsub') {
-        arrangeAddSubDisplay();
+    if (selectedGame === 'addsub' || selectedGame === 'multiply' || selectedGame === 'divide') {
+        arrangeMathDisplay();
     } else if (selectedGame === 'add') {
         arrangeAdditionFruits();
     } else if (selectedGame === 'compare') {
@@ -833,6 +809,11 @@ function generateQuestion() {
         // questions mode
         questionsAsked++;
         questionsRemaining--;
+    }
+    // Update progress indicator in questions mode
+    if (playMode === 'questions' && progressText) {
+        const current = Math.min(questionsAsked, questionTarget);
+        progressText.textContent = `${current}/${questionTarget}`;
     }
     // Speak question only at the beginning of the run
     setTimeout(() => {
@@ -878,8 +859,9 @@ function endRun() {
 }
 
 function updateQuestion() {
-    if (selectedGame === 'addsub') {
-        questionText.textContent = `Solve: ${addSubNum1} ${addSubOperator} ${addSubNum2} = ?`;
+    if (selectedGame === 'addsub' || selectedGame === 'multiply' || selectedGame === 'divide') {
+        const op = addSubOperator === '-' ? '−' : addSubOperator;
+        questionText.textContent = `Solve: ${addSubNum1} ${op} ${addSubNum2} = ?`;
     } else if (selectedGame === 'add') {
         questionText.textContent = `How many ${currentFruit}s in total?`;
     } else if (selectedGame === 'compare') {
@@ -923,13 +905,12 @@ function arrangeFruits() {
     }
 }
 
-// Arrange math problem display for Add/Subtract game (numbers only, no fruits)
-function arrangeAddSubDisplay() {
+// Arrange math problem display for Add/Subtract/Multiply/Divide games (numbers only, no fruits)
+function arrangeMathDisplay() {
     fruitsContainer.innerHTML = '';
     fruitsContainer.style.position = 'static';
     fruitsContainer.classList.remove('compare-layout', 'match-layout');
-    
-    // Create a large math problem display
+
     const mathProblem = document.createElement('div');
     mathProblem.className = 'math-problem-display';
     mathProblem.style.textAlign = 'center';
@@ -942,12 +923,10 @@ function arrangeAddSubDisplay() {
     mathProblem.style.boxShadow = '0 8px 20px rgba(0,0,0,0.2)';
     mathProblem.style.margin = '20px auto';
     mathProblem.style.maxWidth = '400px';
-    
-    // Display the problem: num1 operator num2 = ?
-    const operatorSymbol = addSubOperator === '+' ? '+' : '−';
-    const problemText = `${addSubNum1} ${operatorSymbol} ${addSubNum2} = ?`;
-    mathProblem.textContent = problemText;
-    
+
+    const op = addSubOperator === '-' ? '−' : addSubOperator;
+    mathProblem.textContent = `${addSubNum1} ${op} ${addSubNum2} = ?`;
+
     fruitsContainer.appendChild(mathProblem);
 }
 
@@ -1216,10 +1195,11 @@ function checkAnswer(selectedAnswer) {
         if (playMode === 'questions') {
             // Questions mode: don't allow retries, move to next question immediately
             showFeedback = true;
-            speakText(`Incorrect! The answer was ${correctAnswer}.`);
+            speakText(`Incorrect! The answer was ${formatAnswerForSpeech(correctAnswer)}.`);
             // Advance to next question after brief feedback
             if (!runEnded) {
-                setTimeout(() => {
+                advanceTimeout = setTimeout(() => {
+                    advanceTimeout = null;
                     if (!runEnded) generateQuestion();
                 }, 1500);
             }
@@ -1230,7 +1210,7 @@ function checkAnswer(selectedAnswer) {
             // Time mode: allow retries, show brief feedback
             showBriefIncorrectFeedback();
             speakText("Oops! Try again!");
-            
+
             // Clear input for next attempt
             if (inputMode === 'keyboard') {
                 answerInput.value = '';
@@ -1259,9 +1239,10 @@ fruitsContainer.addEventListener('click', (e) => {
         checkAnswer(symbol);
     } else {
         target.classList.add('incorrect');
-        // On incorrect, go to next question immediately
+        // Delegate to checkAnswer. In questions mode it schedules the advance itself
+        // (with spoken feedback); in time mode we nudge to the next question here.
         checkAnswer(symbol);
-        if (!runEnded) {
+        if (!runEnded && playMode !== 'questions') {
             setTimeout(() => { if (!runEnded) generateQuestion(); }, 150);
         }
     }
@@ -1279,35 +1260,6 @@ function showBriefIncorrectFeedback() {
     setTimeout(() => {
         feedbackContainer.classList.add('hidden');
     }, 2000);
-}
-
-function showFeedbackMessage(isCorrect, timeUp) {
-    feedbackContainer.classList.remove('hidden', 'correct', 'incorrect');
-    
-    if (isCorrect) {
-        // In new flows we don't show any prolonged message for correct answers
-        feedbackContainer.classList.add('correct');
-        feedbackTitle.textContent = '';
-        feedbackText.textContent = '';
-        nextQuestionBtn.style.display = 'none';
-        // Addition merge animation on correct
-        // No merge or celebratory animations to keep flow instant
-    } else if (timeUp) {
-        feedbackContainer.classList.add('incorrect');
-        feedbackTitle.textContent = "Time's up!";
-        if (selectedGame === 'compare') {
-            let phrase;
-            if (correctAnswer === '>') phrase = 'Left > Right';
-            else if (correctAnswer === '<') phrase = 'Left < Right';
-            else phrase = 'Left = Right';
-            feedbackText.textContent = phrase;
-        } else if (selectedGame === 'match') {
-            feedbackText.textContent = 'Try again next time!';
-        } else {
-            feedbackText.textContent = `The correct answer is ${correctAnswer}`;
-        }
-        nextQuestionBtn.style.display = 'block'; // Show button when time is up
-    }
 }
 
 // Match game layout and interactions
@@ -1494,61 +1446,6 @@ function createMatchLine(x1, y1, x2, y2, success) {
     return path;
 }
 
-// Simple WebAudio beeps
-function playBeep(frequency, durationMs, type = 'sine') {
-    try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.type = type;
-        o.frequency.value = frequency;
-        o.connect(g);
-        g.connect(ctx.destination);
-        g.gain.setValueAtTime(0.0001, ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + 0.02);
-        o.start();
-        setTimeout(() => {
-            g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.05);
-            setTimeout(() => { o.stop(); ctx.close(); }, 60);
-        }, durationMs);
-    } catch (_) {}
-}
-
-function playSuccessSound() { playBeep(880, 150, 'triangle'); setTimeout(() => playBeep(1320, 150, 'triangle'), 160); }
-function playFailSound() { playBeep(220, 200, 'sawtooth'); }
-
-function tryMergeAnimation() {
-    const items = Array.from(fruitsContainer.querySelectorAll('.fruit-item'));
-    if (items.length === 0) return;
-    const centerX = fruitsContainer.clientWidth / 2;
-    const centerY = fruitsContainer.clientHeight / 2;
-    // Fade out the plus sign when merging
-    const plusSign = fruitsContainer.querySelector('.plus-sign');
-    if (plusSign) {
-        plusSign.style.transition = 'opacity 0.6s ease-in, transform 0.6s ease-in';
-        requestAnimationFrame(() => {
-            plusSign.style.opacity = '0';
-            plusSign.style.transform = 'scale(0.7)';
-        });
-        setTimeout(() => {
-            if (plusSign && plusSign.parentNode) {
-                plusSign.parentNode.removeChild(plusSign);
-            }
-        }, 650);
-    }
-    items.forEach((el, idx) => {
-        el.style.transition = 'transform 0.6s ease-in, opacity 0.6s ease-in';
-        const rect = el.getBoundingClientRect();
-        const parentRect = fruitsContainer.getBoundingClientRect();
-        const dx = centerX - (rect.left - parentRect.left) - el.offsetWidth / 2;
-        const dy = centerY - (rect.top - parentRect.top) - el.offsetHeight / 2;
-        requestAnimationFrame(() => {
-            el.style.transform = `translate(${dx}px, ${dy}px) scale(0.8)`;
-            el.style.opacity = '0.7';
-        });
-    });
-}
-
 // UI update functions
 function updateScore() {
     scoreElement.textContent = score;
@@ -1573,6 +1470,36 @@ function getRandomIntInclusive(min, max) {
     const minCeil = Math.ceil(min);
     const maxFloor = Math.floor(max);
     return Math.floor(Math.random() * (maxFloor - minCeil + 1)) + minCeil;
+}
+
+// Build four options spread around the correct answer.
+// Wrong options use a random offset proportional to the range, not just ±1,
+// so the correct number isn't obvious in wide ranges (e.g. hard addsub, multiply).
+function buildSpreadOptions(correct, minBound, maxBound) {
+    const options = new Set([correct]);
+    const range = Math.max(1, maxBound - minBound);
+    const baseDelta = Math.max(2, Math.floor(range / 8));
+    let attempts = 0;
+    while (options.size < 4 && attempts < 200) {
+        const mag = getRandomIntInclusive(1, baseDelta * 3);
+        const sign = Math.random() < 0.5 ? -1 : 1;
+        const candidate = correct + sign * mag;
+        if (candidate >= minBound && candidate <= maxBound && candidate !== correct) {
+            options.add(candidate);
+        }
+        attempts++;
+    }
+    // Fallback: fill with adjacent numbers if we couldn't find 4 spread values
+    if (options.size < 4) {
+        for (let d = 1; d <= 10 && options.size < 4; d++) {
+            for (const offset of [-d, d]) {
+                const v = correct + offset;
+                if (v >= minBound && v <= maxBound) options.add(v);
+                if (options.size >= 4) break;
+            }
+        }
+    }
+    return Array.from(options);
 }
 
 // Build four consecutive options around the correct answer, clamped to bounds.

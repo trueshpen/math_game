@@ -33,18 +33,13 @@ Simply open `index.html` in any modern web browser. No installation required!
 
 ```
 kids_math_game/
-├── index.html          # Main game HTML
-├── styles.css          # Game styling
-├── script.js           # Game logic and functionality
-├── assets/
-│   └── images/         # Fruit images
-│       ├── apple.jpg
-│       ├── banana.jpg
-│       ├── orange.jpg
-│       ├── watermelon.jpg
-│       └── pineapple.jpg
-└── README.md           # This file
+├── index.html   # Main game HTML
+├── styles.css   # Game styling
+├── script.js    # Game logic and functionality
+└── README.md    # This file
 ```
+
+Fruits are rendered as Unicode emoji (🍎🍌🍊🍉🍍) — no image assets required.
 
 ## Game Logic
 
