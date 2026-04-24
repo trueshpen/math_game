@@ -1,3 +1,313 @@
+// ============================================================
+// Internationalization (EN / CS)
+// ============================================================
+const translations = {
+    en: {
+        // Age selection
+        'age.littleKids': 'Little Kids',
+        'age.littleKids.ages': 'Ages 3-6',
+        'age.littleKids.desc1': 'Fun counting & matching!',
+        'age.littleKids.desc2': '🌈 Colorful & Playful 🌈',
+        'age.biggerKids': 'Bigger Kids',
+        'age.biggerKids.ages': 'Ages 7-10',
+        'age.biggerKids.desc1': 'Advanced Math Challenges!',
+        'age.biggerKids.desc2': '🚀 Level Up Your Skills 🚀',
+        // Home
+        'home.title': '🍎 Kids Math Game 🍊',
+        'home.welcome': 'Welcome! Pick a game to play:',
+        'home.changeAge': '🔄 Change Age Group',
+        // Games
+        'game.count.name': 'Count the Fruits',
+        'game.count.desc': 'Count how many fruits you see!',
+        'game.add.name': 'Add the Fruits',
+        'game.add.desc': 'Solve simple addition with fruits!',
+        'game.compare.name': 'Which Group Has More?',
+        'game.compare.desc': 'Choose >, <, or =',
+        'game.match.name': 'Match Number to Fruits',
+        'game.match.desc': 'Connect numbers to matching fruit groups',
+        'game.addsub.name': 'Add & Subtract',
+        'game.addsub.desc': 'Practice addition and subtraction!',
+        'game.multiply.name': 'Multiply',
+        'game.multiply.desc': 'Practice multiplication!',
+        'game.divide.name': 'Divide',
+        'game.divide.desc': 'Practice division!',
+        // Settings
+        'settings.title': 'Settings',
+        'settings.inputMode': 'Input Mode',
+        'settings.click': '👆 Click Numbers',
+        'settings.keyboard': '⌨️ Type Numbers',
+        'settings.difficulty': 'Difficulty',
+        'settings.easy': 'Easy',
+        'settings.medium': 'Medium',
+        'settings.hard': 'Hard',
+        'settings.speech': 'Speech Rate',
+        'settings.speech.slow': '🐢 Slow',
+        'settings.speech.normal': '🚶 Normal',
+        'settings.speech.fast': '🏃 Fast',
+        'settings.sound': 'Sound Effects',
+        'settings.sound.on': '🔊 On',
+        'settings.sound.off': '🔇 Off',
+        'settings.saved': 'Saved ✓',
+        'settings.hint': 'Games will use these settings and start immediately.',
+        'instructions.line1': '🎯 Fun math games for kids!',
+        'instructions.line2': '⭐ Learn counting and numbers!',
+        'difficulty.subtitle': 'Choose your difficulty',
+        'playMode.title': 'Pick Play Mode',
+        'playMode.subtitle': 'Choose how you want to play',
+        'playMode.time': '⏱️ Time Mode',
+        'playMode.time.desc': '20 seconds',
+        'playMode.questions': '❓ Questions Mode',
+        'playMode.questions.desc': '10 questions',
+        'modeSelect.subtitle': 'How do you want to enter your answers?',
+        'modeSelect.click.desc': 'Tap the answer button',
+        'modeSelect.keyboard.desc': 'Use keyboard to type',
+        // Game screen chrome
+        'stats.score': 'Score',
+        'submit': 'Submit',
+        'backToHome': 'Back to Home',
+        'back': '← Back to Games',
+        'nextQuestion': 'Next Question',
+        'speakBtn.title': 'Repeat question',
+        // Dynamic game titles (long = menu, short = game header)
+        'gameTitles.count.long': '🍎 Count the Fruits 🍊',
+        'gameTitles.count.short': 'Count the Fruits!',
+        'gameTitles.add.long': '🍎 Add the Fruits 🍊',
+        'gameTitles.add.short': 'Add the Fruits!',
+        'gameTitles.compare.long': '🍎 Which Group Has More? 🍊',
+        'gameTitles.compare.short': 'Which Group Has More?',
+        'gameTitles.match.long': '🍎 Match Number to Fruits 🍊',
+        'gameTitles.match.short': 'Match Number to Fruits',
+        'gameTitles.addsub.long': '➕ Add & Subtract ➖',
+        'gameTitles.addsub.short': 'Add & Subtract!',
+        'gameTitles.multiply.long': '✖️ Multiply',
+        'gameTitles.multiply.short': 'Multiply!',
+        'gameTitles.divide.long': '➗ Divide',
+        'gameTitles.divide.short': 'Divide!',
+        // Question text
+        'q.count': 'How many {fruit} do you see?',
+        'q.add': 'How many {fruit} in total?',
+        'q.compare': 'Which group has more?',
+        'q.match': 'Match the numbers to the groups!',
+        'q.math': 'Solve: {a} {op} {b} = ?',
+        // Spoken
+        'tts.count': 'How many {fruit} do you see?',
+        'tts.add': 'Add the {fruit}. How many in total?',
+        'tts.compare': 'Which group has more? Choose greater than, less than, or equal.',
+        'tts.match': 'Match each number to the group with the same number of fruits.',
+        'tts.math': '{a} {op} {b} equals what?',
+        'tts.op.plus': 'plus',
+        'tts.op.minus': 'minus',
+        'tts.op.times': 'times',
+        'tts.op.dividedBy': 'divided by',
+        'tts.incorrect': 'Incorrect! The answer was {answer}.',
+        'tts.tryAgain': 'Oops! Try again!',
+        'tts.compare.left': 'left is more',
+        'tts.compare.right': 'right is more',
+        'tts.compare.equal': 'they are equal',
+        // Feedback
+        'feedback.tryAgain': 'Oops! Try again!',
+        'feedback.keepTrying': 'Keep trying...',
+        // Result
+        'result.title': 'Results',
+        'result.yourScore': 'Your Score',
+        'result.timeUp': 'Time Up!',
+        'result.allDone': 'All Questions Done!',
+        'result.correct': 'Correct: {n}',
+        'result.correctOf': 'Correct: {n}/{total}',
+        'result.newBest': '🏆 New best!',
+        'result.best': 'Best: {n}',
+        'result.playAgain': '🔄 Play Again',
+        // Fruit plurals for question templates
+        'fruit.apple': 'apples',
+        'fruit.banana': 'bananas',
+        'fruit.orange': 'oranges',
+        'fruit.watermelon': 'watermelons',
+        'fruit.pineapple': 'pineapples',
+    },
+    cs: {
+        'age.littleKids': 'Menší děti',
+        'age.littleKids.ages': 'Věk 3-6',
+        'age.littleKids.desc1': 'Zábavné počítání a spojování!',
+        'age.littleKids.desc2': '🌈 Barevné a hravé 🌈',
+        'age.biggerKids': 'Větší děti',
+        'age.biggerKids.ages': 'Věk 7-10',
+        'age.biggerKids.desc1': 'Pokročilé matematické úlohy!',
+        'age.biggerKids.desc2': '🚀 Zlepši své dovednosti 🚀',
+        'home.title': '🍎 Dětská matematika 🍊',
+        'home.welcome': 'Vítej! Vyber si hru:',
+        'home.changeAge': '🔄 Změnit věkovou skupinu',
+        'game.count.name': 'Počítej ovoce',
+        'game.count.desc': 'Spočítej, kolik ovoce vidíš!',
+        'game.add.name': 'Sčítej ovoce',
+        'game.add.desc': 'Vyřeš jednoduché sčítání s ovocem!',
+        'game.compare.name': 'Která skupina má víc?',
+        'game.compare.desc': 'Vyber >, <, nebo =',
+        'game.match.name': 'Přiřaď číslo k ovoci',
+        'game.match.desc': 'Spojuj čísla s odpovídajícími skupinami',
+        'game.addsub.name': 'Sčítání a odčítání',
+        'game.addsub.desc': 'Trénuj sčítání a odčítání!',
+        'game.multiply.name': 'Násobení',
+        'game.multiply.desc': 'Trénuj násobení!',
+        'game.divide.name': 'Dělení',
+        'game.divide.desc': 'Trénuj dělení!',
+        'settings.title': 'Nastavení',
+        'settings.inputMode': 'Způsob zadávání',
+        'settings.click': '👆 Klikat na čísla',
+        'settings.keyboard': '⌨️ Psát na klávesnici',
+        'settings.difficulty': 'Obtížnost',
+        'settings.easy': 'Lehká',
+        'settings.medium': 'Střední',
+        'settings.hard': 'Těžká',
+        'settings.speech': 'Rychlost mluvení',
+        'settings.speech.slow': '🐢 Pomalu',
+        'settings.speech.normal': '🚶 Normálně',
+        'settings.speech.fast': '🏃 Rychle',
+        'settings.sound': 'Zvukové efekty',
+        'settings.sound.on': '🔊 Zapnuté',
+        'settings.sound.off': '🔇 Vypnuté',
+        'settings.saved': 'Uloženo ✓',
+        'settings.hint': 'Hry použijí toto nastavení a ihned se spustí.',
+        'instructions.line1': '🎯 Zábavné matematické hry pro děti!',
+        'instructions.line2': '⭐ Uč se počítat a poznávat čísla!',
+        'difficulty.subtitle': 'Vyber si obtížnost',
+        'playMode.title': 'Vyber si herní mód',
+        'playMode.subtitle': 'Zvol, jak chceš hrát',
+        'playMode.time': '⏱️ Na čas',
+        'playMode.time.desc': '20 sekund',
+        'playMode.questions': '❓ Na otázky',
+        'playMode.questions.desc': '10 otázek',
+        'modeSelect.subtitle': 'Jak chceš zadávat odpovědi?',
+        'modeSelect.click.desc': 'Klikni na odpověď',
+        'modeSelect.keyboard.desc': 'Napiš na klávesnici',
+        'stats.score': 'Skóre',
+        'submit': 'Odeslat',
+        'backToHome': 'Zpět na úvod',
+        'back': '← Zpět ke hrám',
+        'nextQuestion': 'Další otázka',
+        'speakBtn.title': 'Zopakovat otázku',
+        'gameTitles.count.long': '🍎 Počítej ovoce 🍊',
+        'gameTitles.count.short': 'Počítej ovoce!',
+        'gameTitles.add.long': '🍎 Sčítej ovoce 🍊',
+        'gameTitles.add.short': 'Sčítej ovoce!',
+        'gameTitles.compare.long': '🍎 Která skupina má víc? 🍊',
+        'gameTitles.compare.short': 'Která skupina má víc?',
+        'gameTitles.match.long': '🍎 Přiřaď číslo k ovoci 🍊',
+        'gameTitles.match.short': 'Přiřaď číslo k ovoci',
+        'gameTitles.addsub.long': '➕ Sčítání a odčítání ➖',
+        'gameTitles.addsub.short': 'Sčítání a odčítání!',
+        'gameTitles.multiply.long': '✖️ Násobení',
+        'gameTitles.multiply.short': 'Násobení!',
+        'gameTitles.divide.long': '➗ Dělení',
+        'gameTitles.divide.short': 'Dělení!',
+        'q.count': 'Kolik vidíš {fruit}?',
+        'q.add': 'Kolik je {fruit} celkem?',
+        'q.compare': 'Která skupina má víc?',
+        'q.match': 'Přiřaď čísla ke skupinám!',
+        'q.math': 'Vypočítej: {a} {op} {b} = ?',
+        'tts.count': 'Kolik vidíš {fruit}?',
+        'tts.add': 'Sečti {fruit}. Kolik jich je celkem?',
+        'tts.compare': 'Která skupina má víc? Vyber větší, menší, nebo rovná se.',
+        'tts.match': 'Přiřaď každé číslo ke skupině se stejným počtem ovoce.',
+        'tts.math': 'Kolik je {a} {op} {b}?',
+        'tts.op.plus': 'plus',
+        'tts.op.minus': 'mínus',
+        'tts.op.times': 'krát',
+        'tts.op.dividedBy': 'děleno',
+        'tts.incorrect': 'Špatně! Správná odpověď byla {answer}.',
+        'tts.tryAgain': 'Zkus to znovu!',
+        'tts.compare.left': 'levá skupina má víc',
+        'tts.compare.right': 'pravá skupina má víc',
+        'tts.compare.equal': 'skupiny jsou stejně velké',
+        'feedback.tryAgain': 'Zkus to znovu!',
+        'feedback.keepTrying': 'Pokračuj...',
+        'result.title': 'Výsledky',
+        'result.yourScore': 'Tvé skóre',
+        'result.timeUp': 'Čas vypršel!',
+        'result.allDone': 'Hotovo!',
+        'result.correct': 'Správně: {n}',
+        'result.correctOf': 'Správně: {n}/{total}',
+        'result.newBest': '🏆 Nové nejlepší skóre!',
+        'result.best': 'Nejlepší: {n}',
+        'result.playAgain': '🔄 Hrát znovu',
+        'fruit.apple': 'jablek',
+        'fruit.banana': 'banánů',
+        'fruit.orange': 'pomerančů',
+        'fruit.watermelon': 'melounů',
+        'fruit.pineapple': 'ananasů',
+    },
+};
+
+let currentLang = 'en';
+const LANG_STORAGE_KEY = 'km_lang';
+const SPEECH_LANG = { en: 'en-US', cs: 'cs-CZ' };
+
+function loadLang() {
+    try {
+        const stored = localStorage.getItem(LANG_STORAGE_KEY);
+        if (stored === 'en' || stored === 'cs') return stored;
+    } catch (_) {}
+    // Auto-detect from browser language, default EN
+    const nav = (navigator.language || '').toLowerCase();
+    if (nav.startsWith('cs') || nav.startsWith('sk')) return 'cs';
+    return 'en';
+}
+
+function t(key, vars) {
+    const dict = translations[currentLang] || translations.en;
+    let s = dict[key];
+    if (s === undefined) s = (translations.en[key] !== undefined ? translations.en[key] : key);
+    if (vars) {
+        for (const [k, v] of Object.entries(vars)) {
+            s = s.replaceAll(`{${k}}`, String(v));
+        }
+    }
+    return s;
+}
+
+function applyTranslations() {
+    // textContent on [data-i18n]
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        el.textContent = t(key);
+    });
+    // attribute translations: data-i18n-attr="title:key, aria-label:key"
+    document.querySelectorAll('[data-i18n-attr]').forEach(el => {
+        const spec = el.getAttribute('data-i18n-attr');
+        spec.split(',').forEach(pair => {
+            const [attr, key] = pair.split(':').map(s => s.trim());
+            if (attr && key) el.setAttribute(attr, t(key));
+        });
+    });
+    // Reflect to <html lang>
+    document.documentElement.setAttribute('lang', currentLang);
+    // Refresh dynamic text that JS controls
+    refreshDynamicI18nText();
+    // Flag button active state
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === currentLang);
+    });
+}
+
+// Called after applyTranslations and after settings change game/difficulty.
+function refreshDynamicI18nText() {
+    // Update the difficulty screen / mode-select screen / game-header titles if a game is selected
+    if (selectedGame && modeTitle) modeTitle.textContent = t(`gameTitles.${selectedGame}.long`);
+    if (selectedGame && gameHeaderTitle) gameHeaderTitle.textContent = t(`gameTitles.${selectedGame}.short`);
+    if (selectedGame && difficultyTitle) difficultyTitle.textContent = t(`gameTitles.${selectedGame}.long`);
+    // Update the current question text if a game is active
+    if (selectedGame && !gameScreen.classList.contains('hidden')) {
+        updateQuestion();
+    }
+}
+
+function setLanguage(lang) {
+    if (lang !== 'en' && lang !== 'cs') return;
+    currentLang = lang;
+    try { localStorage.setItem(LANG_STORAGE_KEY, lang); } catch (_) {}
+    applyTranslations();
+}
+
+// ============================================================
 // Game state variables
 let currentFruit = '';
 let correctAnswer = 0;
@@ -299,6 +609,7 @@ function speakText(text) {
         utterance.rate = SPEECH_RATES[speech] || SPEECH_RATES.normal;
         utterance.pitch = 1.2;
         utterance.volume = 0.8;
+        utterance.lang = SPEECH_LANG[currentLang] || 'en-US';
         speechSynthesis.speak(utterance);
     }
 }
@@ -345,34 +656,32 @@ function playIncorrectSound() {
 function speakQuestion() {
     let question;
     if (selectedGame === 'addsub' || selectedGame === 'multiply' || selectedGame === 'divide') {
-        const word = operatorWord(addSubOperator);
-        question = `${addSubNum1} ${word} ${addSubNum2} equals what?`;
+        question = t('tts.math', { a: addSubNum1, op: operatorWord(addSubOperator), b: addSubNum2 });
     } else if (selectedGame === 'add') {
-        question = `Add the ${currentFruit}s. How many in total?`;
+        question = t('tts.add', { fruit: t(`fruit.${currentFruit}`) });
     } else if (selectedGame === 'compare') {
-        question = `Which group has more? Choose greater than, less than, or equal.`;
+        question = t('tts.compare');
     } else if (selectedGame === 'match') {
-        // Generic phrasing so it remains correct across changing fruits
-        question = `Match each number to the group with the same number of fruits.`;
+        question = t('tts.match');
     } else {
-        question = `How many ${currentFruit}s do you see?`;
+        question = t('tts.count', { fruit: t(`fruit.${currentFruit}`) });
     }
     speakText(question);
 }
 
 function operatorWord(op) {
-    if (op === '+') return 'plus';
-    if (op === '-' || op === '−') return 'minus';
-    if (op === '×' || op === '*') return 'times';
-    if (op === '÷' || op === '/') return 'divided by';
+    if (op === '+') return t('tts.op.plus');
+    if (op === '-' || op === '−') return t('tts.op.minus');
+    if (op === '×' || op === '*') return t('tts.op.times');
+    if (op === '÷' || op === '/') return t('tts.op.dividedBy');
     return op;
 }
 
 function formatAnswerForSpeech(answer) {
     if (selectedGame === 'compare') {
-        if (answer === '>') return 'left is more';
-        if (answer === '<') return 'right is more';
-        if (answer === '=') return 'they are equal';
+        if (answer === '>') return t('tts.compare.left');
+        if (answer === '<') return t('tts.compare.right');
+        if (answer === '=') return t('tts.compare.equal');
     }
     return String(answer);
 }
@@ -547,21 +856,7 @@ function chooseGame(game) {
     if (svgLayer && svgLayer.parentNode) { svgLayer.parentNode.removeChild(svgLayer); }
     svgLayer = null;
     selectedGame = game; // 'count' | 'add' | 'compare' | 'match' | 'addsub' | 'multiply' | 'divide'
-    if (game === 'count') {
-        difficultyTitle.textContent = '🍎 Count the Fruits 🍊';
-    } else if (game === 'add') {
-        difficultyTitle.textContent = '🍎 Add the Fruits 🍊';
-    } else if (game === 'compare') {
-        difficultyTitle.textContent = '🍎 Which Group Has More? 🍊';
-    } else if (game === 'match') {
-        difficultyTitle.textContent = '🍎 Match Number to Fruits 🍊';
-    } else if (game === 'addsub') {
-        difficultyTitle.textContent = '➕ Add & Subtract ➖';
-    } else if (game === 'multiply') {
-        difficultyTitle.textContent = '✖️ Multiply';
-    } else if (game === 'divide') {
-        difficultyTitle.textContent = '➗ Divide';
-    }
+    if (difficultyTitle) difficultyTitle.textContent = t(`gameTitles.${game}.long`);
     // Always show Play Mode selection first; difficulty and input mode are read from Settings
     showPlayModeSelection();
 }
@@ -609,19 +904,9 @@ function configureDifficulty(level) {
         else if (level === 'medium') { difficultyMin = 2; difficultyMax = 10; answerMin = 1; answerMax = 10; }
         else if (level === 'hard') { difficultyMin = 2; difficultyMax = 12; answerMin = 1; answerMax = 12; }
     }
-    // Update titles for next screens
-    const gameTitles = {
-        count: ['🍎 Count the Fruits 🍊', 'Count the Fruits!'],
-        add: ['🍎 Add the Fruits 🍊', 'Add the Fruits!'],
-        compare: ['🍎 Which Group Has More? 🍊', 'Which Group Has More?'],
-        match: ['🍎 Match Number to Fruits 🍊', 'Match Number to Fruits'],
-        addsub: ['➕ Add & Subtract ➖', 'Add & Subtract!'],
-        multiply: ['✖️ Multiply', 'Multiply!'],
-        divide: ['➗ Divide', 'Divide!'],
-    };
-    const titles = gameTitles[selectedGame] || gameTitles.count;
-    if (modeTitle) modeTitle.textContent = titles[0];
-    if (gameHeaderTitle) gameHeaderTitle.textContent = titles[1];
+    // Update titles for next screens using current language
+    if (modeTitle) modeTitle.textContent = t(`gameTitles.${selectedGame}.long`);
+    if (gameHeaderTitle) gameHeaderTitle.textContent = t(`gameTitles.${selectedGame}.short`);
 }
 
 function selectDifficulty(level) {
@@ -659,7 +944,7 @@ function filterGamesByAgeGroup() {
         if (divideBtn) divideBtn.style.display = 'none';
         document.body.className = 'little-kids-theme';
         if (instructionsPanel) {
-            instructionsPanel.innerHTML = '<p>🎯 Fun math games for kids!</p><p>⭐ Learn counting and numbers!</p>';
+            instructionsPanel.innerHTML = `<p data-i18n="instructions.line1">${t('instructions.line1')}</p><p data-i18n="instructions.line2">${t('instructions.line2')}</p>`;
             instructionsPanel.style.display = '';
         }
     } else if (selectedAgeGroup === 'bigger') {
@@ -984,20 +1269,20 @@ function endRun() {
     const isNewBest = saveBestScore(score);
     if (playMode === 'time') {
         if (score >= 16) stars = 3; else if (score >= 10) stars = 2; else if (score >= 1) stars = 1; else stars = 0;
-        resultTitle.textContent = 'Time Up!';
-        resultScore.textContent = `Correct: ${score}`;
+        resultTitle.textContent = t('result.timeUp');
+        resultScore.textContent = t('result.correct', { n: score });
     } else {
         if (score >= 9) stars = 3; else if (score >= 5) stars = 2; else if (score >= 1) stars = 1; else stars = 0;
-        resultTitle.textContent = 'All Questions Done!';
-        resultScore.textContent = `Correct: ${score}/${questionTarget}`;
+        resultTitle.textContent = t('result.allDone');
+        resultScore.textContent = t('result.correctOf', { n: score, total: questionTarget });
     }
     // Best score display
     if (resultBest) {
         if (isNewBest && score > 0) {
-            resultBest.textContent = `🏆 New best!`;
+            resultBest.textContent = t('result.newBest');
         } else {
             const best = Math.max(previousBest, score);
-            resultBest.textContent = best > 0 ? `Best: ${best}` : '';
+            resultBest.textContent = best > 0 ? t('result.best', { n: best }) : '';
         }
     }
     // Render stars under score
@@ -1019,17 +1304,15 @@ function endRun() {
 function updateQuestion() {
     if (selectedGame === 'addsub' || selectedGame === 'multiply' || selectedGame === 'divide') {
         const op = addSubOperator === '-' ? '−' : addSubOperator;
-        questionText.textContent = `Solve: ${addSubNum1} ${op} ${addSubNum2} = ?`;
+        questionText.textContent = t('q.math', { a: addSubNum1, op, b: addSubNum2 });
     } else if (selectedGame === 'add') {
-        questionText.textContent = `How many ${currentFruit}s in total?`;
+        questionText.textContent = t('q.add', { fruit: t(`fruit.${currentFruit}`) });
     } else if (selectedGame === 'compare') {
-        const left = compareLeftCount;
-        const right = compareRightCount;
-        questionText.textContent = `Which group has more?`;
+        questionText.textContent = t('q.compare');
     } else if (selectedGame === 'match') {
-        questionText.textContent = `Match the numbers to the groups!`;
+        questionText.textContent = t('q.match');
     } else {
-        questionText.textContent = `How many ${currentFruit}s do you see?`;
+        questionText.textContent = t('q.count', { fruit: t(`fruit.${currentFruit}`) });
     }
 }
 
@@ -1426,7 +1709,7 @@ function checkAnswer(selectedAnswer) {
         if (playMode === 'questions') {
             // Questions mode: don't allow retries, move to next question immediately
             showFeedback = true;
-            speakText(`Incorrect! The answer was ${formatAnswerForSpeech(correctAnswer)}.`);
+            speakText(t('tts.incorrect', { answer: formatAnswerForSpeech(correctAnswer) }));
             // Advance to next question after brief feedback
             if (!runEnded) {
                 advanceTimeout = setTimeout(() => {
@@ -1440,7 +1723,7 @@ function checkAnswer(selectedAnswer) {
         } else {
             // Time mode: allow retries, show brief feedback
             showBriefIncorrectFeedback();
-            speakText("Oops! Try again!");
+            speakText(t('tts.tryAgain'));
 
             // Clear input for next attempt
             if (inputMode === 'keyboard') {
@@ -1483,8 +1766,8 @@ function showBriefIncorrectFeedback() {
     // Show brief "try again" message without stopping the game
     feedbackContainer.classList.remove('hidden', 'correct', 'incorrect');
     feedbackContainer.classList.add('incorrect');
-    feedbackTitle.textContent = 'Oops! Try again!';
-    feedbackText.textContent = 'Keep trying...';
+    feedbackTitle.textContent = t('feedback.tryAgain');
+    feedbackText.textContent = t('feedback.keepTrying');
     nextQuestionBtn.style.display = 'none';
     
     // Hide the feedback after 2 seconds
@@ -1769,17 +2052,26 @@ function buildConsecutiveOptions(x, minBound, maxBound) {
     return arr;
 }
 
+// Language switcher wiring
+document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => setLanguage(btn.dataset.lang));
+});
+
 // Initialize the game
 function init() {
+    // Apply language first so all subsequent text uses the right locale
+    currentLang = loadLang();
+    applyTranslations();
+
     updateScore();
     updateTimer();
     updatePoints();
     updateSettingsUI();
-    
+
     // Show age selection screen first, hide home screen
     if (ageSelectionScreen) ageSelectionScreen.classList.remove('hidden');
     homeScreen.classList.add('hidden');
 }
 
 // Start the app
-init(); 
+init();

@@ -5,6 +5,37 @@
     box-sizing: border-box;
 }
 
+/* Language switcher: fixed top-right flag buttons */
+.lang-switcher {
+    position: fixed;
+    top: 10px;
+    right: 14px;
+    z-index: 1000;
+    display: flex;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.85);
+    padding: 4px 6px;
+    border-radius: 999px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.lang-btn {
+    border: 2px solid transparent;
+    background: transparent;
+    font-size: 22px;
+    line-height: 1;
+    padding: 4px 6px;
+    cursor: pointer;
+    border-radius: 999px;
+    opacity: 0.55;
+    transition: opacity 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+.lang-btn:hover { opacity: 0.9; transform: scale(1.08); }
+.lang-btn.active { opacity: 1; border-color: #1e88e5; background: rgba(30, 136, 229, 0.1); }
+@media (max-width: 480px) {
+    .lang-switcher { top: 6px; right: 6px; padding: 2px 4px; }
+    .lang-btn { font-size: 18px; padding: 3px 5px; }
+}
+
 body {
     font-family: 'Arial', sans-serif;
     background: linear-gradient(135deg, #90EE90, #32CD32);
