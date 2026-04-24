@@ -41,6 +41,12 @@ let addSubNum2 = 0;
 // Compare game state
 let compareLeftCount = 0;
 let compareRightCount = 0;
+// Per-side fruits so Add / Compare / Match can visually distinguish groups
+let addLeftFruit = 'apple';
+let addRightFruit = 'banana';
+let compareLeftFruit = 'apple';
+let compareRightFruit = 'banana';
+let matchGroupFruits = []; // one fruit per group
 // Match game state
 let matchNumbers = []; // e.g., [4,6,8]
 let matchGroups = []; // e.g., [{fruit:'apple', count:4, id:'g1'}, ...]
@@ -105,6 +111,8 @@ const pointsBoxEl = document.querySelector('.points-box');
 const currentPointsElement = document.getElementById('currentPoints');
 const progressBox = document.getElementById('progressBox');
 const progressText = document.getElementById('progressText');
+const timeCounterBox = document.getElementById('timeCounterBox');
+const timeCounterText = document.getElementById('timeCounterText');
 const questionText = document.getElementById('questionText');
 const fruitsContainer = document.getElementById('fruitsContainer');
 const optionsContainer = document.getElementById('optionsContainer');
@@ -138,9 +146,17 @@ const submitBtn = document.getElementById('submitBtn');
 const resultScreen = document.getElementById('resultScreen');
 const resultTitle = document.getElementById('resultTitle');
 const resultScore = document.getElementById('resultScore');
+const resultBest = document.getElementById('resultBest');
 const resultStars = document.getElementById('resultStars');
 const resultBackBtn = document.getElementById('resultBackBtn');
+const resultPlayAgainBtn = document.getElementById('resultPlayAgainBtn');
 const changeAgeGroupBtn = document.getElementById('changeAgeGroupBtn');
+// Extra settings buttons
+const settingsSpeechSlow = document.getElementById('settingsSpeechSlow');
+const settingsSpeechNormal = document.getElementById('settingsSpeechNormal');
+const settingsSpeechFast = document.getElementById('settingsSpeechFast');
+const settingsSoundOn = document.getElementById('settingsSoundOn');
+const settingsSoundOff = document.getElementById('settingsSoundOff');
 
 // Event listeners
 if (littleKidsBtn) littleKidsBtn.addEventListener('click', () => selectAgeGroup('little'));
@@ -168,18 +184,28 @@ if (timeModeBtn) timeModeBtn.addEventListener('click', () => selectPlayMode('tim
 if (questionsModeBtn) questionsModeBtn.addEventListener('click', () => selectPlayMode('questions'));
 if (backToHomeFromPlayModeBtn) backToHomeFromPlayModeBtn.addEventListener('click', goHome);
 if (resultBackBtn) resultBackBtn.addEventListener('click', goHome);
+if (resultPlayAgainBtn) resultPlayAgainBtn.addEventListener('click', playAgain);
 if (changeAgeGroupBtn) changeAgeGroupBtn.addEventListener('click', goToAgeSelection);
 
 // Settings management
-const SETTINGS_KEYS = { mode: 'km_inputMode', difficulty: 'km_difficulty' };
+const SETTINGS_KEYS = {
+    mode: 'km_inputMode',
+    difficulty: 'km_difficulty',
+    speech: 'km_speechRate',
+    sound: 'km_soundOn',
+};
+const SPEECH_RATES = { slow: 0.6, normal: 0.9, fast: 1.25 };
 
 function loadSettings() {
     try {
-        const mode = localStorage.getItem(SETTINGS_KEYS.mode);
-        const difficulty = localStorage.getItem(SETTINGS_KEYS.difficulty);
-        return { mode, difficulty };
+        return {
+            mode: localStorage.getItem(SETTINGS_KEYS.mode),
+            difficulty: localStorage.getItem(SETTINGS_KEYS.difficulty),
+            speech: localStorage.getItem(SETTINGS_KEYS.speech) || 'normal',
+            sound: localStorage.getItem(SETTINGS_KEYS.sound) || 'on',
+        };
     } catch (_) {
-        return { mode: null, difficulty: null };
+        return { mode: null, difficulty: null, speech: 'normal', sound: 'on' };
     }
 }
 
@@ -189,22 +215,23 @@ function persistSettings(partial) {
     try {
         if (next.mode) localStorage.setItem(SETTINGS_KEYS.mode, next.mode);
         if (next.difficulty) localStorage.setItem(SETTINGS_KEYS.difficulty, next.difficulty);
+        if (next.speech) localStorage.setItem(SETTINGS_KEYS.speech, next.speech);
+        if (next.sound) localStorage.setItem(SETTINGS_KEYS.sound, next.sound);
     } catch (_) {}
     showSettingsSaved();
     updateSettingsUI();
 }
 
 function updateSettingsUI() {
-    const { mode, difficulty } = loadSettings();
-    // Mode buttons
-    [settingsClickMode, settingsKeyboardMode].forEach(btn => btn && btn.classList.remove('active'));
-    if (mode === 'click' && settingsClickMode) settingsClickMode.classList.add('active');
-    if (mode === 'keyboard' && settingsKeyboardMode) settingsKeyboardMode.classList.add('active');
-    // Difficulty buttons
-    [settingsDiffEasy, settingsDiffMedium, settingsDiffHard].forEach(btn => btn && btn.classList.remove('active'));
-    if (difficulty === 'easy' && settingsDiffEasy) settingsDiffEasy.classList.add('active');
-    if (difficulty === 'medium' && settingsDiffMedium) settingsDiffMedium.classList.add('active');
-    if (difficulty === 'hard' && settingsDiffHard) settingsDiffHard.classList.add('active');
+    const { mode, difficulty, speech, sound } = loadSettings();
+    const setActive = (buttons, value, match) => {
+        buttons.forEach(btn => btn && btn.classList.remove('active'));
+        buttons.forEach(btn => { if (btn && match(btn) === value) btn.classList.add('active'); });
+    };
+    setActive([settingsClickMode, settingsKeyboardMode], mode, b => b.dataset.mode);
+    setActive([settingsDiffEasy, settingsDiffMedium, settingsDiffHard], difficulty, b => b.dataset.diff);
+    setActive([settingsSpeechSlow, settingsSpeechNormal, settingsSpeechFast], speech, b => b.dataset.speech);
+    setActive([settingsSoundOn, settingsSoundOff], sound, b => b.dataset.sound);
 }
 
 function showSettingsSaved() {
@@ -219,12 +246,35 @@ if (settingsKeyboardMode) settingsKeyboardMode.addEventListener('click', () => p
 if (settingsDiffEasy) settingsDiffEasy.addEventListener('click', () => persistSettings({ difficulty: 'easy' }));
 if (settingsDiffMedium) settingsDiffMedium.addEventListener('click', () => persistSettings({ difficulty: 'medium' }));
 if (settingsDiffHard) settingsDiffHard.addEventListener('click', () => persistSettings({ difficulty: 'hard' }));
+if (settingsSpeechSlow) settingsSpeechSlow.addEventListener('click', () => persistSettings({ speech: 'slow' }));
+if (settingsSpeechNormal) settingsSpeechNormal.addEventListener('click', () => persistSettings({ speech: 'normal' }));
+if (settingsSpeechFast) settingsSpeechFast.addEventListener('click', () => persistSettings({ speech: 'fast' }));
+if (settingsSoundOn) settingsSoundOn.addEventListener('click', () => persistSettings({ sound: 'on' }));
+if (settingsSoundOff) settingsSoundOff.addEventListener('click', () => persistSettings({ sound: 'off' }));
 
 // Add option button click listeners
 optionsContainer.addEventListener('click', (e) => {
     if (e.target.classList.contains('option-btn') && !showFeedback && inputMode === 'click') {
         const selectedAnswer = parseInt(e.target.dataset.answer);
         checkAnswer(selectedAnswer);
+    }
+});
+
+// Global keyboard shortcuts: 1-4 picks the corresponding option in click mode.
+// Skips when typing into the keyboard-input field or when feedback is showing.
+document.addEventListener('keydown', (e) => {
+    if (showFeedback) return;
+    if (gameScreen.classList.contains('hidden')) return;
+    if (inputMode !== 'click') return;
+    if (document.activeElement === answerInput) return;
+    if (selectedGame === 'compare' || selectedGame === 'match') return;
+    const idx = ['1', '2', '3', '4'].indexOf(e.key);
+    if (idx === -1) return;
+    const btn = optionsContainer.querySelectorAll('.option-btn')[idx];
+    if (btn) {
+        e.preventDefault();
+        const val = parseInt(btn.dataset.answer);
+        if (Number.isFinite(val)) checkAnswer(val);
     }
 });
 
@@ -245,11 +295,51 @@ function speakText(text) {
     if ('speechSynthesis' in window) {
         speechSynthesis.cancel(); // Stop any current speech
         const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 0.7;
+        const speech = loadSettings().speech;
+        utterance.rate = SPEECH_RATES[speech] || SPEECH_RATES.normal;
         utterance.pitch = 1.2;
         utterance.volume = 0.8;
         speechSynthesis.speak(utterance);
     }
+}
+
+// WebAudio beeps for correct/incorrect feedback. Gated by sound setting.
+let _audioCtx = null;
+function getAudioCtx() {
+    if (!_audioCtx) {
+        try { _audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (_) { _audioCtx = null; }
+    }
+    return _audioCtx;
+}
+
+function playBeep(frequency, durationMs, type = 'sine', volume = 0.15) {
+    if (loadSettings().sound === 'off') return;
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    try {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = type;
+        o.frequency.value = frequency;
+        o.connect(g);
+        g.connect(ctx.destination);
+        const now = ctx.currentTime;
+        g.gain.setValueAtTime(0.0001, now);
+        g.gain.exponentialRampToValueAtTime(volume, now + 0.02);
+        o.start(now);
+        const stopAt = now + durationMs / 1000;
+        g.gain.exponentialRampToValueAtTime(0.0001, stopAt);
+        o.stop(stopAt + 0.05);
+    } catch (_) {}
+}
+
+function playCorrectSound() {
+    playBeep(880, 120, 'triangle');
+    setTimeout(() => playBeep(1320, 140, 'triangle'), 130);
+}
+
+function playIncorrectSound() {
+    playBeep(220, 220, 'sawtooth', 0.12);
 }
 
 function speakQuestion() {
@@ -348,15 +438,40 @@ function startGame(mode) {
     if (playMode === 'questions') {
         questionsRemaining = questionTarget;
     }
-    // Hide or show timer/progress depending on mode
+    // Hide or show timer/progress/counter depending on mode
     if (playMode === 'questions') {
         timerBox.style.display = 'none';
         if (progressBox) progressBox.classList.remove('hidden');
+        if (timeCounterBox) timeCounterBox.classList.add('hidden');
     } else {
         timerBox.style.display = '';
         if (progressBox) progressBox.classList.add('hidden');
+        if (timeCounterBox) timeCounterBox.classList.remove('hidden');
+        if (timeCounterText) timeCounterText.textContent = '0';
     }
     generateQuestion();
+}
+
+// Restart the same game+difficulty+playMode without going back to menus.
+function playAgain() {
+    // Stop any TTS/timers from the result screen context
+    if ('speechSynthesis' in window) { try { speechSynthesis.cancel(); } catch (_) {} }
+    clearTimer();
+    if (advanceTimeout) { clearTimeout(advanceTimeout); advanceTimeout = null; }
+    // Reset state
+    score = 0;
+    questionsAsked = 0;
+    questionsRemaining = (playMode === 'questions') ? questionTarget : 0;
+    runEnded = false;
+    hasAnnouncedQuestion = false;
+    isGeneratingQuestion = false;
+    isHandlingTimeUp = false;
+    showFeedback = false;
+    updateScore();
+    // Hide result, show game screen, re-enter startGame with current input mode
+    resultScreen.classList.add('hidden');
+    if (resultBest) resultBest.textContent = '';
+    startGame(inputMode);
 }
 
 function showModeSelection() {
@@ -396,13 +511,18 @@ function selectPlayMode(mode) {
     if (saved && saved.difficulty) {
         configureDifficulty(saved.difficulty);
     }
-    // Hide timer in questions mode; show progress instead
+    // Stat boxes: questions mode shows progress, time mode shows question counter
     if (playMode === 'questions') {
         if (timerBox) timerBox.style.display = 'none';
         if (progressBox) progressBox.classList.remove('hidden');
+        if (timeCounterBox) timeCounterBox.classList.add('hidden');
     } else {
         if (timerBox) timerBox.style.display = '';
         if (progressBox) progressBox.classList.add('hidden');
+        if (timeCounterBox) {
+            timeCounterBox.classList.remove('hidden');
+            if (timeCounterText) timeCounterText.textContent = '0';
+        }
     }
     // Hide current points box as stars system is removed
     if (pointsBoxEl) pointsBoxEl.style.display = 'none';
@@ -449,9 +569,10 @@ function chooseGame(game) {
 function configureDifficulty(level) {
     selectedDifficulty = level;
     if (selectedGame === 'count') {
+        // Hard capped at 12 so fruits don't overcrowd the container.
         if (level === 'easy') { difficultyMin = 1; difficultyMax = 5; }
         else if (level === 'medium') { difficultyMin = 5; difficultyMax = 10; }
-        else if (level === 'hard') { difficultyMin = 10; difficultyMax = 15; }
+        else if (level === 'hard') { difficultyMin = 8; difficultyMax = 12; }
         answerMin = difficultyMin;
         answerMax = difficultyMax;
     } else if (selectedGame === 'add') {
@@ -723,10 +844,13 @@ function generateQuestion() {
         addendA = getRandomIntInclusive(1, sum - 1);
         addendB = sum - addendA;
         correctAnswer = sum;
+        // Two distinct fruits so the groups read as separate visually
+        [addLeftFruit, addRightFruit] = pickDistinctFruits(2);
     } else if (selectedGame === 'compare') {
         compareLeftCount = getRandomIntInclusive(difficultyMin, difficultyMax);
         compareRightCount = getRandomIntInclusive(difficultyMin, difficultyMax);
         correctAnswer = compareLeftCount > compareRightCount ? '>' : (compareLeftCount < compareRightCount ? '<' : '=');
+        [compareLeftFruit, compareRightFruit] = pickDistinctFruits(2);
     } else if (selectedGame === 'match') {
         // Build 4 distinct counts within difficulty range
         const used = new Set();
@@ -735,10 +859,11 @@ function generateQuestion() {
             const val = getRandomIntInclusive(difficultyMin, difficultyMax);
             if (!used.has(val)) { used.add(val); matchNumbers.push(val); }
         }
-        // Build 4 fruit groups with the same counts but shuffled order
+        // One fruit per group (distinct) so visually each group is its own thing
+        matchGroupFruits = pickDistinctFruits(4);
         const shuffledCounts = [...matchNumbers].sort(() => Math.random() - 0.5);
         matchGroups = shuffledCounts.map((count, idx) => {
-            return { fruit: currentFruit, count, id: `group_${Date.now()}_${idx}` };
+            return { fruit: matchGroupFruits[idx], count, id: `group_${Date.now()}_${idx}` };
         });
         matchLinks = [];
         selectedNumberId = null;
@@ -810,10 +935,12 @@ function generateQuestion() {
         questionsAsked++;
         questionsRemaining--;
     }
-    // Update progress indicator in questions mode
+    // Update progress indicator in questions mode / question counter in time mode
     if (playMode === 'questions' && progressText) {
         const current = Math.min(questionsAsked, questionTarget);
         progressText.textContent = `${current}/${questionTarget}`;
+    } else if (playMode === 'time' && timeCounterText) {
+        timeCounterText.textContent = String(questionsAsked);
     }
     // Speak question only at the beginning of the run
     setTimeout(() => {
@@ -825,22 +952,53 @@ function generateQuestion() {
     }, 300);
 }
 
+function bestScoreKey() {
+    return `km_best_${selectedGame}_${selectedDifficulty}_${playMode}`;
+}
+
+function getBestScore() {
+    try {
+        const v = parseInt(localStorage.getItem(bestScoreKey()));
+        return Number.isFinite(v) ? v : 0;
+    } catch (_) { return 0; }
+}
+
+function saveBestScore(newScore) {
+    try {
+        const prev = getBestScore();
+        if (newScore > prev) {
+            localStorage.setItem(bestScoreKey(), String(newScore));
+            return true;
+        }
+    } catch (_) {}
+    return false;
+}
+
 function endRun() {
     runEnded = true;
     // Show a dedicated result screen
     gameScreen.classList.add('hidden');
     resultScreen.classList.remove('hidden');
     let stars = 0;
+    const previousBest = getBestScore();
+    const isNewBest = saveBestScore(score);
     if (playMode === 'time') {
-        // time mode thresholds
         if (score >= 16) stars = 3; else if (score >= 10) stars = 2; else if (score >= 1) stars = 1; else stars = 0;
         resultTitle.textContent = 'Time Up!';
         resultScore.textContent = `Correct: ${score}`;
     } else {
-        // questions mode thresholds
         if (score >= 9) stars = 3; else if (score >= 5) stars = 2; else if (score >= 1) stars = 1; else stars = 0;
         resultTitle.textContent = 'All Questions Done!';
         resultScore.textContent = `Correct: ${score}/${questionTarget}`;
+    }
+    // Best score display
+    if (resultBest) {
+        if (isNewBest && score > 0) {
+            resultBest.textContent = `🏆 New best!`;
+        } else {
+            const best = Math.max(previousBest, score);
+            resultBest.textContent = best > 0 ? `Best: ${best}` : '';
+        }
     }
     // Render stars under score
     if (resultStars) {
@@ -905,7 +1063,9 @@ function arrangeFruits() {
     }
 }
 
-// Arrange math problem display for Add/Subtract/Multiply/Divide games (numbers only, no fruits)
+// Arrange math problem display for Add/Subtract/Multiply/Divide games.
+// For small ranges we add a visual aid (grid for ×, fade-out row for −)
+// so the concept is concrete, not just symbolic.
 function arrangeMathDisplay() {
     fruitsContainer.innerHTML = '';
     fruitsContainer.style.position = 'static';
@@ -914,20 +1074,89 @@ function arrangeMathDisplay() {
     const mathProblem = document.createElement('div');
     mathProblem.className = 'math-problem-display';
     mathProblem.style.textAlign = 'center';
-    mathProblem.style.fontSize = '4rem';
     mathProblem.style.fontWeight = 'bold';
     mathProblem.style.color = '#1e3c72';
-    mathProblem.style.padding = '40px';
     mathProblem.style.background = 'white';
     mathProblem.style.borderRadius = '20px';
     mathProblem.style.boxShadow = '0 8px 20px rgba(0,0,0,0.2)';
-    mathProblem.style.margin = '20px auto';
-    mathProblem.style.maxWidth = '400px';
+    mathProblem.style.margin = '12px auto';
+    mathProblem.style.maxWidth = '480px';
 
-    const op = addSubOperator === '-' ? '−' : addSubOperator;
-    mathProblem.textContent = `${addSubNum1} ${op} ${addSubNum2} = ?`;
+    const showGrid = selectedGame === 'multiply' && selectedDifficulty !== 'hard' && addSubNum1 * addSubNum2 <= 60;
+    const showSubtractVisual = selectedGame === 'addsub' && addSubOperator === '-' && selectedDifficulty === 'easy' && addSubNum1 <= 12;
+
+    if (showGrid) {
+        mathProblem.style.fontSize = '2rem';
+        mathProblem.style.padding = '16px';
+        mathProblem.appendChild(buildTextLine(`${addSubNum1} × ${addSubNum2} = ?`));
+        mathProblem.appendChild(buildMultiplyGrid(addSubNum1, addSubNum2));
+    } else if (showSubtractVisual) {
+        mathProblem.style.fontSize = '2rem';
+        mathProblem.style.padding = '16px';
+        mathProblem.appendChild(buildTextLine(`${addSubNum1} − ${addSubNum2} = ?`));
+        mathProblem.appendChild(buildSubtractVisual(addSubNum1, addSubNum2));
+    } else {
+        mathProblem.style.fontSize = '4rem';
+        mathProblem.style.padding = '40px';
+        const op = addSubOperator === '-' ? '−' : addSubOperator;
+        mathProblem.textContent = `${addSubNum1} ${op} ${addSubNum2} = ?`;
+    }
 
     fruitsContainer.appendChild(mathProblem);
+}
+
+function buildTextLine(text) {
+    const el = document.createElement('div');
+    el.textContent = text;
+    el.style.marginBottom = '8px';
+    return el;
+}
+
+function buildMultiplyGrid(rows, cols) {
+    // Pick one fruit for the whole grid
+    const fruit = fruits[Math.floor(Math.random() * fruits.length)];
+    const grid = document.createElement('div');
+    grid.style.display = 'grid';
+    grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+    grid.style.gap = '4px';
+    grid.style.justifyItems = 'center';
+    grid.style.padding = '8px';
+    const size = cols > 8 ? 20 : (cols > 5 ? 26 : 32);
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            const cell = document.createElement('span');
+            cell.textContent = fruitSymbols[fruit];
+            cell.style.fontSize = size + 'px';
+            cell.style.lineHeight = '1';
+            grid.appendChild(cell);
+        }
+    }
+    return grid;
+}
+
+function buildSubtractVisual(total, removed) {
+    const fruit = fruits[Math.floor(Math.random() * fruits.length)];
+    const row = document.createElement('div');
+    row.style.display = 'flex';
+    row.style.flexWrap = 'wrap';
+    row.style.gap = '6px';
+    row.style.justifyContent = 'center';
+    row.style.padding = '8px';
+    for (let i = 0; i < total; i++) {
+        const cell = document.createElement('span');
+        cell.textContent = fruitSymbols[fruit];
+        cell.style.fontSize = '32px';
+        cell.style.lineHeight = '1';
+        cell.style.position = 'relative';
+        if (i < removed) {
+            cell.style.opacity = '0.35';
+            cell.style.textDecoration = 'line-through';
+            cell.style.textDecorationColor = '#d32f2f';
+            cell.style.textDecorationThickness = '3px';
+        }
+        row.appendChild(cell);
+    }
+    return row;
 }
 
 // Arrange two groups of fruits with a plus sign between for addition game
@@ -954,7 +1183,7 @@ function arrangeAdditionFruits() {
         item.style.position = 'absolute';
         item.style.left = leftPositions[i].x + 'px';
         item.style.top = leftPositions[i].y + 'px';
-        item.innerHTML = fruitSymbols[currentFruit];
+        item.innerHTML = fruitSymbols[addLeftFruit];
         fruitsContainer.appendChild(item);
     }
 
@@ -976,7 +1205,7 @@ function arrangeAdditionFruits() {
         item.style.position = 'absolute';
         item.style.left = rightPositions[i].x + 'px';
         item.style.top = rightPositions[i].y + 'px';
-        item.innerHTML = fruitSymbols[currentFruit];
+        item.innerHTML = fruitSymbols[addRightFruit];
         fruitsContainer.appendChild(item);
     }
 }
@@ -1041,7 +1270,7 @@ function arrangeCompareFruits() {
         item.style.position = 'absolute';
         item.style.left = leftPositions[i].x + 'px';
         item.style.top = leftPositions[i].y + 'px';
-        item.innerHTML = fruitSymbols[currentFruit];
+        item.innerHTML = fruitSymbols[compareLeftFruit];
         leftBox.appendChild(item);
     }
 
@@ -1052,7 +1281,7 @@ function arrangeCompareFruits() {
         item.style.position = 'absolute';
         item.style.left = rightPositions[i].x + 'px';
         item.style.top = rightPositions[i].y + 'px';
-        item.innerHTML = fruitSymbols[currentFruit];
+        item.innerHTML = fruitSymbols[compareRightFruit];
         rightBox.appendChild(item);
     }
 }
@@ -1174,6 +1403,7 @@ function checkAnswer(selectedAnswer) {
     const isCorrect = selectedGame === 'compare' ? (String(selectedAnswer) === String(correctAnswer)) : (selectedAnswer === correctAnswer);
     
     if (isCorrect) {
+        playCorrectSound();
         // In per-question timer (legacy) clear; in time mode, keep global timer running
         if (playMode !== 'time') clearTimer();
         showFeedback = true;
@@ -1192,6 +1422,7 @@ function checkAnswer(selectedAnswer) {
         }
     } else {
         // For incorrect answers
+        playIncorrectSound();
         if (playMode === 'questions') {
             // Questions mode: don't allow retries, move to next question immediately
             showFeedback = true;
@@ -1330,7 +1561,7 @@ function arrangeMatchLayout() {
             f.style.width = fruitSize + 'px';
             f.style.height = fruitSize + 'px';
             f.style.fontSize = Math.round(fruitSize * 0.6) + 'px';
-            f.innerHTML = fruitSymbols[currentFruit];
+            f.innerHTML = fruitSymbols[g.fruit || currentFruit];
             box.appendChild(f);
         }
         // Keep answers hidden; do not render a visible count label
@@ -1379,32 +1610,27 @@ function tryAttemptMatch(numEl, grpEl) {
     const success = num === cnt;
     const line = createMatchLine(a.x, a.y, b.x, b.y, success);
     if (success) {
-        // Persist line and mark matched
+        playBeep(660, 90, 'triangle');
         numEl.classList.add('matched');
         grpEl.classList.add('matched');
         numEl.classList.remove('selected');
         grpEl.classList.remove('selected');
         matchLinks.push({ numId: numEl.id, groupId: grpEl.id });
-        // Keep global timer running in time mode; do not stop or clear on correct
-        // Clear selections
         selectedNumberId = null;
         selectedGroupId = null;
-        // If all matched -> complete
         if (matchLinks.length >= matchGroups.length) {
-            // Count one correct for the fully completed match puzzle
+            playCorrectSound();
             score += 1;
             updateScore();
-            // Immediately go to next question if run not ended
             if (!runEnded) {
                 setTimeout(() => { if (!runEnded) generateQuestion(); }, 50);
             }
         }
     } else {
-        // Temporary line for failure
+        playIncorrectSound();
         setTimeout(() => {
             if (line && line.parentNode) line.parentNode.removeChild(line);
         }, 600);
-        // Keep selections but flash
         numEl.classList.remove('selected');
         grpEl.classList.remove('selected');
         selectedNumberId = null;
@@ -1470,6 +1696,16 @@ function getRandomIntInclusive(min, max) {
     const minCeil = Math.ceil(min);
     const maxFloor = Math.floor(max);
     return Math.floor(Math.random() * (maxFloor - minCeil + 1)) + minCeil;
+}
+
+// Pick N distinct fruits from the fruits list (Fisher–Yates partial shuffle)
+function pickDistinctFruits(n) {
+    const pool = [...fruits];
+    for (let i = pool.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [pool[i], pool[j]] = [pool[j], pool[i]];
+    }
+    return pool.slice(0, Math.min(n, pool.length));
 }
 
 // Build four options spread around the correct answer.

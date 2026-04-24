@@ -107,8 +107,8 @@
                 <div class="settings-group">
                     <div class="settings-label">Input Mode</div>
                     <div class="settings-options">
-                        <button id="settingsClickMode" class="settings-btn" data-mode="click">👆 Click Numbers</button>
-                        <button id="settingsKeyboardMode" class="settings-btn" data-mode="keyboard">⌨️ Type Numbers</button>
+                        <button id="settingsClickMode" class="settings-btn" data-mode="click" aria-label="Use buttons to answer">👆 Click Numbers</button>
+                        <button id="settingsKeyboardMode" class="settings-btn" data-mode="keyboard" aria-label="Type answer on keyboard">⌨️ Type Numbers</button>
                     </div>
                 </div>
                 <div class="settings-group">
@@ -117,6 +117,21 @@
                         <button id="settingsDiffEasy" class="settings-btn" data-diff="easy">Easy</button>
                         <button id="settingsDiffMedium" class="settings-btn" data-diff="medium">Medium</button>
                         <button id="settingsDiffHard" class="settings-btn" data-diff="hard">Hard</button>
+                    </div>
+                </div>
+                <div class="settings-group">
+                    <div class="settings-label">Speech Rate</div>
+                    <div class="settings-options">
+                        <button id="settingsSpeechSlow" class="settings-btn" data-speech="slow" aria-label="Slow speech">🐢 Slow</button>
+                        <button id="settingsSpeechNormal" class="settings-btn" data-speech="normal" aria-label="Normal speech">🚶 Normal</button>
+                        <button id="settingsSpeechFast" class="settings-btn" data-speech="fast" aria-label="Fast speech">🏃 Fast</button>
+                    </div>
+                </div>
+                <div class="settings-group">
+                    <div class="settings-label">Sound Effects</div>
+                    <div class="settings-options">
+                        <button id="settingsSoundOn" class="settings-btn" data-sound="on" aria-label="Sound effects on">🔊 On</button>
+                        <button id="settingsSoundOff" class="settings-btn" data-sound="off" aria-label="Sound effects off">🔇 Off</button>
                     </div>
                 </div>
                 <div id="settingsSaved" class="settings-saved hidden">Saved ✓</div>
@@ -233,8 +248,11 @@
             <div class="stat-box points-box">
                 <span>⭐ <span id="currentPoints">10</span></span>
             </div>
-            <div class="stat-box progress-box hidden" id="progressBox">
+            <div class="stat-box progress-box hidden" id="progressBox" aria-label="Questions progress">
                 <span>❓ <span id="progressText">1/10</span></span>
+            </div>
+            <div class="stat-box time-counter-box hidden" id="timeCounterBox" aria-label="Questions answered">
+                <span>❓ <span id="timeCounterText">0</span></span>
             </div>
         </div>
 
@@ -249,11 +267,11 @@
             <!-- Fruits will be dynamically added here -->
         </div>
 
-        <div class="options-container" id="optionsContainer">
-            <button class="option-btn" data-answer="1">1</button>
-            <button class="option-btn" data-answer="2">2</button>
-            <button class="option-btn" data-answer="3">3</button>
-            <button class="option-btn" data-answer="4">4</button>
+        <div class="options-container" id="optionsContainer" aria-label="Answer choices">
+            <button class="option-btn" data-answer="1" aria-label="Answer option 1, press 1">1</button>
+            <button class="option-btn" data-answer="2" aria-label="Answer option 2, press 2">2</button>
+            <button class="option-btn" data-answer="3" aria-label="Answer option 3, press 3">3</button>
+            <button class="option-btn" data-answer="4" aria-label="Answer option 4, press 4">4</button>
         </div>
 
         <div class="input-container" id="keyboardContainer" style="display: none;">
@@ -280,9 +298,11 @@
                 <div class="settings-group" style="justify-content:center;">
                     <div class="settings-label">Your Score</div>
                 </div>
-                <p id="resultScore" class="game-subtitle" style="margin-bottom:16px;">0</p>
+                <p id="resultScore" class="game-subtitle" style="margin-bottom:8px;">0</p>
+                <p id="resultBest" class="settings-hint" style="margin-bottom:16px;"></p>
                 <div id="resultStars" class="stars" aria-label="stars"></div>
-                <div style="margin-top:18px;">
+                <div style="margin-top:18px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+                    <button id="resultPlayAgainBtn" class="mode-btn" aria-label="Play again">🔄 Play Again</button>
                     <button id="resultBackBtn" class="back-btn">← Back to Games</button>
                 </div>
             </div>
