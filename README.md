@@ -71,3 +71,22 @@ kids_math_game/
 - Audio learning reinforcement
 
 Enjoy learning with fruits! 🍊🍌🍎🍉🍍
+
+---
+
+## Poslední aktivita
+
+<!-- AUTO-GENERATED: START -->
+*Tato sekce je automaticky aktualizována nočním skriptem.*
+
+**Poslední aktualizace:** 2026-04-14
+
+**Poslední commity:**
+- Add AGENTS_GUIDE.md
+- Fix input mode and questions mode behavior
+- Add age-based game selection and bigger kids math game
+- Add Play Mode, result screen, and flow updates
+- Add Match Number to Fruits game; adjust UI spacing
+
+**Stav projektu:** Active — bez git remote (lokální projekt)
+<!-- AUTO-GENERATED: END -->
