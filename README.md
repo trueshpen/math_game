@@ -1,87 +1,91 @@
-# Kids Math Game - Web Version
+# Kids Math Game — Web Version
 
-A fun and educational counting game for kids, featuring colorful fruits and interactive gameplay!
+A fun and educational math game for kids, featuring counting, arithmetic, comparisons, and matching games with gamification, sounds, and bilingual support.
 
 ## Features
 
-🍎 **Fruit Counting Game**: Count different fruits (apple, banana, orange, watermelon, pineapple)
-⏰ **20-Second Timer**: Each question has a 20-second time limit
-⭐ **Dynamic Scoring**: Points start at 10 and decrease every 2 seconds
-🔊 **Text-to-Speech**: Questions and feedback are spoken aloud
-🎯 **Auto-Advance**: Automatically moves to the next question after feedback
-📱 **Responsive Design**: Works on desktop and mobile devices
+### Game Modes
+- **Fruit Counting** — count fruits displayed in circles and pick the correct number
+- **Addition** — simple addition problems appropriate for the selected age
+- **Multiplication / Division** — for older kids
+- **Which Group Has More?** — compare two groups and pick the larger one
+- **Match Number to Fruits** — match a number to the correct group of fruits
 
-## How to Play
+### Age-Based Selection
+- Game mode and difficulty adapt to the selected age group
+- Younger children get simpler counting games; older children get arithmetic
 
-1. Click "COUNT FRUITS" on the home screen
-2. Look at the fruits displayed in circles
-3. Count how many fruits you see
-4. Click the correct number from the 4 options
-5. Get instant feedback and points for correct answers!
+### Gamification
+- **Streak tracking** — consecutive correct answer streaks
+- **Daily goal** — set and track a daily practice goal
+- **Calendar view** — see which days you practiced
+- **Total stats** — cumulative correct answers and games played
+
+### Scoring & Progression
+- Dynamic scoring — points start at 10 and decrease every 2 seconds
+- Best score tracking per game mode
+- Play Again flow with result screen
+
+### Sound & Feedback
+- Text-to-speech — questions and feedback are read aloud
+- Sound effects for correct / incorrect answers
+
+### Language Support
+- **EN / CS language switcher** — full i18n for all UI text and spoken prompts
+
+### Deployment
+- GitHub Actions auto-deploy to Server 3 on push to `main`
+
+---
 
 ## Getting Started
 
-Simply open `index.html` in any modern web browser. No installation required!
-
-### Running Locally
-
-1. Clone or download this repository
-2. Open `index.html` in your web browser
-3. Start playing!
-
-### Files Structure
+Open `index.html` in any modern web browser. No server or build step required.
 
 ```
 kids_math_game/
-├── index.html   # Main game HTML
-├── styles.css   # Game styling
-├── script.js    # Game logic and functionality
-└── README.md    # This file
+├── index.html   # Main game
+├── styles.css   # Styling
+├── script.js    # Game logic
+└── README.md
 ```
 
 Fruits are rendered as Unicode emoji (🍎🍌🍊🍉🍍) — no image assets required.
 
-## Game Logic
+---
 
-- Questions feature 1-10 fruits in different arrangements
-- 4 multiple choice answers are generated for each question
-- Timer starts at 20 seconds, points decrease every 2 seconds
-- Correct answers earn points (maximum 10 points per question)
-- Immediate feedback with text-to-speech
-- Auto-advance to next question after 3 seconds
+## Game Rules
+
+- Each question has a **20-second timer**
+- 4 multiple-choice answers per question
+- Correct answers earn up to 10 points (points decrease as the timer counts down)
+- Auto-advance to the next question after feedback
+- Incorrect answer or timeout: no points, show correct answer
+
+---
 
 ## Browser Compatibility
 
-- Chrome/Edge (recommended)
+- Chrome / Edge (recommended)
 - Firefox
 - Safari
 - Any modern browser with JavaScript enabled
 
-## Educational Benefits
-
-- Number recognition (1-10)
-- Counting skills
-- Visual pattern recognition
-- Time pressure management
-- Audio learning reinforcement
-
-Enjoy learning with fruits! 🍊🍌🍎🍉🍍
-
 ---
 
-## Poslední aktivita
+## Recent Activity
 
 <!-- AUTO-GENERATED: START -->
-*Tato sekce je automaticky aktualizována nočním skriptem.*
+*This part is automatically updated by the night AI task*
 
-**Poslední aktualizace:** 2026-04-14
+**Last update:** 2026-04-29 UTC
 
-**Poslední commity:**
-- Add AGENTS_GUIDE.md
-- Fix input mode and questions mode behavior
-- Add age-based game selection and bigger kids math game
-- Add Play Mode, result screen, and flow updates
-- Add Match Number to Fruits game; adjust UI spacing
+**Last commits:**
+- `4bbedb3` Add gamification MVP: streak, daily goal, calendar, totals (2026-04-24)
+- `54ebc0e` UI overhaul: readable sizes + tighten option spread (2026-04-24)
+- `e8fed4e` Add EN/CS language switcher with full i18n (2026-04-24)
+- `713e2d4` Add Play Again, best-score, visual grids, sound, and more (2026-04-24)
+- `402b6f8` Fix bugs, clean dead code, add multiply/divide games (2026-04-24)
 
-**Stav projektu:** Active — bez git remote (lokální projekt)
+**Project status:** Active — git remote: https://github.com/trueshpen/math_game
 <!-- AUTO-GENERATED: END -->
