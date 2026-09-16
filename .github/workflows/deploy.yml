@@ -5,16 +5,36 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Configure SSH
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          SERVER_HOST: ${{ secrets.SERVER3_HOST }}
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          echo 'true-server3 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKl5m55bGdRn3NSVEyo+2mS1XKpbgm6TDaBxuDlRGwji' > ~/.ssh/known_hosts
+          cat > ~/.ssh/config <<EOF
+          Host true-server3
+            HostName $SERVER_HOST
+            User ubuntu
+            IdentityFile ~/.ssh/deploy_key
+            IdentitiesOnly yes
+            HostKeyAlias true-server3
+            StrictHostKeyChecking yes
+            BatchMode yes
+            ConnectTimeout 30
+            ServerAliveInterval 30
+          EOF
+
+      # The key is restricted on the server to /usr/local/sbin/deploy-gateway (profile math_game):
+      # "deploy" runs git pull in /var/www/math.trueshpen.com and nothing else.
       - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.SERVER3_HOST }}
-          username: ubuntu
-          key: ${{ secrets.DEPLOY_SSH_KEY }}
-          script: |
-            cd /var/www/math.trueshpen.com
-            git pull origin main
+        run: ssh true-server3 deploy
