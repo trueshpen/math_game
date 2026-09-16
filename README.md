@@ -76,16 +76,9 @@ Fruits are rendered as Unicode emoji (🍎🍌🍊🍉🍍) — no image assets 
 ## Recent Activity
 
 <!-- AUTO-GENERATED: START -->
-*This part is automatically updated by the night AI task*
+*Auto-maintained by the nightly README agent. This block is refreshed only when new commits land in the repo.*
 
-**Last update:** 2026-05-15T23:06:55Z — no new changes
-
-**Last commits:**
-- `4bbedb3` Add gamification MVP: streak, daily goal, calendar, totals (2026-04-24)
-- `54ebc0e` UI overhaul: readable sizes + tighten option spread (2026-04-24)
-- `e8fed4e` Add EN/CS language switcher with full i18n (2026-04-24)
-- `713e2d4` Add Play Again, best-score, visual grids, sound, and more (2026-04-24)
-- `402b6f8` Fix bugs, clean dead code, add multiply/divide games (2026-04-24)
+**Last reflected change:** 2026-09-16T23:08:39Z
 
 **Project status:** Active — git remote: https://github.com/trueshpen/math_game
 <!-- AUTO-GENERATED: END -->
