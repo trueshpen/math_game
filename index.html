@@ -2,63 +2,63 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#3fae55">
+    <meta name="description" content="Fun math games for kids: counting, adding, comparing, matching, multiplication and division.">
     <title>Kids Math Game</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍎</text></svg>">
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-    <!-- Language Switcher (fixed top-right) -->
-    <div id="langSwitcher" class="lang-switcher" role="group" aria-label="Language">
-        <button class="lang-btn" data-lang="en" aria-label="English" title="English">🇬🇧</button>
-        <button class="lang-btn" data-lang="cs" aria-label="Čeština" title="Čeština">🇨🇿</button>
+<body class="little-kids-theme">
+    <!-- Language switcher (fixed top-right; hidden during a game) -->
+    <div id="langSwitcher" class="lang-switcher" role="group" data-i18n-attr="aria-label:lang.label" aria-label="Language">
+        <button type="button" class="lang-btn" data-lang="en" lang="en" aria-label="English" title="English">EN</button>
+        <button type="button" class="lang-btn" data-lang="cs" lang="cs" aria-label="Čeština" title="Čeština">CZ</button>
     </div>
 
     <!-- Age Selection Screen -->
-    <div id="ageSelectionScreen" class="screen">
+    <div id="ageSelectionScreen" class="screen age-screen">
         <div class="age-split-container">
-            <!-- Little Kids Section -->
-            <button id="littleKidsBtn" class="age-section little-kids-section">
-                <div class="age-content">
-                    <div class="age-emoji-container">
-                        <span class="bounce-emoji">🍎</span>
-                        <span class="bounce-emoji delay-1">🐻</span>
-                        <span class="bounce-emoji delay-2">🌻</span>
-                        <span class="bounce-emoji delay-3">🎈</span>
-                        <span class="bounce-emoji delay-4">🦋</span>
-                        <span class="bounce-emoji delay-5">🐰</span>
-                    </div>
-                    <h2 class="age-title fun-font" data-i18n="age.littleKids">Little Kids</h2>
-                    <p class="age-subtitle fun-font" data-i18n="age.littleKids.ages">Ages 3-6</p>
-                    <div class="age-icons-row">
-                        <span>🍎🍌🍊🍇🍓</span>
-                    </div>
-                    <div class="age-description">
-                        <p data-i18n="age.littleKids.desc1">Fun counting &amp; matching!</p>
-                        <p data-i18n="age.littleKids.desc2">🌈 Colorful &amp; Playful 🌈</p>
-                    </div>
-                </div>
+            <button id="littleKidsBtn" type="button" class="age-section little-kids-section">
+                <span class="age-deco" aria-hidden="true">
+                    <span class="deco deco-1">🍎</span>
+                    <span class="deco deco-2">🐻</span>
+                    <span class="deco deco-3">🌻</span>
+                    <span class="deco deco-4">🎈</span>
+                    <span class="deco deco-5">🦋</span>
+                    <span class="deco deco-6">🐰</span>
+                </span>
+                <span class="age-content">
+                    <span class="age-title fun-font" data-i18n="age.littleKids">Little Kids</span>
+                    <span class="age-subtitle" data-i18n="age.littleKids.ages">Ages 3-6</span>
+                    <span class="age-icons-row" aria-hidden="true">🍎🍌🍊🍇🍓</span>
+                    <span class="age-description">
+                        <span data-i18n="age.littleKids.desc1">Fun counting &amp; matching!</span>
+                        <span data-i18n="age.littleKids.desc2">🌈 Colorful &amp; Playful 🌈</span>
+                    </span>
+                    <span class="age-cta" data-i18n="age.play">Play ▶</span>
+                </span>
             </button>
 
-            <!-- Bigger Kids Section -->
-            <button id="biggerKidsBtn" class="age-section bigger-kids-section">
-                <div class="age-content">
-                    <div class="math-symbols-container">
-                        <span class="math-symbol">×</span>
-                        <span class="math-symbol">÷</span>
-                        <span class="math-symbol">+</span>
-                        <span class="math-symbol">−</span>
-                        <span class="math-symbol">=</span>
-                    </div>
-                    <h2 class="age-title cool-font" data-i18n="age.biggerKids">Bigger Kids</h2>
-                    <p class="age-subtitle cool-font" data-i18n="age.biggerKids.ages">Ages 7-10</p>
-                    <div class="age-icons-row math-style">
-                        <span>📐📊🔢💡⚡</span>
-                    </div>
-                    <div class="age-description cool-text">
-                        <p data-i18n="age.biggerKids.desc1">Advanced Math Challenges!</p>
-                        <p data-i18n="age.biggerKids.desc2">🚀 Level Up Your Skills 🚀</p>
-                    </div>
-                </div>
+            <button id="biggerKidsBtn" type="button" class="age-section bigger-kids-section">
+                <span class="age-deco" aria-hidden="true">
+                    <span class="deco deco-1">×</span>
+                    <span class="deco deco-2">÷</span>
+                    <span class="deco deco-3">+</span>
+                    <span class="deco deco-4">−</span>
+                    <span class="deco deco-5">=</span>
+                    <span class="deco deco-6">%</span>
+                </span>
+                <span class="age-content">
+                    <span class="age-title cool-font" data-i18n="age.biggerKids">Bigger Kids</span>
+                    <span class="age-subtitle" data-i18n="age.biggerKids.ages">Ages 7-10</span>
+                    <span class="age-icons-row" aria-hidden="true">📐📊🔢💡⚡</span>
+                    <span class="age-description">
+                        <span data-i18n="age.biggerKids.desc1">Advanced Math Challenges!</span>
+                        <span data-i18n="age.biggerKids.desc2">🚀 Level Up Your Skills 🚀</span>
+                    </span>
+                    <span class="age-cta" data-i18n="age.play">Play ▶</span>
+                </span>
             </button>
         </div>
     </div>
@@ -66,11 +66,52 @@
     <!-- Home Screen -->
     <div id="homeScreen" class="screen hidden">
         <div class="home-container">
-            <h1 class="game-title" data-i18n="home.title">🍎 Kids Math Game 🍊</h1>
-            <p class="game-subtitle" data-i18n="home.welcome">Welcome! Pick a game to play:</p>
+            <header class="home-header">
+                <h1 class="game-title" data-i18n="home.title">🍎 Kids Math Game 🍊</h1>
+                <p class="game-subtitle" data-i18n="home.welcome">Welcome! Pick a game to play:</p>
+            </header>
 
-            <div class="progress-panel" id="progressPanel" aria-label="Your progress">
-                <h3 class="progress-title" data-i18n="progress.title">My Progress</h3>
+            <div class="game-selection" id="gameSelection">
+                <button id="countFruitsBtn" type="button" class="game-btn">
+                    <span class="game-icon" aria-hidden="true">🍎🍌🍊</span>
+                    <span class="game-name" data-i18n="game.count.name">Count the Fruits</span>
+                    <span class="game-desc" data-i18n="game.count.desc">Count how many fruits you see!</span>
+                </button>
+                <button id="addFruitsBtn" type="button" class="game-btn">
+                    <span class="game-icon" aria-hidden="true">🍎➕🍌</span>
+                    <span class="game-name" data-i18n="game.add.name">Add the Fruits</span>
+                    <span class="game-desc" data-i18n="game.add.desc">Solve simple addition with fruits!</span>
+                </button>
+                <button id="compareFruitsBtn" type="button" class="game-btn">
+                    <span class="game-icon" aria-hidden="true">🍎⚖️🍊</span>
+                    <span class="game-name" data-i18n="game.compare.name">Which Group Has More?</span>
+                    <span class="game-desc" data-i18n="game.compare.desc">Choose &gt;, &lt;, or =</span>
+                </button>
+                <button id="matchFruitsBtn" type="button" class="game-btn">
+                    <span class="game-icon" aria-hidden="true">🔢➡️🍎</span>
+                    <span class="game-name" data-i18n="game.match.name">Match Number to Fruits</span>
+                    <span class="game-desc" data-i18n="game.match.desc">Connect numbers to matching fruit groups</span>
+                </button>
+                <!-- Bigger Kids Games -->
+                <button id="addSubBtn" type="button" class="game-btn bigger-kids-game">
+                    <span class="game-icon" aria-hidden="true">➕➖</span>
+                    <span class="game-name" data-i18n="game.addsub.name">Add &amp; Subtract</span>
+                    <span class="game-desc" data-i18n="game.addsub.desc">Practice addition and subtraction!</span>
+                </button>
+                <button id="multiplyBtn" type="button" class="game-btn bigger-kids-game">
+                    <span class="game-icon" aria-hidden="true">✖️</span>
+                    <span class="game-name" data-i18n="game.multiply.name">Multiply</span>
+                    <span class="game-desc" data-i18n="game.multiply.desc">Practice multiplication!</span>
+                </button>
+                <button id="divideBtn" type="button" class="game-btn bigger-kids-game">
+                    <span class="game-icon" aria-hidden="true">➗</span>
+                    <span class="game-name" data-i18n="game.divide.name">Divide</span>
+                    <span class="game-desc" data-i18n="game.divide.desc">Practice division!</span>
+                </button>
+            </div>
+
+            <section class="panel progress-panel" id="progressPanel" data-i18n-attr="aria-label:progress.title" aria-label="My Progress">
+                <h2 class="panel-title" data-i18n="progress.title">My Progress</h2>
                 <div class="progress-top">
                     <div class="progress-card daily-goal" id="dailyGoalCard">
                         <div class="progress-card-label" data-i18n="progress.today">Today</div>
@@ -78,260 +119,186 @@
                     </div>
                     <div class="progress-card streak" id="streakCard">
                         <div class="progress-card-label" data-i18n="progress.streak">Streak</div>
-                        <div class="progress-card-value" id="streakDisplay">🔥 0</div>
+                        <div class="progress-card-value" id="streakDisplay">Start today!</div>
                     </div>
                 </div>
-                <div class="calendar" id="calendar" aria-label="Last 14 days"></div>
+                <div class="calendar" id="calendar" role="list" data-i18n-attr="aria-label:progress.calendar" aria-label="Last 14 days"></div>
                 <div class="progress-bottom">
-                    <div class="progress-stat" title="Total stars"><span class="progress-stat-icon">🌟</span> <span id="totalStarsDisplay">0</span></div>
-                    <div class="progress-stat" title="Total correct"><span class="progress-stat-icon">✅</span> <span id="totalCorrectDisplay">0</span></div>
-                    <div class="progress-stat" title="Best streak"><span class="progress-stat-icon">🏆</span> <span id="bestStreakDisplay">0</span></div>
+                    <div class="progress-stat">
+                        <span class="progress-stat-value"><span aria-hidden="true">🌟</span> <span id="totalStarsDisplay">0</span></span>
+                        <span class="progress-stat-label" data-i18n="progress.totalStars">Stars</span>
+                    </div>
+                    <div class="progress-stat">
+                        <span class="progress-stat-value"><span aria-hidden="true">✅</span> <span id="totalCorrectDisplay">0</span></span>
+                        <span class="progress-stat-label" data-i18n="progress.totalCorrect">Correct answers</span>
+                    </div>
+                    <div class="progress-stat">
+                        <span class="progress-stat-value"><span aria-hidden="true">🏆</span> <span id="bestStreakDisplay">0</span></span>
+                        <span class="progress-stat-label" data-i18n="progress.bestStreak">Best streak</span>
+                    </div>
                 </div>
-            </div>
+            </section>
 
-            <div class="game-selection">
-                <button id="countFruitsBtn" class="game-btn">
-                    <div class="game-icon">🍎🍌🍊</div>
-                    <h3 data-i18n="game.count.name">Count the Fruits</h3>
-                    <p data-i18n="game.count.desc">Count how many fruits you see!</p>
-                </button>
-                <button id="addFruitsBtn" class="game-btn">
-                    <div class="game-icon">🍎➕🍎</div>
-                    <h3 data-i18n="game.add.name">Add the Fruits</h3>
-                    <p data-i18n="game.add.desc">Solve simple addition with fruits!</p>
-                </button>
-                 <button id="compareFruitsBtn" class="game-btn">
-                     <div class="game-icon">🍎⚖️🍎</div>
-                     <h3 data-i18n="game.compare.name">Which Group Has More?</h3>
-                     <p data-i18n="game.compare.desc">Choose &gt;, &lt;, or =</p>
-                 </button>
-                  <button id="matchFruitsBtn" class="game-btn">
-                      <div class="game-icon">🔢➡️🍎</div>
-                      <h3 data-i18n="game.match.name">Match Number to Fruits</h3>
-                      <p data-i18n="game.match.desc">Connect numbers to matching fruit groups</p>
-                  </button>
-                  <!-- Bigger Kids Games -->
-                  <button id="addSubBtn" class="game-btn bigger-kids-game">
-                      <div class="game-icon">➕➖</div>
-                      <h3 data-i18n="game.addsub.name">Add &amp; Subtract</h3>
-                      <p data-i18n="game.addsub.desc">Practice addition and subtraction!</p>
-                  </button>
-                  <button id="multiplyBtn" class="game-btn bigger-kids-game">
-                      <div class="game-icon">✖️</div>
-                      <h3 data-i18n="game.multiply.name">Multiply</h3>
-                      <p data-i18n="game.multiply.desc">Practice multiplication!</p>
-                  </button>
-                  <button id="divideBtn" class="game-btn bigger-kids-game">
-                      <div class="game-icon">➗</div>
-                      <h3 data-i18n="game.divide.name">Divide</h3>
-                      <p data-i18n="game.divide.desc">Practice division!</p>
-                  </button>
-            </div>
+            <details class="panel settings-panel" id="settingsPanel">
+                <summary class="settings-summary"><span data-i18n="settings.title">Settings</span></summary>
+                <div class="settings-body">
+                    <div class="settings-group" role="group" aria-labelledby="settingsInputLabel">
+                        <div class="settings-label" id="settingsInputLabel" data-i18n="settings.inputMode">Input Mode</div>
+                        <div class="settings-options">
+                            <button id="settingsClickMode" type="button" class="settings-btn" data-mode="click" data-i18n="settings.click">👆 Click Numbers</button>
+                            <button id="settingsKeyboardMode" type="button" class="settings-btn" data-mode="keyboard" data-i18n="settings.keyboard">⌨️ Type Numbers</button>
+                        </div>
+                    </div>
+                    <div class="settings-group" role="group" aria-labelledby="settingsDiffLabel">
+                        <div class="settings-label" id="settingsDiffLabel" data-i18n="settings.difficulty">Difficulty</div>
+                        <div class="settings-options">
+                            <button id="settingsDiffEasy" type="button" class="settings-btn" data-diff="easy" data-i18n="settings.easy">Easy</button>
+                            <button id="settingsDiffMedium" type="button" class="settings-btn" data-diff="medium" data-i18n="settings.medium">Medium</button>
+                            <button id="settingsDiffHard" type="button" class="settings-btn" data-diff="hard" data-i18n="settings.hard">Hard</button>
+                        </div>
+                    </div>
+                    <div class="settings-group" role="group" aria-labelledby="settingsSpeechLabel">
+                        <div class="settings-label" id="settingsSpeechLabel" data-i18n="settings.speech">Speech Rate</div>
+                        <div class="settings-options">
+                            <button id="settingsSpeechSlow" type="button" class="settings-btn" data-speech="slow" data-i18n="settings.speech.slow">🐢 Slow</button>
+                            <button id="settingsSpeechNormal" type="button" class="settings-btn" data-speech="normal" data-i18n="settings.speech.normal">🚶 Normal</button>
+                            <button id="settingsSpeechFast" type="button" class="settings-btn" data-speech="fast" data-i18n="settings.speech.fast">🏃 Fast</button>
+                        </div>
+                    </div>
+                    <div class="settings-group" role="group" aria-labelledby="settingsSoundLabel">
+                        <div class="settings-label" id="settingsSoundLabel" data-i18n="settings.sound">Sound Effects</div>
+                        <div class="settings-options">
+                            <button id="settingsSoundOn" type="button" class="settings-btn" data-sound="on" data-i18n="settings.sound.on">🔊 On</button>
+                            <button id="settingsSoundOff" type="button" class="settings-btn" data-sound="off" data-i18n="settings.sound.off">🔇 Off</button>
+                        </div>
+                    </div>
+                    <p class="settings-hint" data-i18n="settings.hint">Games will use these settings and start immediately.</p>
+                    <p id="settingsSaved" class="settings-saved" data-i18n="settings.saved" aria-live="polite">Saved ✓</p>
+                </div>
+            </details>
 
-            <div class="settings-panel" id="settingsPanel">
-                <h3 class="settings-title" data-i18n="settings.title">Settings</h3>
-                <div class="settings-group">
-                    <div class="settings-label" data-i18n="settings.inputMode">Input Mode</div>
-                    <div class="settings-options">
-                        <button id="settingsClickMode" class="settings-btn" data-mode="click" data-i18n="settings.click" aria-label="Use buttons to answer">👆 Click Numbers</button>
-                        <button id="settingsKeyboardMode" class="settings-btn" data-mode="keyboard" data-i18n="settings.keyboard" aria-label="Type answer on keyboard">⌨️ Type Numbers</button>
-                    </div>
-                </div>
-                <div class="settings-group">
-                    <div class="settings-label" data-i18n="settings.difficulty">Difficulty</div>
-                    <div class="settings-options">
-                        <button id="settingsDiffEasy" class="settings-btn" data-diff="easy" data-i18n="settings.easy">Easy</button>
-                        <button id="settingsDiffMedium" class="settings-btn" data-diff="medium" data-i18n="settings.medium">Medium</button>
-                        <button id="settingsDiffHard" class="settings-btn" data-diff="hard" data-i18n="settings.hard">Hard</button>
-                    </div>
-                </div>
-                <div class="settings-group">
-                    <div class="settings-label" data-i18n="settings.speech">Speech Rate</div>
-                    <div class="settings-options">
-                        <button id="settingsSpeechSlow" class="settings-btn" data-speech="slow" data-i18n="settings.speech.slow" aria-label="Slow speech">🐢 Slow</button>
-                        <button id="settingsSpeechNormal" class="settings-btn" data-speech="normal" data-i18n="settings.speech.normal" aria-label="Normal speech">🚶 Normal</button>
-                        <button id="settingsSpeechFast" class="settings-btn" data-speech="fast" data-i18n="settings.speech.fast" aria-label="Fast speech">🏃 Fast</button>
-                    </div>
-                </div>
-                <div class="settings-group">
-                    <div class="settings-label" data-i18n="settings.sound">Sound Effects</div>
-                    <div class="settings-options">
-                        <button id="settingsSoundOn" class="settings-btn" data-sound="on" data-i18n="settings.sound.on" aria-label="Sound effects on">🔊 On</button>
-                        <button id="settingsSoundOff" class="settings-btn" data-sound="off" data-i18n="settings.sound.off" aria-label="Sound effects off">🔇 Off</button>
-                    </div>
-                </div>
-                <div id="settingsSaved" class="settings-saved hidden" data-i18n="settings.saved">Saved ✓</div>
-                <p class="settings-hint" data-i18n="settings.hint">Games will use these settings and start immediately.</p>
-            </div>
-
-            <div class="instructions" id="instructionsPanel">
-                <p data-i18n="instructions.line1">🎯 Fun math games for kids!</p>
-                <p data-i18n="instructions.line2">⭐ Learn counting and numbers!</p>
-            </div>
-            <button id="changeAgeGroupBtn" class="back-btn" data-i18n="home.changeAge" style="margin-top: 20px;">🔄 Change Age Group</button>
+            <button id="changeAgeGroupBtn" type="button" class="back-btn" data-i18n="home.changeAge">🔄 Change Age Group</button>
         </div>
     </div>
 
-    <!-- Difficulty Selection Screen -->
-    <div id="difficultyScreen" class="screen hidden">
-        <div class="home-container">
-            <h1 id="difficultyTitle" class="game-title">🍎 Count the Fruits 🍊</h1>
-            <p class="game-subtitle" data-i18n="difficulty.subtitle">Choose your difficulty</p>
-
-            <div class="mode-selection">
-                <div class="mode-buttons">
-                    <button id="easyDifficultyBtn" class="mode-btn" data-i18n="settings.easy">Easy</button>
-                    <button id="mediumDifficultyBtn" class="mode-btn" data-i18n="settings.medium">Medium</button>
-                    <button id="hardDifficultyBtn" class="mode-btn" data-i18n="settings.hard">Hard</button>
-                </div>
-                <button id="backToHomeFromDifficultyBtn" class="back-btn" data-i18n="back">← Back to Games</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Play Mode Selection Screen -->
+    <!-- Play Mode Selection Screen (level + how to play) -->
     <div id="playModeScreen" class="screen hidden">
-        <div class="home-container">
-            <h1 id="playModeTitle" class="game-title" data-i18n="playMode.title">Pick Play Mode</h1>
+        <div class="home-container narrow">
+            <h1 id="playModeTitle" class="game-title">Pick Play Mode</h1>
             <p class="game-subtitle" data-i18n="playMode.subtitle">Choose how you want to play</p>
 
-            <div class="mode-selection">
+            <div class="panel play-setup">
+                <div class="settings-group" role="group" aria-labelledby="playLevelLabel">
+                    <div class="settings-label" id="playLevelLabel" data-i18n="settings.difficulty">Difficulty</div>
+                    <div class="settings-options" id="playLevelOptions">
+                        <button type="button" class="settings-btn level-btn" data-diff="easy" data-i18n="settings.easy">Easy</button>
+                        <button type="button" class="settings-btn level-btn" data-diff="medium" data-i18n="settings.medium">Medium</button>
+                        <button type="button" class="settings-btn level-btn" data-diff="hard" data-i18n="settings.hard">Hard</button>
+                    </div>
+                </div>
                 <div class="mode-buttons">
-                    <button id="timeModeBtn" class="mode-btn">
-                        <h3 data-i18n="playMode.time">⏱️ Time Mode</h3>
-                        <p data-i18n="playMode.time.desc">20 seconds</p>
+                    <button id="timeModeBtn" type="button" class="mode-btn">
+                        <span class="mode-icon" aria-hidden="true">⏱️</span>
+                        <span class="mode-name" data-i18n="playMode.time">Time Mode</span>
+                        <span class="mode-desc" id="timeModeDesc">20 seconds</span>
                     </button>
-                    <button id="questionsModeBtn" class="mode-btn keyboard">
-                        <h3 data-i18n="playMode.questions">❓ Questions Mode</h3>
-                        <p data-i18n="playMode.questions.desc">10 questions</p>
+                    <button id="questionsModeBtn" type="button" class="mode-btn alt">
+                        <span class="mode-icon" aria-hidden="true">❓</span>
+                        <span class="mode-name" data-i18n="playMode.questions">Questions Mode</span>
+                        <span class="mode-desc" data-i18n="playMode.questions.desc">10 questions</span>
                     </button>
                 </div>
-                <button id="backToHomeFromPlayModeBtn" class="back-btn" data-i18n="back">← Back to Games</button>
             </div>
-        </div>
-    </div>
-
-    <!-- Mode Selection Screen -->
-    <div id="modeScreen" class="screen hidden">
-        <div class="home-container">
-            <h1 id="modeTitle" class="game-title">🍎 Count the Fruits 🍊</h1>
-            <p class="game-subtitle" data-i18n="modeSelect.subtitle">How do you want to enter your answers?</p>
-
-            <div class="mode-selection">
-                <div class="mode-buttons">
-                    <button id="clickModeBtn" class="mode-btn">
-                        <div class="mode-icon">
-                            <svg viewBox="0 0 100 100" style="width: 48px; height: 48px;">
-                                <circle cx="50" cy="50" r="35" fill="#4CAF50"/>
-                                <circle cx="50" cy="50" r="25" fill="#66BB6A"/>
-                                <text x="50" y="60" text-anchor="middle" fill="white" font-size="20" font-weight="bold">1</text>
-                                <path d="M30 30 L40 40 M35 25 L35 45 M25 35 L45 35" stroke="white" stroke-width="3" fill="none"/>
-                            </svg>
-                        </div>
-                        <h3 data-i18n="settings.click">👆 Click Numbers</h3>
-                        <p data-i18n="modeSelect.click.desc">Tap the answer button</p>
-                    </button>
-                    <button id="keyboardModeBtn" class="mode-btn keyboard">
-                        <div class="mode-icon">
-                            <svg viewBox="0 0 100 100" style="width: 48px; height: 48px;">
-                                <rect x="10" y="35" width="80" height="40" rx="8" fill="#2196F3"/>
-                                <rect x="15" y="40" width="8" height="6" rx="2" fill="white"/>
-                                <rect x="27" y="40" width="8" height="6" rx="2" fill="white"/>
-                                <rect x="39" y="40" width="8" height="6" rx="2" fill="white"/>
-                                <rect x="51" y="40" width="8" height="6" rx="2" fill="white"/>
-                                <rect x="63" y="40" width="8" height="6" rx="2" fill="white"/>
-                                <rect x="75" y="40" width="8" height="6" rx="2" fill="white"/>
-                                <rect x="21" y="52" width="8" height="6" rx="2" fill="white"/>
-                                <rect x="33" y="52" width="8" height="6" rx="2" fill="white"/>
-                                <rect x="45" y="52" width="8" height="6" rx="2" fill="white"/>
-                                <rect x="57" y="52" width="8" height="6" rx="2" fill="white"/>
-                                <rect x="69" y="52" width="8" height="6" rx="2" fill="white"/>
-                                <rect x="27" y="64" width="46" height="6" rx="2" fill="white"/>
-                            </svg>
-                        </div>
-                        <h3 data-i18n="settings.keyboard">⌨️ Type Numbers</h3>
-                        <p data-i18n="modeSelect.keyboard.desc">Use keyboard to type</p>
-                    </button>
-                </div>
-                <button id="backToHomeBtn" class="back-btn" data-i18n="back">← Back to Games</button>
-            </div>
+            <button id="backToHomeFromPlayModeBtn" type="button" class="back-btn" data-i18n="back">← Back to Games</button>
         </div>
     </div>
 
     <!-- Game Screen -->
-    <div id="gameScreen" class="screen hidden">
-        <div class="game-header">
-            <h2 id="gameHeaderTitle">Count the Fruits!</h2>
-        </div>
+    <div id="gameScreen" class="screen game-screen hidden">
+        <div class="game-shell">
+            <header class="game-topbar">
+                <button id="backHomeBtn" type="button" class="topbar-btn" data-i18n="backToHome">🏠 Home</button>
+                <h2 id="gameHeaderTitle" class="game-topbar-title">Count the Fruits!</h2>
+            </header>
 
-        <div class="game-stats">
-            <div class="stat-box score-box">
-                <span><span data-i18n="stats.score">Score</span>: <span id="score">0</span></span>
-            </div>
-            <div class="stat-box timer-box" id="timerBox">
-                <span>⏰ <span id="timer">20</span></span>
-            </div>
-            <div class="stat-box points-box">
-                <span>⭐ <span id="currentPoints">10</span></span>
-            </div>
-            <div class="stat-box progress-box hidden" id="progressBox" aria-label="Questions progress">
-                <span>❓ <span id="progressText">1/10</span></span>
-            </div>
-            <div class="stat-box time-counter-box hidden" id="timeCounterBox" aria-label="Questions answered">
-                <span>❓ <span id="timeCounterText">0</span></span>
-            </div>
-        </div>
+            <main class="game-main">
+                <div class="game-stats">
+                    <div class="stat-box score-box">
+                        <span class="stat-label" data-i18n="stats.score">Score</span>
+                        <span id="score" class="stat-value">0</span>
+                    </div>
+                    <div class="stat-box timer-box" id="timerBox" data-i18n-attr="aria-label:aria.timer" aria-label="Time left">
+                        <span aria-hidden="true">⏰</span>
+                        <span id="timer" class="stat-value">20</span>
+                    </div>
+                    <div class="stat-box progress-box hidden" id="progressBox" data-i18n-attr="aria-label:aria.progress" aria-label="Question">
+                        <span aria-hidden="true">❓</span>
+                        <span id="progressText" class="stat-value">1/10</span>
+                    </div>
+                </div>
 
-        <div class="question-container">
-            <div class="question-text">
-                <span id="questionText">How many apples do you see?</span>
-                <button id="speakBtn" class="speak-button" data-i18n-attr="title:speakBtn.title" title="Repeat question">🔊</button>
-            </div>
-        </div>
+                <div class="question-container">
+                    <div class="question-text">
+                        <span id="questionText">How many apples do you see?</span>
+                        <button id="speakBtn" type="button" class="speak-button" data-i18n-attr="title:speakBtn.title, aria-label:speakBtn.title" title="Repeat question" aria-label="Repeat question">🔊</button>
+                    </div>
+                </div>
 
-        <div class="fruits-container" id="fruitsContainer">
-            <!-- Fruits will be dynamically added here -->
-        </div>
+                <div class="fruits-container" id="fruitsContainer">
+                    <!-- Question content is rendered here -->
+                </div>
 
-        <div class="options-container" id="optionsContainer" aria-label="Answer choices">
-            <button class="option-btn" data-answer="1" aria-label="Answer option 1, press 1">1</button>
-            <button class="option-btn" data-answer="2" aria-label="Answer option 2, press 2">2</button>
-            <button class="option-btn" data-answer="3" aria-label="Answer option 3, press 3">3</button>
-            <button class="option-btn" data-answer="4" aria-label="Answer option 4, press 4">4</button>
-        </div>
+                <div class="answer-feedback" aria-live="polite">
+                    <span id="answerFeedback" class="answer-feedback-bubble"></span>
+                </div>
 
-        <div class="input-container" id="keyboardContainer" style="display: none;">
-            <input type="number" id="answerInput" class="answer-input" min="1" placeholder="?">
-            <button id="submitBtn" class="submit-btn" data-i18n="submit">Submit</button>
-        </div>
+                <div class="options-container" id="optionsContainer" role="group" data-i18n-attr="aria-label:aria.options" aria-label="Answer choices">
+                    <button type="button" class="option-btn" data-answer="1" aria-keyshortcuts="1">1</button>
+                    <button type="button" class="option-btn" data-answer="2" aria-keyshortcuts="2">2</button>
+                    <button type="button" class="option-btn" data-answer="3" aria-keyshortcuts="3">3</button>
+                    <button type="button" class="option-btn" data-answer="4" aria-keyshortcuts="4">4</button>
+                </div>
 
-        <button id="backHomeBtn" class="back-button" data-i18n="backToHome">Back to Home</button>
-
-        <div id="feedbackContainer" class="feedback-container hidden">
-            <div class="feedback-message" id="feedbackMessage">
-                <h3 id="feedbackTitle">Excellent!</h3>
-                <p id="feedbackText">+10 points!</p>
-                <button id="nextQuestionBtn" class="next-question-btn" data-i18n="nextQuestion" style="display: none;">Next Question</button>
-            </div>
+                <!-- Typing mode: an on-screen number pad, so no phone keyboard covers the game.
+                     A real keyboard types into the same display. -->
+                <div class="input-container hidden" id="keyboardContainer">
+                    <div class="typed-row">
+                        <output id="answerInput" class="answer-input" aria-live="polite" data-i18n-attr="aria-label:aria.answer" aria-label="Your answer"></output>
+                        <button id="backspaceBtn" type="button" class="pad-key pad-back" tabindex="-1" data-i18n-attr="aria-label:aria.backspace, title:aria.backspace" aria-label="Delete" title="Delete">⌫</button>
+                        <button id="submitBtn" type="button" class="submit-btn" data-i18n="submit" disabled>Submit</button>
+                    </div>
+                    <div class="num-pad" id="numPad">
+                        <button type="button" class="pad-key" data-digit="1" tabindex="-1">1</button>
+                        <button type="button" class="pad-key" data-digit="2" tabindex="-1">2</button>
+                        <button type="button" class="pad-key" data-digit="3" tabindex="-1">3</button>
+                        <button type="button" class="pad-key" data-digit="4" tabindex="-1">4</button>
+                        <button type="button" class="pad-key" data-digit="5" tabindex="-1">5</button>
+                        <button type="button" class="pad-key" data-digit="6" tabindex="-1">6</button>
+                        <button type="button" class="pad-key" data-digit="7" tabindex="-1">7</button>
+                        <button type="button" class="pad-key" data-digit="8" tabindex="-1">8</button>
+                        <button type="button" class="pad-key" data-digit="9" tabindex="-1">9</button>
+                        <button type="button" class="pad-key" data-digit="0" tabindex="-1">0</button>
+                    </div>
+                </div>
+            </main>
         </div>
     </div>
 
     <!-- Result Screen -->
     <div id="resultScreen" class="screen hidden">
-        <div class="home-container">
-            <h1 id="resultTitle" class="game-title">Results</h1>
-            <div class="mode-selection" style="max-width: 480px;">
-                <div class="settings-group" style="justify-content:center;">
-                    <div class="settings-label" data-i18n="result.yourScore">Your Score</div>
-                </div>
-                <p id="resultScore" class="game-subtitle" style="margin-bottom:8px;">0</p>
-                <p id="resultBest" class="settings-hint" style="margin-bottom:8px;"></p>
-                <p id="resultComeback" class="result-comeback hidden" data-i18n="result.comeback">🎁 Comeback bonus! 2× stars</p>
-                <p id="resultStreakUpdate" class="result-streak hidden"></p>
-                <div id="resultStars" class="stars" aria-label="stars"></div>
-                <div style="margin-top:18px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
-                    <button id="resultPlayAgainBtn" class="mode-btn" data-i18n="result.playAgain" aria-label="Play again">🔄 Play Again</button>
-                    <button id="resultBackBtn" class="back-btn" data-i18n="back">← Back to Games</button>
+        <div class="home-container narrow">
+            <div class="panel result-card">
+                <div id="resultEmoji" class="result-emoji" aria-hidden="true">🎉</div>
+                <h1 id="resultTitle" class="result-title">Results</h1>
+                <div class="result-score-label" data-i18n="result.yourScore">Correct answers</div>
+                <p id="resultScore" class="result-score">0</p>
+                <div id="resultStars" class="stars" role="img" aria-label="0/3"></div>
+                <p id="resultBest" class="result-best"></p>
+                <p id="resultComeback" class="result-chip result-comeback hidden" data-i18n="result.comeback">🎁 Comeback bonus! 2× stars</p>
+                <p id="resultStreakUpdate" class="result-chip result-streak hidden"></p>
+                <div class="result-actions">
+                    <button id="resultPlayAgainBtn" type="button" class="mode-btn" data-i18n="result.playAgain">🔄 Play Again</button>
+                    <button id="resultBackBtn" type="button" class="back-btn" data-i18n="back">← Back to Games</button>
                 </div>
             </div>
         </div>
