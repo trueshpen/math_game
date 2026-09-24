@@ -1,5 +1,5 @@
 // Bump APP_VERSION together with the ?v= values in index.html whenever this file changes.
-const APP_VERSION = '2026-09-24.3';
+const APP_VERSION = '2026-09-24.4';
 
 // A page the browser cached from another version may still load this file (the
 // server keeps no old copies). The page asks for script.js?v=<its version>; if that
@@ -153,6 +153,26 @@ const translations = {
         'result.streakUp.other': '🔥 Streak: {n} days in a row!',
         'result.streakNew': '🔥 New streak started!',
         'result.stars': '{n} of 3 stars',
+        'result.endlessTitle': 'Well done!',
+        'result.dayBest': '🏆 Best result of the day!',
+        'result.bestToday': 'Best today: {pct} %',
+        'result.notSaved': '⚠️ This result could not be saved.',
+        'endless.notSaving': 'The result can\'t be saved right now',
+        // Endless mode
+        'endless.mode': 'Endless',
+        'endless.mode.desc': 'as long as you like',
+        'endless.finish': '✓ Finish',
+        'endless.title': '♾️ Endless mode',
+        'endless.last': 'Last time',
+        'endless.none': 'No result yet – give it a try!',
+        'endless.chart': 'Best result of each day',
+        'endless.questions.one': '{n} question',
+        'endless.questions.other': '{n} questions',
+        'endless.correct': '{n} correct',
+        'endless.numbers.multiply': 'times tables {list}',
+        'endless.numbers.divide': 'dividing by {list}',
+        'endless.level': 'level: {level}',
+        'aria.endlessStats': 'Questions and success rate',
         // Progress panel
         'progress.title': 'My Progress',
         'progress.today': 'Today',
@@ -293,6 +313,26 @@ const translations = {
         'result.streakUp.many': '🔥 Série: {n} dní v řadě!',
         'result.streakNew': '🔥 Nová série začala!',
         'result.stars': '{n} ze 3 hvězd',
+        'result.endlessTitle': 'Dobrá práce!',
+        'result.dayBest': '🏆 Nejlepší výsledek dne!',
+        'result.bestToday': 'Dnes nejlépe: {pct} %',
+        'result.notSaved': '⚠️ Výsledek se nepodařilo uložit.',
+        'endless.notSaving': 'Výsledek se teď nedaří uložit',
+        'endless.mode': 'Nekonečně',
+        'endless.mode.desc': 'dokud chceš',
+        'endless.finish': '✓ Konec',
+        'endless.title': '♾️ Nekonečný režim',
+        'endless.last': 'Naposledy',
+        'endless.none': 'Zatím žádný výsledek – zkus to!',
+        'endless.chart': 'Nejlepší výsledek dne',
+        'endless.questions.one': '{n} otázka',
+        'endless.questions.few': '{n} otázky',
+        'endless.questions.many': '{n} otázek',
+        'endless.correct': '{n} správně',
+        'endless.numbers.multiply': 'násobilka {list}',
+        'endless.numbers.divide': 'dělení {list}',
+        'endless.level': 'obtížnost: {level}',
+        'aria.endlessStats': 'Otázky a úspěšnost',
         'progress.title': 'Můj pokrok',
         'progress.today': 'Dnes',
         'progress.streak': 'Série',
@@ -389,6 +429,7 @@ function refreshDynamicI18nText() {
     if (lastResult && !resultScreen.classList.contains('hidden')) {
         renderResult(lastResult);
     }
+    if (!playModeScreen.classList.contains('hidden')) renderEndlessPanel();
 }
 
 function setLanguage(lang) {
@@ -414,7 +455,7 @@ let showFeedback = false;    // an answer is being shown; further input is ignor
 let inputLockedUntil = 0;    // brief lock after a new question so a double tap can't answer it
 let inputMode = 'click'; // 'click' or 'keyboard'
 // Play mode state
-let playMode = null; // 'time' | 'questions'
+let playMode = null; // 'time' | 'questions' | 'endless'
 let questionsAsked = 0;
 let questionTarget = 10;
 let answersGiven = 0; // real attempts this run; a run without any is not recorded as played
@@ -462,6 +503,17 @@ const PRACTICE_NUMBER_KEYS = { multiply: 'km_multiply_numbers', divide: 'km_divi
 const PRACTICE_NUMBER_CHOICES = [2, 3, 4, 5, 6, 7, 8, 9];
 let practiceNumbers = []; // numbers chosen for the current run; [] = use the level
 let lastMathProblem = '';
+// Endless mode (bigger kids): play until "Finish"; results kept per game
+const ENDLESS_GAMES = ['addsub', 'multiply', 'divide'];
+const ENDLESS_HISTORY_DAYS = 60; // days of runs kept
+const ENDLESS_CHART_DAYS = 14;   // most recent days with a result in the chart
+const ENDLESS_FULL_RUN = 10;     // three stars need a run at least this long
+const ENDLESS_RUN_PREFIX = 'km_endless_run_'; // + game + '_' + run id: one run's result
+let endlessRunId = null;         // id of this page's endless run
+let endlessRunDate = null;       // the day it belongs to (set by its first answer)
+let endlessRunAt = 0;            // when its last answer was counted
+let lastRunAt = 0;               // newest run time seen (runs are ordered by it, see nextRunAt)
+const unsavedEndlessRuns = new Map(); // run id -> latest result that could not be written yet
 
 // Timing (ms)
 const CORRECT_ADVANCE_MS = 350;      // green flash on a right answer
@@ -552,6 +604,18 @@ const resultStreakUpdate = document.getElementById('resultStreakUpdate');
 const resultBackBtn = document.getElementById('resultBackBtn');
 const resultPlayAgainBtn = document.getElementById('resultPlayAgainBtn');
 const changeAgeGroupBtn = document.getElementById('changeAgeGroupBtn');
+// Endless mode elements
+const modeButtonsEl = document.getElementById('modeButtons');
+const endlessModeBtn = document.getElementById('endlessModeBtn');
+const endlessPanel = document.getElementById('endlessPanel');
+const endlessLast = document.getElementById('endlessLast');
+const endlessHistory = document.getElementById('endlessHistory');
+const endlessChart = document.getElementById('endlessChart');
+const endlessTip = document.getElementById('endlessTip');
+const endlessBox = document.getElementById('endlessBox');
+const endlessStatsText = document.getElementById('endlessStatsText');
+const finishBtn = document.getElementById('finishBtn');
+const resultDetail = document.getElementById('resultDetail');
 
 const LITTLE_KIDS_GAMES = [countFruitsBtn, addFruitsBtn, compareFruitsBtn, matchFruitsBtn];
 const BIGGER_KIDS_GAMES = [addSubBtn, multiplyBtn, divideBtn];
@@ -580,6 +644,8 @@ numberChecks.forEach(box => box.addEventListener('change', () => {
 }));
 resultBackBtn.addEventListener('click', goHome);
 resultPlayAgainBtn.addEventListener('click', playAgain);
+endlessModeBtn.addEventListener('click', () => selectPlayMode('endless'));
+finishBtn.addEventListener('click', finishEndlessRun);
 changeAgeGroupBtn.addEventListener('click', goToAgeSelection);
 
 // Settings management
@@ -722,6 +788,17 @@ function todayKey(date) {
     const day = String(d.getDate()).padStart(2, '0');
     return `${y}-${m}-${day}`;
 }
+// 'YYYY-MM-DD' moved by n days
+function shiftDay(key, n) {
+    const [y, m, d] = key.split('-').map(Number);
+    return todayKey(new Date(y, m - 1, d + n));
+}
+// How many days in a row, from `from` going by `step` (-1 back, +1 on), are in `days`
+function consecutiveDays(days, from, step) {
+    let n = 0;
+    for (let d = from; days.has(d); d = shiftDay(d, step)) n++;
+    return n;
+}
 function daysBetween(aKey, bKey) {
     if (!aKey || !bKey) return null;
     const a = new Date(aKey + 'T00:00:00');
@@ -748,6 +825,18 @@ function saveChoice(k, v) {
         unsavedChoices.set(k, String(v));
     }
 }
+// Reads a key telling "missing" ({ok: true, value: null}) apart from "unreadable" ({ok: false}).
+function lsRead(k) {
+    try { return { ok: true, value: localStorage.getItem(k) }; } catch (_) { return { ok: false, value: null }; }
+}
+// Writes a key and says whether it really holds the value now (lsSet stays silent).
+function lsWrite(k, v) {
+    lsSet(k, v);
+    return lsRead(k).value === v;
+}
+function lsRemove(k) {
+    try { localStorage.removeItem(k); } catch (_) {}
+}
 function lsGetInt(k, def) {
     const v = parseInt(lsGet(k), 10);
     return Number.isFinite(v) ? v : def;
@@ -760,9 +849,10 @@ function getPlayedDaysSet() {
     return s;
 }
 function savePlayedDaysSet(set) {
-    // Cap to ~400 days to avoid unbounded growth
+    // Kept for ~10 years (about 40 kB): a day filled in late recounts the streak
+    // from these days, so they must reach back past any real streak
     const arr = [...set].sort();
-    const trimmed = arr.slice(-400);
+    const trimmed = arr.slice(-3660);
     lsSet(PROGRESS_KEYS.playedDays, trimmed.join(','));
 }
 
@@ -783,10 +873,13 @@ function checkComebackOnStart() {
 
 // Call this when a run ENDS with real play (at least one answer attempt).
 // Updates streak, played days, totals. Returns a summary for the result screen.
-function recordPlaySession(starsEarned, correctCount) {
-    const today = todayKey();
+// `day`: the day the run was played, if not today (an endless run left open
+// overnight ends the next morning but counts for its own day).
+function recordPlaySession(starsEarned, correctCount, day) {
+    const playDay = day || todayKey();
+    const forToday = playDay === todayKey();
     const playedDays = getPlayedDaysSet();
-    const alreadyPlayedToday = playedDays.has(today);
+    const alreadyPlayed = playedDays.has(playDay);
 
     let streak = lsGetInt(PROGRESS_KEYS.streakCurrent, 0);
     let best = lsGetInt(PROGRESS_KEYS.streakBest, 0);
@@ -794,31 +887,35 @@ function recordPlaySession(starsEarned, correctCount) {
     let streakChanged = false;
     let newStreakStarted = false;
 
-    if (!alreadyPlayedToday) {
-        const gap = last ? daysBetween(last, today) : null;
+    if (!alreadyPlayed) {
+        const gap = last ? daysBetween(last, playDay) : null;
+        playedDays.add(playDay);
         if (gap === null) {
             streak = 1;
             newStreakStarted = true;
         } else if (gap === 1) {
             streak += 1;
             streakChanged = true;
-        } else if (gap === 0) {
-            // Should not happen (alreadyPlayedToday covers it) but be safe
-        } else {
+        } else if (gap > 1) {
             streak = 1;
             newStreakStarted = true;
+        } else if (gap < 0) {
+            // A day before the last one on record (a run finished late) may join
+            // streaks up: count them again from the played days (never shorter)
+            streak = Math.max(streak, consecutiveDays(playedDays, last, -1));
+            best = Math.max(best, consecutiveDays(playedDays, playDay, -1) + consecutiveDays(playedDays, shiftDay(playDay, 1), 1));
         }
+        // (gap === 0 should not happen - alreadyPlayed covers it)
         if (streak > best) best = streak;
         lsSetInt(PROGRESS_KEYS.streakCurrent, streak);
         lsSetInt(PROGRESS_KEYS.streakBest, best);
-        lsSet(PROGRESS_KEYS.lastPlay, today);
-        playedDays.add(today);
+        if (gap === null || gap > 0) lsSet(PROGRESS_KEYS.lastPlay, playDay); // never moves back
         savePlayedDaysSet(playedDays);
     }
 
     // Comeback bonus: 2x stars if the flag was set at run start. A run without
     // stars leaves it for the next run today (0 × 2 would just waste it).
-    const comeback = lsGet(PROGRESS_KEYS.comebackPending) === '1' && starsEarned > 0;
+    const comeback = forToday && lsGet(PROGRESS_KEYS.comebackPending) === '1' && starsEarned > 0;
     const effectiveStars = comeback ? starsEarned * 2 : starsEarned;
     if (comeback) lsSet(PROGRESS_KEYS.comebackPending, '0');
 
@@ -836,7 +933,7 @@ function recordPlaySession(starsEarned, correctCount) {
         starsEarned: effectiveStars,
         streakChanged,
         newStreakStarted,
-        firstPlayToday: !alreadyPlayedToday,
+        firstPlayToday: forToday && !alreadyPlayed,
     };
 }
 
@@ -890,6 +987,278 @@ function renderCalendar() {
         if (i === 0) cell.classList.add('today');
         cal.appendChild(cell);
     }
+}
+
+// ============================================================
+// Endless mode (bigger kids): last result and the best result of each day
+// ============================================================
+function isEndlessGame(game) {
+    return ENDLESS_GAMES.includes(game);
+}
+
+function endlessKey(game) {
+    return `km_endless_${game}`;
+}
+
+function resultPercent(r) {
+    return Math.round((r.correct / r.answered) * 100);
+}
+
+// The day's best: the higher share of correct answers; on a tie, more
+// questions; on an exact tie, the earlier run (by id, which never changes - so
+// every tab picks the same winner and cleanup never drops both).
+function isBetterResult(a, b) {
+    const lhs = a.correct * b.answered;
+    const rhs = b.correct * a.answered;
+    if (lhs !== rhs) return lhs > rhs;
+    if (a.answered !== b.answered) return a.answered > b.answered;
+    return a.id < b.id;
+}
+
+const RUN_ID_PATTERN = /^[a-z0-9-]{1,40}$/;
+
+// Stored results are checked before use (storage can be edited or damaged).
+function cleanEndlessResult(r, game) {
+    if (!r || typeof r !== 'object') return null;
+    const answered = Number(r.answered);
+    const correct = Number(r.correct);
+    if (!Number.isInteger(answered) || !Number.isInteger(correct) || answered < 1 || correct < 0 || correct > answered) return null;
+    if (typeof r.date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(r.date)) return null;
+    const numbers = Array.isArray(r.numbers) ? PRACTICE_NUMBER_CHOICES.filter(n => r.numbers.includes(n)) : [];
+    const level = SETTINGS_ALLOWED.difficulty.includes(r.level) ? r.level : 'medium';
+    const id = typeof r.id === 'string' && RUN_ID_PATTERN.test(r.id) ? r.id : '';
+    const at = Number.isFinite(r.at) && r.at >= 0 && r.at <= 8.64e15 ? r.at : 0; // (a valid time)
+    return { id, game, date: r.date, at, answered, correct, numbers, level, done: r.done === true };
+}
+
+// ------------------------------------------------------------
+// Each endless run has its own record (key = game + run id), written after
+// every answer and at the end (then marked done) by the page playing it - and
+// by nothing else. Nothing is merged or taken over, so two tabs can't
+// overwrite each other or count a run twice, and closing the page, reloading
+// it or the browser dropping the tab keeps the run as far as it got. A run
+// belongs to the day of its first answer. "Last time" and each day's best are
+// worked out from the records.
+// ------------------------------------------------------------
+function endlessRunKey(game, id) {
+    return `${ENDLESS_RUN_PREFIX}${game}_${id}`;
+}
+
+function newRunId() {
+    return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+// Order of runs ("last time"): the clock, but never earlier than any run on
+// record (whichever tab saved it), so a clock set back can't make a new run
+// look older than the old ones.
+function nextRunAt(game) {
+    readEndlessRuns(game); // raises lastRunAt
+    lastRunAt = Math.max(Date.now(), lastRunAt + 1);
+    return lastRunAt;
+}
+
+// The run as it stands. Its time is that of its last counted answer, so ending
+// it later (Finish, Home, the next morning) doesn't make it look newer than
+// runs played in between.
+function currentEndlessRun(done = false) {
+    if (!endlessRunDate) endlessRunDate = todayKey();
+    return {
+        id: endlessRunId,
+        game: selectedGame,
+        date: endlessRunDate,
+        at: endlessRunAt || nextRunAt(selectedGame),
+        answered: answersGiven,
+        correct: score,
+        numbers: [...practiceNumbers],
+        level: selectedDifficulty,
+        done,
+    };
+}
+
+// A run belongs to one day: when the next answer would fall on another day
+// (a paused tab picked up the next morning, or play past midnight), the run
+// ends where it was instead.
+function endlessRunCrossedDay() {
+    return playMode === 'endless' && !runEnded && answersGiven > 0 && !!endlessRunDate && endlessRunDate !== todayKey()
+        && !gameScreen.classList.contains('hidden');
+}
+
+// Writes a run's record. One that can't be written is kept in memory to try
+// again (latest state), and its older copy is removed so that it can't pass
+// for the result.
+function writeEndlessRun(run) {
+    const key = endlessRunKey(run.game, run.id);
+    if (lsWrite(key, JSON.stringify(run))) {
+        unsavedEndlessRuns.delete(run.id);
+        return true;
+    }
+    lsRemove(key);
+    unsavedEndlessRuns.set(run.id, run);
+    return false;
+}
+
+function retryUnsavedRuns() {
+    unsavedEndlessRuns.forEach(run => writeEndlessRun(run));
+}
+
+// All readable records of a game (damaged ones or ones not matching their key are ignored)
+function readEndlessRuns(game) {
+    const prefix = `${ENDLESS_RUN_PREFIX}${game}_`;
+    let keys;
+    try { keys = Object.keys(localStorage).filter(k => k.startsWith(prefix)); } catch (_) { return []; }
+    const runs = [];
+    keys.forEach(key => {
+        const read = lsRead(key);
+        if (!read.ok || read.value === null) return;
+        let raw;
+        try { raw = JSON.parse(read.value); } catch (_) { return; }
+        const run = raw && raw.game === game ? cleanEndlessResult(raw, game) : null;
+        if (run && run.id && key === prefix + run.id) {
+            runs.push(run);
+            lastRunAt = Math.max(lastRunAt, run.at);
+        }
+    });
+    return runs;
+}
+
+// { last: the run played most recently, days: { 'YYYY-MM-DD': best run of that day } }
+function summarizeEndless(runs) {
+    let last = null;
+    const days = {};
+    runs.forEach(r => {
+        if (!last || r.at > last.at || (r.at === last.at && r.id > last.id)) last = r; // (same pick in every tab)
+        if (!days[r.date] || isBetterResult(r, days[r.date])) days[r.date] = r;
+    });
+    return { last, days };
+}
+
+// Keeps the latest run, and for each of the last ENDLESS_HISTORY_DAYS days
+// (today included) the best finished run and every unfinished one (a paused
+// tab may still add to it). Finished runs never change, so one that is not
+// its day's best can never become it and goes, as does anything older.
+function pruneEndlessRuns(game, runs) {
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - (ENDLESS_HISTORY_DAYS - 1));
+    const oldest = todayKey(cutoff);
+    const { last } = summarizeEndless(runs);
+    const bestDone = {};
+    runs.forEach(r => {
+        if (r.done && (!bestDone[r.date] || isBetterResult(r, bestDone[r.date]))) bestDone[r.date] = r;
+    });
+    runs.forEach(r => {
+        const keep = r === last || (r.date >= oldest && (!r.done || bestDone[r.date] === r));
+        if (!keep) lsRemove(endlessRunKey(game, r.id));
+    });
+}
+
+// After each answer in endless mode
+function checkpointEndlessRun() {
+    if (playMode !== 'endless' || runEnded || !endlessRunId) return;
+    retryUnsavedRuns();
+    endlessRunAt = nextRunAt(selectedGame);
+    const saved = writeEndlessRun(currentEndlessRun());
+    endlessBox.classList.toggle('not-saving', !saved);
+    endlessBox.title = saved ? '' : t('endless.notSaving');
+}
+
+// Endless stars go by the share of correct answers, but a few lucky answers
+// can't earn the top ones
+function endlessStars(answered, correct) {
+    const share = answered ? correct / answered : 0;
+    if (answered >= ENDLESS_FULL_RUN && share >= 0.9) return 3;
+    if (answered >= 5 && share >= 0.7) return 2;
+    return correct >= 1 ? 1 : 0;
+}
+
+// A page about to be hidden (or closed) tries once more to write what it could
+// not; a page coming back on another day ends its endless run where it was.
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') retryUnsavedRuns();
+    else if (endlessRunCrossedDay()) endRun();
+});
+
+function formatDay(key) {
+    const [y, m, d] = key.split('-').map(Number);
+    return new Intl.DateTimeFormat(SPEECH_LANG[currentLang] || 'en-US', { day: 'numeric', month: 'numeric' }).format(new Date(y, m - 1, d));
+}
+
+// "násobilka 2–6" / "dělení 3, 7" / "obtížnost: Střední"
+function describePractice(r) {
+    if (r.numbers.length && (r.game === 'multiply' || r.game === 'divide')) {
+        return t(`endless.numbers.${r.game}`, { list: formatNumberList(r.numbers) });
+    }
+    return t('endless.level', { level: t(`settings.${r.level}`) });
+}
+
+// "25 otázek · 21 správně · 84 % · násobilka 2–6"
+function describeEndlessResult(r) {
+    return [
+        tn('endless.questions', r.answered),
+        t('endless.correct', { n: r.correct }),
+        `${resultPercent(r)} %`,
+        describePractice(r),
+    ].join(' · ');
+}
+
+// Play-mode screen: last endless result of the selected game and a chart of
+// the best result of each day (hover, focus or tap a day for the details).
+function renderEndlessPanel() {
+    const shown = isEndlessGame(selectedGame);
+    endlessPanel.classList.toggle('hidden', !shown);
+    playModeScreen.classList.toggle('with-endless', shown); // wide screens: panel beside the modes
+    if (!shown) return;
+    retryUnsavedRuns();
+    pruneEndlessRuns(selectedGame, readEndlessRuns(selectedGame));
+    const data = summarizeEndless(readEndlessRuns(selectedGame));
+    endlessLast.textContent = data.last
+        ? `${t('endless.last')} (${formatDay(data.last.date)}): ${describeEndlessResult(data.last)}`
+        : t('endless.none');
+    const keys = Object.keys(data.days).sort().slice(-ENDLESS_CHART_DAYS);
+    endlessHistory.classList.toggle('hidden', !keys.length);
+    endlessChart.innerHTML = '';
+    let newest = null;
+    keys.forEach(key => {
+        const r = data.days[key];
+        const pct = resultPercent(r);
+        const tip = `${formatDay(key)}: ${describeEndlessResult(r)}`;
+        const bar = document.createElement('button');
+        bar.type = 'button';
+        bar.className = 'chart-bar';
+        bar.dataset.tone = pct >= 90 ? 'good' : pct >= 70 ? 'ok' : 'low';
+        bar.title = tip;
+        bar.setAttribute('aria-label', tip);
+        const value = document.createElement('span');
+        value.className = 'bar-value';
+        value.textContent = `${pct}%`;
+        const track = document.createElement('span');
+        track.className = 'bar-track';
+        const fill = document.createElement('span');
+        fill.className = 'bar-fill';
+        fill.style.height = `${Math.max(pct, 3)}%`;
+        track.appendChild(fill);
+        const day = document.createElement('span');
+        day.className = 'bar-day';
+        day.textContent = formatDay(key);
+        bar.append(value, track, day);
+        const pick = () => selectChartBar(bar, tip);
+        bar.addEventListener('mouseenter', pick);
+        bar.addEventListener('focus', pick);
+        bar.addEventListener('click', pick);
+        endlessChart.appendChild(bar);
+        newest = { bar, tip };
+    });
+    if (newest) {
+        selectChartBar(newest.bar, newest.tip);
+        endlessChart.scrollLeft = endlessChart.scrollWidth; // newest days in view
+    } else {
+        endlessTip.textContent = '';
+    }
+}
+
+function selectChartBar(bar, tip) {
+    endlessChart.querySelectorAll('.chart-bar.selected').forEach(b => b.classList.remove('selected'));
+    bar.classList.add('selected');
+    endlessTip.textContent = tip;
 }
 
 // Settings button listeners
@@ -1144,9 +1513,20 @@ function startGame(mode) {
     isGeneratingQuestion = false;
     showFeedback = false;
     lastResult = null;
-    // Questions mode shows progress; time mode shows the clock
-    timerBox.classList.toggle('hidden', playMode === 'questions');
+    // Time mode shows the clock, questions mode the progress, endless mode
+    // the problems answered, the success rate and a Finish button
+    timerBox.classList.toggle('hidden', playMode !== 'time');
     progressBox.classList.toggle('hidden', playMode !== 'questions');
+    endlessBox.classList.toggle('hidden', playMode !== 'endless');
+    finishBtn.classList.toggle('hidden', playMode !== 'endless');
+    gameScreen.dataset.mode = playMode; // phones held sideways make room for the wider chips
+    endlessRunId = playMode === 'endless' ? newRunId() : null;
+    endlessRunDate = null;
+    endlessRunAt = 0;
+    retryUnsavedRuns();
+    endlessBox.classList.remove('not-saving');
+    endlessBox.title = '';
+    updateRunStats();
     if (playMode === 'time') {
         timeLeft = getTimeModeDuration();
         updateTimer();
@@ -1172,11 +1552,15 @@ function updateGameTitles() {
 function showPlayModeSelection() {
     updateGameTitles();
     updateSettingsUI(); // level buttons and the time-mode length follow the saved difficulty
+    const endless = isEndlessGame(selectedGame);
+    endlessModeBtn.classList.toggle('hidden', !endless);
+    modeButtonsEl.dataset.count = endless ? '3' : '2';
     showOnly(playModeScreen);
+    renderEndlessPanel(); // after showing, so the chart can scroll to the newest day
 }
 
 function selectPlayMode(mode) {
-    playMode = mode; // 'time' | 'questions'
+    playMode = mode; // 'time' | 'questions' | 'endless'
     const saved = loadSettings();
     configureDifficulty(saved.difficulty);
     updateGameTitles(); // the header names chosen times tables
@@ -1275,6 +1659,12 @@ function goToAgeSelection() {
 }
 
 function goHome() {
+    // Leaving an endless run keeps its result (it has no other end)
+    if (playMode === 'endless' && !runEnded && answersGiven > 0 && !gameScreen.classList.contains('hidden')) {
+        runEnded = true;
+        cancelPendingCallbacks();
+        lastResult = recordRun();
+    }
     // Properly stop all game activities
     cancelPendingCallbacks();
     stopSpeech();
@@ -1511,6 +1901,7 @@ function saveBestScore(newScore) {
 
 function starsForScore(value) {
     if (playMode === 'time') return value >= 16 ? 3 : value >= 10 ? 2 : value >= 1 ? 1 : 0;
+    if (playMode === 'endless') return endlessStars(answersGiven, value);
     return value >= 9 ? 3 : value >= 5 ? 2 : value >= 1 ? 1 : 0;
 }
 
@@ -1518,12 +1909,32 @@ function endRun() {
     if (runEnded) return;
     runEnded = true;
     cancelPendingCallbacks();
+    lastResult = recordRun();
+    renderResult(lastResult);
+    showOnly(resultScreen);
+    if (lastResult.stars > 0) playFanfare();
+}
+
+// Saves a finished run (best score or endless history, streak and totals) and
+// returns what the result screen shows.
+function recordRun() {
     const stars = starsForScore(score);
-    const previousBest = getBestScore();
-    const isNewBest = saveBestScore(score);
+    if (playMode === 'endless') {
+        const run = currentEndlessRun(true);
+        retryUnsavedRuns();
+        const saved = writeEndlessRun(run);
+        // Stars, streak and totals like any run: once, since this page ends its run
+        // once - and for the day the run was played
+        const session = recordPlaySession(stars, score, run.date);
+        pruneEndlessRuns(run.game, readEndlessRuns(run.game));
+        const dayBest = summarizeEndless(readEndlessRuns(run.game)).days[run.date] || null;
+        return { mode: 'endless', run, score, stars, session, saved, newDayBest: saved && !!dayBest && dayBest.id === run.id, dayBest };
+    }
     // Only a run in which the child actually answered counts toward streak and totals
     const session = answersGiven > 0 ? recordPlaySession(stars, score) : null;
-    lastResult = {
+    const previousBest = getBestScore();
+    const isNewBest = saveBestScore(score);
+    return {
         mode: playMode,
         score,
         total: questionTarget,
@@ -1532,17 +1943,50 @@ function endRun() {
         best: Math.max(previousBest, score),
         session,
     };
-    renderResult(lastResult);
-    showOnly(resultScreen);
-    if (stars > 0) playFanfare();
+}
+
+// Endless mode's Finish button. With nothing answered there is nothing to show.
+function finishEndlessRun() {
+    if (runEnded) return;
+    if (answersGiven === 0) {
+        runEnded = true;
+        cancelPendingCallbacks();
+        stopSpeech();
+        showPlayModeSelection();
+        return;
+    }
+    endRun();
+}
+
+// Endless mode: problems answered and the share of correct answers so far
+function updateRunStats() {
+    if (playMode !== 'endless') return;
+    endlessStatsText.textContent = answersGiven
+        ? `${answersGiven} · ${Math.round((score / answersGiven) * 100)} %`
+        : '0';
 }
 
 function renderResult(result) {
-    resultTitle.textContent = result.mode === 'time' ? t('result.timeUp') : t('result.allDone');
+    const endless = result.mode === 'endless';
+    resultTitle.textContent = endless ? t('result.endlessTitle') : (result.mode === 'time' ? t('result.timeUp') : t('result.allDone'));
     resultEmoji.textContent = ['💪', '👍', '🎉', '🏆'][result.stars];
-    resultScore.textContent = result.mode === 'time' ? String(result.score) : `${result.score} / ${result.total}`;
-    resultBest.textContent = result.isNewBest ? t('result.newBest') : (result.best > 0 ? t('result.best', { n: result.best }) : '');
-    resultBest.classList.toggle('new-best', result.isNewBest);
+    if (endless) {
+        resultScore.textContent = `${result.run.correct} / ${result.run.answered}`;
+        resultDetail.textContent = `${resultPercent(result.run)} % · ${describePractice(result.run)}`;
+        resultBest.textContent = !result.saved
+            ? t('result.notSaved')
+            : result.newDayBest
+                ? t('result.dayBest')
+                : (result.dayBest ? t('result.bestToday', { pct: resultPercent(result.dayBest) }) : '');
+        resultBest.classList.toggle('new-best', result.saved && result.newDayBest);
+        resultBest.classList.toggle('not-saved', !result.saved);
+    } else {
+        resultBest.classList.remove('not-saved');
+        resultScore.textContent = result.mode === 'time' ? String(result.score) : `${result.score} / ${result.total}`;
+        resultBest.textContent = result.isNewBest ? t('result.newBest') : (result.best > 0 ? t('result.best', { n: result.best }) : '');
+        resultBest.classList.toggle('new-best', result.isNewBest);
+    }
+    resultDetail.classList.toggle('hidden', !endless);
     const session = result.session;
     resultComeback.classList.toggle('hidden', !(session && session.comebackApplied));
     if (session && session.firstPlayToday) {
@@ -1794,6 +2238,10 @@ function checkAnswer(selectedAnswer, sourceBtn) {
     // Match mode handles correctness per-link, not a single answer
     if (selectedGame === 'match') return;
     if (performance.now() < inputLockedUntil) return;
+    if (endlessRunCrossedDay()) {
+        endRun();
+        return;
+    }
     answersGiven++;
 
     const typing = inputMode === 'keyboard' && selectedGame !== 'compare';
@@ -1807,6 +2255,8 @@ function checkAnswer(selectedAnswer, sourceBtn) {
         showFeedback = true;
         score += 1;
         updateScore();
+        updateRunStats();
+        checkpointEndlessRun();
         if (chosen) chosen.classList.add('is-correct');
         if (typing) answerInput.classList.add('is-correct');
         scheduleNextQuestion(CORRECT_ADVANCE_MS);
@@ -1814,7 +2264,9 @@ function checkAnswer(selectedAnswer, sourceBtn) {
     }
 
     playIncorrectSound();
-    if (playMode === 'questions' || selectedGame === 'compare') {
+    updateRunStats();
+    checkpointEndlessRun();
+    if (playMode !== 'time' || selectedGame === 'compare') {
         // No second try: show what was right, then move on.
         showFeedback = true;
         if (chosen) chosen.classList.add('is-wrong');
@@ -1823,11 +2275,11 @@ function checkAnswer(selectedAnswer, sourceBtn) {
         showAnswerFeedback(selectedGame === 'compare'
             ? formatAnswerForSpeech(correctAnswer)
             : t('feedback.answerIs', { answer: correctAnswer }));
-        if (playMode === 'questions') {
+        if (playMode !== 'time') {
             const key = selectedGame === 'compare' ? 'tts.incorrect.compare' : 'tts.incorrect';
             speakText(t(key, { answer: formatAnswerForSpeech(correctAnswer) }));
         }
-        scheduleNextQuestion(playMode === 'questions' ? WRONG_ADVANCE_MS : COMPARE_TIME_WRONG_MS);
+        scheduleNextQuestion(playMode !== 'time' ? WRONG_ADVANCE_MS : COMPARE_TIME_WRONG_MS);
         return;
     }
 

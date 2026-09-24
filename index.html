@@ -10,7 +10,7 @@
     <!-- The server sends no cache headers, so browsers keep old copies for days.
          Bump ?v= whenever styles.css or script.js change (and APP_VERSION at the top of script.js), so new HTML never runs with old files
          (a cached page that gets a newer script.js loads the current page once, see its top). -->
-    <link rel="stylesheet" href="styles.css?v=2026-09-24.3">
+    <link rel="stylesheet" href="styles.css?v=2026-09-24.4">
 </head>
 <body class="little-kids-theme">
     <!-- Language switcher (fixed top-right; hidden during a game) -->
@@ -213,7 +213,7 @@
                         <label class="number-chip"><input type="checkbox" value="9"><span>9</span></label>
                     </div>
                 </fieldset>
-                <div class="mode-buttons">
+                <div class="mode-buttons" id="modeButtons">
                     <button id="timeModeBtn" type="button" class="mode-btn">
                         <span class="mode-icon" aria-hidden="true">⏱️</span>
                         <span class="mode-name" data-i18n="playMode.time">Time Mode</span>
@@ -224,8 +224,25 @@
                         <span class="mode-name" data-i18n="playMode.questions">Questions Mode</span>
                         <span class="mode-desc" data-i18n="playMode.questions.desc">10 questions</span>
                     </button>
+                    <!-- Bigger kids only: play until "Finish" -->
+                    <button id="endlessModeBtn" type="button" class="mode-btn endless hidden">
+                        <span class="mode-icon infinity" aria-hidden="true">∞</span>
+                        <span class="mode-name" data-i18n="endless.mode">Endless</span>
+                        <span class="mode-desc" data-i18n="endless.mode.desc">as long as you like</span>
+                    </button>
                 </div>
             </div>
+
+            <!-- Endless mode: last result and the best result of each day -->
+            <section class="panel endless-panel hidden" id="endlessPanel" data-i18n-attr="aria-label:endless.title" aria-label="Endless mode">
+                <h2 class="endless-title" data-i18n="endless.title">♾️ Endless mode</h2>
+                <p class="endless-last" id="endlessLast"></p>
+                <div class="endless-history" id="endlessHistory">
+                    <p class="picker-label" data-i18n="endless.chart">Best result of each day</p>
+                    <div class="endless-chart" id="endlessChart" role="group" data-i18n-attr="aria-label:endless.chart" aria-label="Best result of each day"></div>
+                    <p class="endless-tip" id="endlessTip" aria-live="polite"></p>
+                </div>
+            </section>
             <button id="backToHomeFromPlayModeBtn" type="button" class="back-btn" data-i18n="back">← Back to Games</button>
         </div>
     </div>
@@ -252,6 +269,11 @@
                         <span aria-hidden="true">❓</span>
                         <span id="progressText" class="stat-value">1/10</span>
                     </div>
+                    <div class="stat-box endless-box hidden" id="endlessBox" data-i18n-attr="aria-label:aria.endlessStats" aria-label="Problems and success rate">
+                        <span aria-hidden="true">❓</span>
+                        <span id="endlessStatsText" class="stat-value">0</span>
+                    </div>
+                    <button id="finishBtn" type="button" class="finish-btn hidden" data-i18n="endless.finish">✓ Finish</button>
                 </div>
 
                 <div class="question-container">
@@ -309,6 +331,7 @@
                 <h1 id="resultTitle" class="result-title">Results</h1>
                 <div class="result-score-label" data-i18n="result.yourScore">Correct answers</div>
                 <p id="resultScore" class="result-score">0</p>
+                <p id="resultDetail" class="result-detail hidden"></p>
                 <div id="resultStars" class="stars" role="img" aria-label="0/3"></div>
                 <p id="resultBest" class="result-best"></p>
                 <p id="resultComeback" class="result-chip result-comeback hidden" data-i18n="result.comeback">🎁 Comeback bonus! 2× stars</p>
@@ -321,6 +344,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=2026-09-24.3"></script>
+    <script src="script.js?v=2026-09-24.4"></script>
 </body>
 </html>
