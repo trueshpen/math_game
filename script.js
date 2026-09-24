@@ -1,3 +1,22 @@
+// A page the browser cached before this version still loads plain /script.js
+// (now this file) and cannot run it. Load the current page once, under a URL
+// the cache has never seen (?fresh=...); if that already happened, offer a link.
+// Current pages load this file as script.js?v=... so they never mix versions.
+if (!document.getElementById('numPad')) {
+    const freshUrl = location.pathname + '?fresh=' + Date.now();
+    if (!/[?&]fresh=/.test(location.search)) {
+        location.replace(freshUrl);
+    } else {
+        const link = document.createElement('a');
+        link.href = freshUrl;
+        link.textContent = 'Nová verze hry – klikni pro načtení / New version – tap to load';
+        link.style.cssText = 'position:fixed;inset:auto 12px 12px;z-index:9999;padding:16px;border-radius:14px;'
+            + 'background:#fff;color:#1d2b22;font:800 17px/1.3 sans-serif;text-align:center;box-shadow:0 6px 18px rgba(0,0,0,.3)';
+        document.body.appendChild(link);
+    }
+    throw new Error('Outdated page from the browser cache; loading the current one.');
+}
+
 // ============================================================
 // Internationalization (EN / CS)
 // ============================================================
@@ -2101,6 +2120,11 @@ window.addEventListener('resize', () => {
 
 // Initialize the game
 function init() {
+    // Arrived from an outdated cached page (see the top of this file): tidy the address
+    if (/[?&]fresh=/.test(location.search)) {
+        try { history.replaceState(null, '', location.pathname); } catch (_) {}
+    }
+
     // Apply language first so all subsequent text uses the right locale
     currentLang = loadLang();
     applyTranslations();
