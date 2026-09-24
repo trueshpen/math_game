@@ -8,9 +8,9 @@
     <title>Kids Math Game</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍎</text></svg>">
     <!-- The server sends no cache headers, so browsers keep old copies for days.
-         Bump ?v= whenever styles.css or script.js change, so new HTML never runs with old files
-         (an old cached page that gets the new script.js loads the current page once, see its top). -->
-    <link rel="stylesheet" href="styles.css?v=2026-09-24">
+         Bump ?v= whenever styles.css or script.js change (and APP_VERSION at the top of script.js), so new HTML never runs with old files
+         (a cached page that gets a newer script.js loads the current page once, see its top). -->
+    <link rel="stylesheet" href="styles.css?v=2026-09-24.2">
 </head>
 <body class="little-kids-theme">
     <!-- Language switcher (fixed top-right; hidden during a game) -->
@@ -199,6 +199,20 @@
                         <button type="button" class="settings-btn level-btn" data-diff="hard" data-i18n="settings.hard">Hard</button>
                     </div>
                 </div>
+                <!-- Multiplication only: practise chosen times tables instead of a level -->
+                <fieldset class="number-picker hidden" id="numberPicker">
+                    <legend class="picker-label" data-i18n="playMode.pickNumbers">or pick the numbers you want to practice</legend>
+                    <div class="number-chips">
+                        <label class="number-chip"><input type="checkbox" value="2"><span>2</span></label>
+                        <label class="number-chip"><input type="checkbox" value="3"><span>3</span></label>
+                        <label class="number-chip"><input type="checkbox" value="4"><span>4</span></label>
+                        <label class="number-chip"><input type="checkbox" value="5"><span>5</span></label>
+                        <label class="number-chip"><input type="checkbox" value="6"><span>6</span></label>
+                        <label class="number-chip"><input type="checkbox" value="7"><span>7</span></label>
+                        <label class="number-chip"><input type="checkbox" value="8"><span>8</span></label>
+                        <label class="number-chip"><input type="checkbox" value="9"><span>9</span></label>
+                    </div>
+                </fieldset>
                 <div class="mode-buttons">
                     <button id="timeModeBtn" type="button" class="mode-btn">
                         <span class="mode-icon" aria-hidden="true">⏱️</span>
@@ -307,6 +321,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=2026-09-24"></script>
+    <script src="script.js?v=2026-09-24.2"></script>
 </body>
 </html>

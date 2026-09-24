@@ -762,6 +762,74 @@ body.in-game .lang-switcher {
     font-size: 1.05rem;
 }
 
+/* Multiplication: tick the times tables to practise (native checkboxes as chips) */
+.number-picker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.picker-label {
+    padding: 0;
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    font-weight: 800;
+    text-align: center;
+}
+
+.number-chips {
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    gap: 6px;
+    width: 100%;
+    max-width: 440px;
+}
+
+.number-chip {
+    position: relative;
+    display: block;
+}
+
+/* The real checkbox covers the chip, invisible: tapping anywhere toggles it */
+.number-chip input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.number-chip span {
+    display: grid;
+    place-items: center;
+    height: 46px;
+    border-radius: 12px;
+    background: var(--muted-bg);
+    color: var(--ink);
+    font-size: 1.3rem;
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.number-chip input:checked + span {
+    background: var(--accent);
+    color: #ffffff;
+    box-shadow: 0 3px 0 var(--accent-edge);
+}
+
+.number-chip input:focus-visible + span {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+}
+
 .mode-buttons {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1061,6 +1129,7 @@ body.in-game .lang-switcher {
     align-items: center;
     gap: 10px;
     width: min(100%, 560px);
+    min-width: 0; /* a wide picture must not widen the card before it is measured */
     max-height: 100%;
     padding: 22px 18px;
     border-radius: var(--radius-lg);
@@ -1651,6 +1720,12 @@ body.in-game .lang-switcher {
     }
 }
 
+@media (max-width: 380px) {
+    .number-chips {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
 @media (max-width: 480px) {
     .home-container {
         gap: 14px;
@@ -1764,6 +1839,18 @@ body.in-game .lang-switcher {
 
     .home-container {
         padding-top: 52px;
+    }
+
+    .play-setup {
+        gap: 14px;
+    }
+
+    .mode-btn {
+        min-height: 100px;
+    }
+
+    .number-chip span {
+        height: 40px;
     }
 }
 
@@ -1935,6 +2022,27 @@ body.in-game .lang-switcher {
     }
 }
 
+/* Landscape with little height: level and numbers on the left, the modes on the right */
+@media (max-height: 560px) and (orientation: landscape) {
+    .play-setup {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        grid-template-areas:
+            "level modes"
+            "picker modes";
+        align-items: center;
+        gap: 10px 16px;
+    }
+
+    .play-setup > .settings-group { grid-area: level; }
+    .play-setup > .number-picker { grid-area: picker; }
+    .play-setup > .mode-buttons { grid-area: modes; }
+
+    .number-chips {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
 /* Phones held sideways: menus compact too */
 @media (max-height: 440px) and (orientation: landscape) {
     .home-container {
@@ -1968,6 +2076,23 @@ body.in-game .lang-switcher {
 
     .mode-icon {
         font-size: 1.5rem;
+    }
+
+    .number-picker {
+        gap: 4px;
+    }
+
+    .number-chip span {
+        height: 32px;
+        font-size: 1.1rem;
+    }
+
+    #playModeScreen .game-title {
+        font-size: 1.45rem;
+    }
+
+    #playModeScreen .back-btn {
+        padding: 8px 18px;
     }
 }
 

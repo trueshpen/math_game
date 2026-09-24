@@ -1,8 +1,12 @@
-// A page the browser cached before this version still loads plain /script.js
-// (now this file) and cannot run it. Load the current page once, under a URL
-// the cache has never seen (?fresh=...); if that already happened, offer a link.
-// Current pages load this file as script.js?v=... so they never mix versions.
-if (!document.getElementById('numPad')) {
+// Bump APP_VERSION together with the ?v= values in index.html whenever this file changes.
+const APP_VERSION = '2026-09-24.2';
+
+// A page the browser cached from another version may still load this file (the
+// server keeps no old copies). The page asks for script.js?v=<its version>; if that
+// is not this file's version, load the current page once under a URL the cache has
+// never seen (?fresh=...), and if that already happened, offer a link instead.
+const requestedVersion = ((document.currentScript && document.currentScript.src) || '').match(/[?&]v=([^&#]+)/);
+if (!requestedVersion || requestedVersion[1] !== APP_VERSION) {
     const freshUrl = location.pathname + '?fresh=' + Date.now();
     if (!/[?&]fresh=/.test(location.search)) {
         location.replace(freshUrl);
@@ -77,6 +81,7 @@ const translations = {
         'playMode.time.desc': '{n} seconds',
         'playMode.questions': 'Questions Mode',
         'playMode.questions.desc': '10 questions',
+        'playMode.pickNumbers': 'or pick the numbers you want to practice',
         // Game screen chrome
         'stats.score': 'Score',
         'submit': 'Submit',
@@ -105,6 +110,7 @@ const translations = {
         'gameTitles.addsub.short': 'Add & Subtract!',
         'gameTitles.multiply.long': '✖️ Multiply',
         'gameTitles.multiply.short': 'Multiply!',
+        'gameTitles.multiply.numbers': 'Times tables: {list}',
         'gameTitles.divide.long': '➗ Divide',
         'gameTitles.divide.short': 'Divide!',
         // Question text
@@ -219,6 +225,7 @@ const translations = {
         'playMode.time.desc': '{n} sekund',
         'playMode.questions': 'Na otázky',
         'playMode.questions.desc': '10 otázek',
+        'playMode.pickNumbers': 'nebo vyber čísla, která chceš procvičovat',
         'stats.score': 'Skóre',
         'submit': 'Odeslat',
         'backToHome': '🏠 Domů',
@@ -245,6 +252,7 @@ const translations = {
         'gameTitles.addsub.short': 'Sčítání a odčítání!',
         'gameTitles.multiply.long': '✖️ Násobení',
         'gameTitles.multiply.short': 'Násobení!',
+        'gameTitles.multiply.numbers': 'Násobilka: {list}',
         'gameTitles.divide.long': '➗ Dělení',
         'gameTitles.divide.short': 'Dělení!',
         'q.count': 'Kolik vidíš {fruit}?',
@@ -310,10 +318,8 @@ const LANG_STORAGE_KEY = 'km_lang';
 const SPEECH_LANG = { en: 'en-US', cs: 'cs-CZ' };
 
 function loadLang() {
-    try {
-        const stored = localStorage.getItem(LANG_STORAGE_KEY);
-        if (stored === 'en' || stored === 'cs') return stored;
-    } catch (_) {}
+    const stored = lsGet(LANG_STORAGE_KEY);
+    if (stored === 'en' || stored === 'cs') return stored;
     // Auto-detect from browser language, default EN
     const nav = (navigator.language || '').toLowerCase();
     if (nav.startsWith('cs') || nav.startsWith('sk')) return 'cs';
@@ -386,7 +392,7 @@ function refreshDynamicI18nText() {
 function setLanguage(lang) {
     if (lang !== 'en' && lang !== 'cs') return;
     currentLang = lang;
-    try { localStorage.setItem(LANG_STORAGE_KEY, lang); } catch (_) {}
+    saveChoice(LANG_STORAGE_KEY, lang);
     applyTranslations();
 }
 
@@ -448,6 +454,11 @@ let matchRoundHadMistake = false;
 let svgLayer = null; // SVG overlay for connection lines
 let selectedNumberId = null;
 let selectedGroupId = null;
+// Multiplication can practise chosen times tables (2-9 × 1..10) instead of a level
+const PRACTICE_NUMBERS_KEY = 'km_multiply_numbers';
+const PRACTICE_NUMBER_CHOICES = [2, 3, 4, 5, 6, 7, 8, 9];
+let practiceNumbers = []; // tables chosen for the current run; [] = use the level
+let lastMultiplyProblem = '';
 
 // Timing (ms)
 const CORRECT_ADVANCE_MS = 350;      // green flash on a right answer
@@ -503,6 +514,8 @@ const timeModeBtn = document.getElementById('timeModeBtn');
 const questionsModeBtn = document.getElementById('questionsModeBtn');
 const backToHomeFromPlayModeBtn = document.getElementById('backToHomeFromPlayModeBtn');
 const playLevelButtons = [...document.querySelectorAll('#playLevelOptions .level-btn')];
+const numberPicker = document.getElementById('numberPicker');
+const numberChecks = [...numberPicker.querySelectorAll('input[type="checkbox"]')];
 // Settings UI elements
 const settingsClickMode = document.getElementById('settingsClickMode');
 const settingsKeyboardMode = document.getElementById('settingsKeyboardMode');
@@ -557,7 +570,11 @@ submitBtn.addEventListener('click', submitKeyboardAnswer);
 timeModeBtn.addEventListener('click', () => selectPlayMode('time'));
 questionsModeBtn.addEventListener('click', () => selectPlayMode('questions'));
 backToHomeFromPlayModeBtn.addEventListener('click', goHome);
-playLevelButtons.forEach(btn => btn.addEventListener('click', () => persistSettings({ difficulty: btn.dataset.diff })));
+playLevelButtons.forEach(btn => btn.addEventListener('click', () => chooseLevel(btn.dataset.diff, selectedGame === 'multiply')));
+numberChecks.forEach(box => box.addEventListener('change', () => {
+    savePracticeNumbers(numberChecks.filter(b => b.checked).map(b => Number(b.value)));
+    updateSettingsUI();
+}));
 resultBackBtn.addEventListener('click', goHome);
 resultPlayAgainBtn.addEventListener('click', playAgain);
 changeAgeGroupBtn.addEventListener('click', goToAgeSelection);
@@ -591,7 +608,7 @@ function loadSettings() {
 
 function persistSettings(partial) {
     const next = { ...loadSettings(), ...partial };
-    for (const name of Object.keys(SETTINGS_KEYS)) lsSet(SETTINGS_KEYS[name], next[name]);
+    for (const name of Object.keys(SETTINGS_KEYS)) saveChoice(SETTINGS_KEYS[name], next[name]);
     showSettingsSaved();
     updateSettingsUI();
 }
@@ -606,7 +623,12 @@ function updateSettingsUI() {
         });
     };
     setActive([settingsClickMode, settingsKeyboardMode], mode, b => b.dataset.mode);
-    setActive([settingsDiffEasy, settingsDiffMedium, settingsDiffHard, ...playLevelButtons], difficulty, b => b.dataset.diff);
+    setActive([settingsDiffEasy, settingsDiffMedium, settingsDiffHard], difficulty, b => b.dataset.diff);
+    // Before a multiplication game, chosen numbers take the place of the level
+    const numbers = selectedGame === 'multiply' ? loadPracticeNumbers() : [];
+    setActive(playLevelButtons, numbers.length ? null : difficulty, b => b.dataset.diff);
+    numberPicker.classList.toggle('hidden', selectedGame !== 'multiply');
+    numberChecks.forEach(box => { box.checked = numbers.includes(Number(box.value)); });
     setActive([settingsSpeechSlow, settingsSpeechNormal, settingsSpeechFast], speech, b => b.dataset.speech);
     setActive([settingsSoundOn, settingsSoundOff], sound, b => b.dataset.sound);
     updateTimeModeDesc();
@@ -628,7 +650,26 @@ function timeModeSeconds(level) {
 }
 
 function updateTimeModeDesc() {
-    timeModeDesc.textContent = t('playMode.time.desc', { n: timeModeSeconds(loadSettings().difficulty) });
+    // Chosen times tables are timed like Medium (products up to 90)
+    const level = selectedGame === 'multiply' && loadPracticeNumbers().length ? 'medium' : loadSettings().difficulty;
+    timeModeDesc.textContent = t('playMode.time.desc', { n: timeModeSeconds(level) });
+}
+
+// Chosen times tables for multiplication, e.g. [3, 7]; only numbers 2-9 count.
+function loadPracticeNumbers() {
+    const stored = (lsGet(PRACTICE_NUMBERS_KEY) || '').split(',').map(Number);
+    return PRACTICE_NUMBER_CHOICES.filter(n => stored.includes(n));
+}
+
+function savePracticeNumbers(numbers) {
+    saveChoice(PRACTICE_NUMBERS_KEY, numbers.join(','));
+}
+
+// A level and chosen times tables are alternatives. Choosing a level in Settings
+// (it applies to every game) or before a multiplication game drops the tables.
+function chooseLevel(level, dropTables) {
+    if (dropTables) savePracticeNumbers([]);
+    persistSettings({ difficulty: level });
 }
 
 // ============================================================
@@ -658,13 +699,31 @@ function daysBetween(aKey, bKey) {
     const b = new Date(bKey + 'T00:00:00');
     return Math.round((b - a) / (1000 * 60 * 60 * 24));
 }
-function lsGetInt(k, def) {
-    try { const v = parseInt(localStorage.getItem(k)); return Number.isFinite(v) ? v : def; }
-    catch (_) { return def; }
+// Storage can be blocked or full (privacy settings, quota). A choice (language,
+// settings, chosen tables) that could not be saved is kept in memory for this
+// visit so it still applies. Progress is never kept that way: totals built on an
+// unreadable baseline could later overwrite the real saved ones.
+const unsavedChoices = new Map();
+function lsGet(k) {
+    if (unsavedChoices.has(k)) return unsavedChoices.get(k);
+    try { return localStorage.getItem(k); } catch (_) { return null; }
 }
-function lsSetInt(k, v) { try { localStorage.setItem(k, String(v)); } catch (_) {} }
-function lsGet(k) { try { return localStorage.getItem(k); } catch (_) { return null; } }
-function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (_) {} }
+function lsSet(k, v) {
+    try { localStorage.setItem(k, v); } catch (_) {}
+}
+function saveChoice(k, v) {
+    try {
+        localStorage.setItem(k, v);
+        unsavedChoices.delete(k);
+    } catch (_) {
+        unsavedChoices.set(k, String(v));
+    }
+}
+function lsGetInt(k, def) {
+    const v = parseInt(lsGet(k), 10);
+    return Number.isFinite(v) ? v : def;
+}
+function lsSetInt(k, v) { lsSet(k, String(v)); }
 function getPlayedDaysSet() {
     const raw = lsGet(PROGRESS_KEYS.playedDays) || '';
     const s = new Set();
@@ -807,9 +866,9 @@ function renderCalendar() {
 // Settings button listeners
 settingsClickMode.addEventListener('click', () => persistSettings({ mode: 'click' }));
 settingsKeyboardMode.addEventListener('click', () => persistSettings({ mode: 'keyboard' }));
-settingsDiffEasy.addEventListener('click', () => persistSettings({ difficulty: 'easy' }));
-settingsDiffMedium.addEventListener('click', () => persistSettings({ difficulty: 'medium' }));
-settingsDiffHard.addEventListener('click', () => persistSettings({ difficulty: 'hard' }));
+settingsDiffEasy.addEventListener('click', () => chooseLevel('easy', true));
+settingsDiffMedium.addEventListener('click', () => chooseLevel('medium', true));
+settingsDiffHard.addEventListener('click', () => chooseLevel('hard', true));
 settingsSpeechSlow.addEventListener('click', () => persistSettings({ speech: 'slow' }));
 settingsSpeechNormal.addEventListener('click', () => persistSettings({ speech: 'normal' }));
 settingsSpeechFast.addEventListener('click', () => persistSettings({ speech: 'fast' }));
@@ -1074,7 +1133,11 @@ function playAgain() {
 
 function updateGameTitles() {
     playModeTitle.textContent = selectedGame ? t(`gameTitles.${selectedGame}.long`) : t('playMode.title');
-    if (selectedGame) gameHeaderTitle.textContent = t(`gameTitles.${selectedGame}.short`);
+    if (selectedGame === 'multiply' && practiceNumbers.length) {
+        gameHeaderTitle.textContent = t('gameTitles.multiply.numbers', { list: practiceNumbers.join(', ') });
+    } else if (selectedGame) {
+        gameHeaderTitle.textContent = t(`gameTitles.${selectedGame}.short`);
+    }
 }
 
 function showPlayModeSelection() {
@@ -1087,6 +1150,7 @@ function selectPlayMode(mode) {
     playMode = mode; // 'time' | 'questions'
     const saved = loadSettings();
     configureDifficulty(saved.difficulty);
+    updateGameTitles(); // the header names chosen times tables
     // Compare and Match are always answered by tapping; the other games use the saved input mode
     const modeToUse = (selectedGame === 'compare' || selectedGame === 'match') ? 'click' : saved.mode;
     startGame(modeToUse);
@@ -1102,6 +1166,7 @@ function chooseGame(game) {
 
 function configureDifficulty(level) {
     selectedDifficulty = level;
+    practiceNumbers = [];
     if (selectedGame === 'count') {
         // Hard capped at 12 so fruits don't overcrowd the container.
         if (level === 'easy') { difficultyMin = 1; difficultyMax = 5; }
@@ -1133,8 +1198,14 @@ function configureDifficulty(level) {
         else if (level === 'medium') { difficultyMin = 1; difficultyMax = 50; answerMin = 1; answerMax = 50; }
         else if (level === 'hard') { difficultyMin = 10; difficultyMax = 100; answerMin = 1; answerMax = 100; }
     } else if (selectedGame === 'multiply') {
-        // Multiplication: easy up to 5×5, medium up to 10×10, hard up to 12×12
-        if (level === 'easy') { difficultyMin = 1; difficultyMax = 5; answerMin = 1; answerMax = 25; }
+        // Multiplication: easy up to 5×5, medium up to 10×10, hard up to 12×12,
+        // or chosen times tables (2-9 × 1..10), which play like Medium
+        practiceNumbers = loadPracticeNumbers();
+        if (practiceNumbers.length) {
+            selectedDifficulty = 'medium';
+            answerMin = 1;
+            answerMax = Math.max(...practiceNumbers) * 10;
+        } else if (level === 'easy') { difficultyMin = 1; difficultyMax = 5; answerMin = 1; answerMax = 25; }
         else if (level === 'medium') { difficultyMin = 1; difficultyMax = 10; answerMin = 1; answerMax = 100; }
         else if (level === 'hard') { difficultyMin = 2; difficultyMax = 12; answerMin = 1; answerMax = 144; }
     } else if (selectedGame === 'divide') {
@@ -1301,8 +1372,19 @@ function createQuestion() {
         }
     } else if (selectedGame === 'multiply') {
         addSubOperator = '×';
-        addSubNum1 = getRandomIntInclusive(difficultyMin, difficultyMax);
-        addSubNum2 = getRandomIntInclusive(difficultyMin, difficultyMax);
+        if (practiceNumbers.length) {
+            // A chosen table times 1..10, in either order, never the same problem twice in a row
+            for (let tries = 0; tries < 10; tries++) {
+                const table = practiceNumbers[Math.floor(Math.random() * practiceNumbers.length)];
+                const other = getRandomIntInclusive(1, 10);
+                [addSubNum1, addSubNum2] = Math.random() < 0.5 ? [table, other] : [other, table];
+                if (`${addSubNum1}×${addSubNum2}` !== lastMultiplyProblem) break;
+            }
+        } else {
+            addSubNum1 = getRandomIntInclusive(difficultyMin, difficultyMax);
+            addSubNum2 = getRandomIntInclusive(difficultyMin, difficultyMax);
+        }
+        lastMultiplyProblem = `${addSubNum1}×${addSubNum2}`;
         correctAnswer = addSubNum1 * addSubNum2;
     } else if (selectedGame === 'divide') {
         addSubOperator = '÷';
@@ -1367,25 +1449,19 @@ function createQuestion() {
 }
 
 function bestScoreKey() {
-    return `km_best_${selectedGame}_${selectedDifficulty}_${playMode}`;
+    // Chosen times tables keep their own best score per choice, e.g. km_best_multiply_n37_questions
+    const level = practiceNumbers.length ? `n${practiceNumbers.join('')}` : selectedDifficulty;
+    return `km_best_${selectedGame}_${level}_${playMode}`;
 }
 
 function getBestScore() {
-    try {
-        const v = parseInt(localStorage.getItem(bestScoreKey()));
-        return Number.isFinite(v) ? v : 0;
-    } catch (_) { return 0; }
+    return lsGetInt(bestScoreKey(), 0);
 }
 
 function saveBestScore(newScore) {
-    try {
-        const prev = getBestScore();
-        if (newScore > prev) {
-            localStorage.setItem(bestScoreKey(), String(newScore));
-            return true;
-        }
-    } catch (_) {}
-    return false;
+    if (newScore <= getBestScore()) return false;
+    lsSetInt(bestScoreKey(), newScore);
+    return true;
 }
 
 function starsForScore(value) {
