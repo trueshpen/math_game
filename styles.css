@@ -1118,7 +1118,7 @@ body.in-game .lang-switcher {
     box-shadow: 0 2px 0 #b9c7bd, var(--shadow);
 }
 
-/* Math games: the problem on a card, with an optional picture under it */
+/* Math games: the problem on a card */
 .layout-math {
     place-items: center;
 }
@@ -1127,19 +1127,12 @@ body.in-game .lang-switcher {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
     width: min(100%, 560px);
-    min-width: 0; /* a wide picture must not widen the card before it is measured */
     max-height: 100%;
     padding: 22px 18px;
     border-radius: var(--radius-lg);
     background: var(--surface);
     box-shadow: inset 0 0 0 3px var(--board-line), var(--shadow);
-}
-
-.math-card.has-aid {
-    height: 100%;
-    padding: 14px 14px 12px;
 }
 
 .math-expression {
@@ -1150,46 +1143,6 @@ body.in-game .lang-switcher {
     letter-spacing: 1px;
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
-}
-
-.math-card.has-aid .math-expression {
-    font-size: clamp(1.8rem, 7vw, 2.8rem);
-}
-
-.math-aid {
-    flex: 1 1 auto;
-    min-height: 0;
-    width: 100%;
-    display: grid;
-    grid-template-columns: repeat(var(--aid-cols, 5), var(--aid-cell, 28px));
-    grid-auto-rows: var(--aid-cell, 28px);
-    justify-content: center;
-    align-content: center;
-}
-
-.math-aid span {
-    position: relative;
-    display: grid;
-    place-items: center;
-    font-size: calc(var(--aid-cell, 28px) * 0.78);
-    line-height: 1;
-}
-
-.math-aid span.removed {
-    opacity: 0.35;
-}
-
-.math-aid span.removed::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 6%;
-    right: 6%;
-    height: 3px;
-    margin-top: -1.5px;
-    border-radius: 2px;
-    background: var(--bad);
-    transform: rotate(-35deg);
 }
 
 /* Match: groups on top, numbers below (numbers in the middle on phones) */

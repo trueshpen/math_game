@@ -1,5 +1,5 @@
 // Bump APP_VERSION together with the ?v= values in index.html whenever this file changes.
-const APP_VERSION = '2026-09-24.2';
+const APP_VERSION = '2026-09-24.3';
 
 // A page the browser cached from another version may still load this file (the
 // server keeps no old copies). The page asks for script.js?v=<its version>; if that
@@ -113,6 +113,7 @@ const translations = {
         'gameTitles.multiply.numbers': 'Times tables: {list}',
         'gameTitles.divide.long': '➗ Divide',
         'gameTitles.divide.short': 'Divide!',
+        'gameTitles.divide.numbers': 'Division: {list}',
         // Question text
         'q.count': 'How many {fruit} do you see?',
         'q.add': 'How many fruits in total?',
@@ -255,6 +256,7 @@ const translations = {
         'gameTitles.multiply.numbers': 'Násobilka: {list}',
         'gameTitles.divide.long': '➗ Dělení',
         'gameTitles.divide.short': 'Dělení!',
+        'gameTitles.divide.numbers': 'Dělení: {list}',
         'q.count': 'Kolik vidíš {fruit}?',
         'q.add': 'Kolik je to dohromady?',
         'q.compare': 'Která skupina má víc?',
@@ -454,11 +456,12 @@ let matchRoundHadMistake = false;
 let svgLayer = null; // SVG overlay for connection lines
 let selectedNumberId = null;
 let selectedGroupId = null;
-// Multiplication can practise chosen times tables (2-9 × 1..10) instead of a level
-const PRACTICE_NUMBERS_KEY = 'km_multiply_numbers';
+// Multiplication and division can practise chosen numbers 2-9 instead of a level:
+// that number × 1..10, or a multiple of it ÷ that number. Stored per game.
+const PRACTICE_NUMBER_KEYS = { multiply: 'km_multiply_numbers', divide: 'km_divide_numbers' };
 const PRACTICE_NUMBER_CHOICES = [2, 3, 4, 5, 6, 7, 8, 9];
-let practiceNumbers = []; // tables chosen for the current run; [] = use the level
-let lastMultiplyProblem = '';
+let practiceNumbers = []; // numbers chosen for the current run; [] = use the level
+let lastMathProblem = '';
 
 // Timing (ms)
 const CORRECT_ADVANCE_MS = 350;      // green flash on a right answer
@@ -570,9 +573,9 @@ submitBtn.addEventListener('click', submitKeyboardAnswer);
 timeModeBtn.addEventListener('click', () => selectPlayMode('time'));
 questionsModeBtn.addEventListener('click', () => selectPlayMode('questions'));
 backToHomeFromPlayModeBtn.addEventListener('click', goHome);
-playLevelButtons.forEach(btn => btn.addEventListener('click', () => chooseLevel(btn.dataset.diff, selectedGame === 'multiply')));
+playLevelButtons.forEach(btn => btn.addEventListener('click', () => chooseLevel(btn.dataset.diff, [selectedGame])));
 numberChecks.forEach(box => box.addEventListener('change', () => {
-    savePracticeNumbers(numberChecks.filter(b => b.checked).map(b => Number(b.value)));
+    savePracticeNumbers(selectedGame, numberChecks.filter(b => b.checked).map(b => Number(b.value)));
     updateSettingsUI();
 }));
 resultBackBtn.addEventListener('click', goHome);
@@ -624,10 +627,10 @@ function updateSettingsUI() {
     };
     setActive([settingsClickMode, settingsKeyboardMode], mode, b => b.dataset.mode);
     setActive([settingsDiffEasy, settingsDiffMedium, settingsDiffHard], difficulty, b => b.dataset.diff);
-    // Before a multiplication game, chosen numbers take the place of the level
-    const numbers = selectedGame === 'multiply' ? loadPracticeNumbers() : [];
+    // Before a multiplication or division game, chosen numbers take the place of the level
+    const numbers = loadPracticeNumbers(selectedGame);
     setActive(playLevelButtons, numbers.length ? null : difficulty, b => b.dataset.diff);
-    numberPicker.classList.toggle('hidden', selectedGame !== 'multiply');
+    numberPicker.classList.toggle('hidden', !practiceNumbersKey(selectedGame));
     numberChecks.forEach(box => { box.checked = numbers.includes(Number(box.value)); });
     setActive([settingsSpeechSlow, settingsSpeechNormal, settingsSpeechFast], speech, b => b.dataset.speech);
     setActive([settingsSoundOn, settingsSoundOff], sound, b => b.dataset.sound);
@@ -650,26 +653,52 @@ function timeModeSeconds(level) {
 }
 
 function updateTimeModeDesc() {
-    // Chosen times tables are timed like Medium (products up to 90)
-    const level = selectedGame === 'multiply' && loadPracticeNumbers().length ? 'medium' : loadSettings().difficulty;
+    // Chosen numbers are timed like Medium
+    const level = loadPracticeNumbers(selectedGame).length ? 'medium' : loadSettings().difficulty;
     timeModeDesc.textContent = t('playMode.time.desc', { n: timeModeSeconds(level) });
 }
 
-// Chosen times tables for multiplication, e.g. [3, 7]; only numbers 2-9 count.
-function loadPracticeNumbers() {
-    const stored = (lsGet(PRACTICE_NUMBERS_KEY) || '').split(',').map(Number);
-    return PRACTICE_NUMBER_CHOICES.filter(n => stored.includes(n));
+function practiceNumbersKey(game) {
+    return Object.prototype.hasOwnProperty.call(PRACTICE_NUMBER_KEYS, game) ? PRACTICE_NUMBER_KEYS[game] : null;
 }
 
-function savePracticeNumbers(numbers) {
-    saveChoice(PRACTICE_NUMBERS_KEY, numbers.join(','));
+// Numbers chosen for a game, e.g. [3, 7]; only 2-9 count. Until anything was
+// chosen, all of 2-9 are; an empty choice ('') means "play by level".
+function loadPracticeNumbers(game) {
+    const key = practiceNumbersKey(game);
+    if (!key) return [];
+    const stored = lsGet(key);
+    if (stored === null) return [...PRACTICE_NUMBER_CHOICES];
+    const numbers = stored.split(',').map(Number);
+    return PRACTICE_NUMBER_CHOICES.filter(n => numbers.includes(n));
 }
 
-// A level and chosen times tables are alternatives. Choosing a level in Settings
-// (it applies to every game) or before a multiplication game drops the tables.
-function chooseLevel(level, dropTables) {
-    if (dropTables) savePracticeNumbers([]);
+function savePracticeNumbers(game, numbers) {
+    const key = practiceNumbersKey(game);
+    if (key) saveChoice(key, numbers.join(','));
+}
+
+// A level and chosen numbers are alternatives: choosing a level drops the numbers
+// of the given games (Settings: every game; before a game: that game).
+function chooseLevel(level, games) {
+    games.forEach(game => savePracticeNumbers(game, []));
     persistSettings({ difficulty: level });
+}
+
+// [2, 3, 4, 5, 9] -> "2–5, 9": three or more in a row read as a range
+function formatNumberList(numbers) {
+    const parts = [];
+    for (let i = 0; i < numbers.length; i++) {
+        let j = i;
+        while (j + 1 < numbers.length && numbers[j + 1] === numbers[j] + 1) j++;
+        if (j - i >= 2) {
+            parts.push(`${numbers[i]}–${numbers[j]}`);
+            i = j;
+        } else {
+            parts.push(String(numbers[i]));
+        }
+    }
+    return parts.join(', ');
 }
 
 // ============================================================
@@ -866,9 +895,9 @@ function renderCalendar() {
 // Settings button listeners
 settingsClickMode.addEventListener('click', () => persistSettings({ mode: 'click' }));
 settingsKeyboardMode.addEventListener('click', () => persistSettings({ mode: 'keyboard' }));
-settingsDiffEasy.addEventListener('click', () => chooseLevel('easy', true));
-settingsDiffMedium.addEventListener('click', () => chooseLevel('medium', true));
-settingsDiffHard.addEventListener('click', () => chooseLevel('hard', true));
+settingsDiffEasy.addEventListener('click', () => chooseLevel('easy', Object.keys(PRACTICE_NUMBER_KEYS)));
+settingsDiffMedium.addEventListener('click', () => chooseLevel('medium', Object.keys(PRACTICE_NUMBER_KEYS)));
+settingsDiffHard.addEventListener('click', () => chooseLevel('hard', Object.keys(PRACTICE_NUMBER_KEYS)));
 settingsSpeechSlow.addEventListener('click', () => persistSettings({ speech: 'slow' }));
 settingsSpeechNormal.addEventListener('click', () => persistSettings({ speech: 'normal' }));
 settingsSpeechFast.addEventListener('click', () => persistSettings({ speech: 'fast' }));
@@ -1133,8 +1162,8 @@ function playAgain() {
 
 function updateGameTitles() {
     playModeTitle.textContent = selectedGame ? t(`gameTitles.${selectedGame}.long`) : t('playMode.title');
-    if (selectedGame === 'multiply' && practiceNumbers.length) {
-        gameHeaderTitle.textContent = t('gameTitles.multiply.numbers', { list: practiceNumbers.join(', ') });
+    if (practiceNumbersKey(selectedGame) && practiceNumbers.length) {
+        gameHeaderTitle.textContent = t(`gameTitles.${selectedGame}.numbers`, { list: formatNumberList(practiceNumbers) });
     } else if (selectedGame) {
         gameHeaderTitle.textContent = t(`gameTitles.${selectedGame}.short`);
     }
@@ -1166,7 +1195,7 @@ function chooseGame(game) {
 
 function configureDifficulty(level) {
     selectedDifficulty = level;
-    practiceNumbers = [];
+    practiceNumbers = loadPracticeNumbers(selectedGame); // [] unless multiplication/division with chosen numbers
     if (selectedGame === 'count') {
         // Hard capped at 12 so fruits don't overcrowd the container.
         if (level === 'easy') { difficultyMin = 1; difficultyMax = 5; }
@@ -1200,7 +1229,6 @@ function configureDifficulty(level) {
     } else if (selectedGame === 'multiply') {
         // Multiplication: easy up to 5×5, medium up to 10×10, hard up to 12×12,
         // or chosen times tables (2-9 × 1..10), which play like Medium
-        practiceNumbers = loadPracticeNumbers();
         if (practiceNumbers.length) {
             selectedDifficulty = 'medium';
             answerMin = 1;
@@ -1209,8 +1237,13 @@ function configureDifficulty(level) {
         else if (level === 'medium') { difficultyMin = 1; difficultyMax = 10; answerMin = 1; answerMax = 100; }
         else if (level === 'hard') { difficultyMin = 2; difficultyMax = 12; answerMin = 1; answerMax = 144; }
     } else if (selectedGame === 'divide') {
-        // Division: always clean (no remainders). Difficulty controls divisor/quotient.
-        if (level === 'easy') { difficultyMin = 1; difficultyMax = 5; answerMin = 1; answerMax = 5; }
+        // Division: always clean (no remainders). Difficulty controls divisor/quotient,
+        // or chosen divisors 2-9 with answers 1..10, which play like Medium
+        if (practiceNumbers.length) {
+            selectedDifficulty = 'medium';
+            answerMin = 1;
+            answerMax = 10;
+        } else if (level === 'easy') { difficultyMin = 1; difficultyMax = 5; answerMin = 1; answerMax = 5; }
         else if (level === 'medium') { difficultyMin = 2; difficultyMax = 10; answerMin = 1; answerMax = 10; }
         else if (level === 'hard') { difficultyMin = 2; difficultyMax = 12; answerMin = 1; answerMax = 12; }
     }
@@ -1372,28 +1405,40 @@ function createQuestion() {
         }
     } else if (selectedGame === 'multiply') {
         addSubOperator = '×';
-        if (practiceNumbers.length) {
-            // A chosen table times 1..10, in either order, never the same problem twice in a row
-            for (let tries = 0; tries < 10; tries++) {
+        // A chosen table times 1..10 in either order, or two factors from the level;
+        // never the same problem twice in a row
+        for (let tries = 0; tries < 10; tries++) {
+            if (practiceNumbers.length) {
                 const table = practiceNumbers[Math.floor(Math.random() * practiceNumbers.length)];
                 const other = getRandomIntInclusive(1, 10);
                 [addSubNum1, addSubNum2] = Math.random() < 0.5 ? [table, other] : [other, table];
-                if (`${addSubNum1}×${addSubNum2}` !== lastMultiplyProblem) break;
+            } else {
+                addSubNum1 = getRandomIntInclusive(difficultyMin, difficultyMax);
+                addSubNum2 = getRandomIntInclusive(difficultyMin, difficultyMax);
             }
-        } else {
-            addSubNum1 = getRandomIntInclusive(difficultyMin, difficultyMax);
-            addSubNum2 = getRandomIntInclusive(difficultyMin, difficultyMax);
+            if (`${addSubNum1}×${addSubNum2}` !== lastMathProblem) break;
         }
-        lastMultiplyProblem = `${addSubNum1}×${addSubNum2}`;
+        lastMathProblem = `${addSubNum1}×${addSubNum2}`;
         correctAnswer = addSubNum1 * addSubNum2;
     } else if (selectedGame === 'divide') {
         addSubOperator = '÷';
-        // Build clean division: pick quotient and divisor, compute dividend
-        const quotient = getRandomIntInclusive(Math.max(1, answerMin), answerMax);
-        const divisor = getRandomIntInclusive(Math.max(2, difficultyMin), difficultyMax);
-        addSubNum1 = quotient * divisor;
-        addSubNum2 = divisor;
-        correctAnswer = quotient;
+        // Clean division: pick quotient and divisor (a chosen number, or from the
+        // level), compute the dividend; never the same problem twice in a row
+        for (let tries = 0; tries < 10; tries++) {
+            let quotient, divisor;
+            if (practiceNumbers.length) {
+                divisor = practiceNumbers[Math.floor(Math.random() * practiceNumbers.length)];
+                quotient = getRandomIntInclusive(1, 10);
+            } else {
+                quotient = getRandomIntInclusive(Math.max(1, answerMin), answerMax);
+                divisor = getRandomIntInclusive(Math.max(2, difficultyMin), difficultyMax);
+            }
+            addSubNum1 = quotient * divisor;
+            addSubNum2 = divisor;
+            correctAnswer = quotient;
+            if (`${addSubNum1}÷${addSubNum2}` !== lastMathProblem) break;
+        }
+        lastMathProblem = `${addSubNum1}÷${addSubNum2}`;
     } else if (selectedGame === 'add') {
         const sum = getRandomIntInclusive(answerMin, answerMax);
         // ensure two positive addends that sum to 'sum'
@@ -1683,9 +1728,8 @@ function arrangeFruits() {
     fillBoards([{ board, count: correctAnswer, fruit: currentFruit }], 76);
 }
 
-// Arrange math problem display for Add/Subtract/Multiply/Divide games.
-// For small ranges we add a visual aid (grid for ×, crossed-out fruit for −)
-// so the concept is concrete, not just symbolic.
+// Math problem display for Add/Subtract/Multiply/Divide (bigger kids: the
+// problem only, no pictures)
 function arrangeMathDisplay() {
     resetBoard('layout-math');
     const card = document.createElement('div');
@@ -1695,76 +1739,7 @@ function arrangeMathDisplay() {
     const op = addSubOperator === '-' ? '−' : addSubOperator;
     expression.textContent = `${addSubNum1} ${op} ${addSubNum2} = ?`;
     card.appendChild(expression);
-
-    let aid = null;
-    if (selectedGame === 'multiply' && selectedDifficulty !== 'hard' && addSubNum1 * addSubNum2 <= 60) {
-        aid = buildMultiplyGrid(addSubNum1, addSubNum2);
-    } else if (selectedGame === 'addsub' && addSubOperator === '-' && selectedDifficulty === 'easy' && addSubNum1 <= 12) {
-        aid = buildSubtractVisual(addSubNum1, addSubNum2);
-    }
-    if (aid) {
-        card.classList.add('has-aid');
-        card.appendChild(aid);
-    }
     fruitsContainer.appendChild(card);
-    fitMathAid();
-}
-
-function buildMultiplyGrid(rows, cols) {
-    // Pick one fruit for the whole grid
-    const fruit = fruits[Math.floor(Math.random() * fruits.length)];
-    const grid = makeMathAid(cols, rows);
-    for (let i = 0; i < rows * cols; i++) {
-        grid.appendChild(makeAidCell(fruitSymbols[fruit]));
-    }
-    return grid;
-}
-
-function buildSubtractVisual(total, removed) {
-    const fruit = fruits[Math.floor(Math.random() * fruits.length)];
-    const cols = total <= 6 ? total : Math.ceil(total / 2);
-    const grid = makeMathAid(cols, Math.ceil(total / cols));
-    for (let i = 0; i < total; i++) {
-        const cell = makeAidCell(fruitSymbols[fruit]);
-        if (i < removed) cell.classList.add('removed');
-        grid.appendChild(cell);
-    }
-    return grid;
-}
-
-function makeMathAid(cols, rows) {
-    const aid = document.createElement('div');
-    aid.className = 'math-aid';
-    aid.dataset.cols = String(cols);
-    aid.dataset.rows = String(rows);
-    aid.style.setProperty('--aid-cols', String(cols));
-    aid.setAttribute('aria-hidden', 'true');
-    return aid;
-}
-
-function makeAidCell(symbol) {
-    const cell = document.createElement('span');
-    cell.textContent = symbol;
-    return cell;
-}
-
-// Sizes the visual aid so the whole array fits under the problem. Without room
-// for readable fruit (tiny landscape screens) only the problem is shown.
-function fitMathAid() {
-    const aid = fruitsContainer.querySelector('.math-aid');
-    if (!aid) return;
-    const card = aid.parentElement;
-    card.classList.add('has-aid');
-    aid.classList.remove('hidden');
-    const cols = Number(aid.dataset.cols) || 1;
-    const rows = Number(aid.dataset.rows) || 1;
-    const cell = Math.floor(Math.min(aid.clientWidth / cols, aid.clientHeight / rows));
-    if (cell < 12) {
-        aid.classList.add('hidden');
-        card.classList.remove('has-aid');
-        return;
-    }
-    aid.style.setProperty('--aid-cell', `${Math.min(44, cell)}px`);
 }
 
 // Add game: two groups of fruit with a plus sign between
@@ -2189,7 +2164,6 @@ window.addEventListener('resize', () => {
         if (gameScreen.classList.contains('hidden')) return;
         regridBoardsIfCramped();
         fitBoards();
-        fitMathAid();
         redrawMatchLines();
     }, 80);
 });

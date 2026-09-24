@@ -10,7 +10,7 @@
     <!-- The server sends no cache headers, so browsers keep old copies for days.
          Bump ?v= whenever styles.css or script.js change (and APP_VERSION at the top of script.js), so new HTML never runs with old files
          (a cached page that gets a newer script.js loads the current page once, see its top). -->
-    <link rel="stylesheet" href="styles.css?v=2026-09-24.2">
+    <link rel="stylesheet" href="styles.css?v=2026-09-24.3">
 </head>
 <body class="little-kids-theme">
     <!-- Language switcher (fixed top-right; hidden during a game) -->
@@ -199,7 +199,7 @@
                         <button type="button" class="settings-btn level-btn" data-diff="hard" data-i18n="settings.hard">Hard</button>
                     </div>
                 </div>
-                <!-- Multiplication only: practise chosen times tables instead of a level -->
+                <!-- Multiplication and division: practise chosen numbers (all of 2-9 until changed) instead of a level -->
                 <fieldset class="number-picker hidden" id="numberPicker">
                     <legend class="picker-label" data-i18n="playMode.pickNumbers">or pick the numbers you want to practice</legend>
                     <div class="number-chips">
@@ -321,6 +321,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=2026-09-24.2"></script>
+    <script src="script.js?v=2026-09-24.3"></script>
 </body>
 </html>
