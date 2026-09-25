@@ -207,6 +207,7 @@ lang-fx.sr {
     border: 0;
     color: #ffffff;
     transition: flex-grow 0.35s ease, filter 0.2s ease;
+    container-type: inline-size; /* (its title fits the half: cqi below) */
 }
 
 .age-section:focus-visible {
@@ -279,7 +280,7 @@ lang-fx.sr {
     flex-direction: column;
     align-items: center;
     gap: 12px;
-    max-width: 460px;
+    max-width: 580px;
     text-align: center;
 }
 
@@ -293,7 +294,7 @@ lang-fx.sr {
 
 .age-title.fun-font {
     font-family: var(--font-fun);
-    letter-spacing: 1px;
+    letter-spacing: 0.015em;
     color: #fffdf2;
     text-shadow: 0 4px 0 rgba(10, 60, 25, 0.45), 0 8px 18px rgba(0, 0, 0, 0.18);
     animation: wiggle 2.6s ease-in-out infinite;
@@ -301,9 +302,27 @@ lang-fx.sr {
 
 .age-title.cool-font {
     font-family: "Arial Black", "Segoe UI Black", Impact, var(--font);
-    letter-spacing: 3px;
+    letter-spacing: 0.045em;
     color: #ffffff;
     text-shadow: 0 0 22px rgba(140, 200, 255, 0.7), 0 4px 0 rgba(10, 30, 70, 0.45);
+}
+
+/* Both titles stay on one line in both languages: never wider than their half.
+   The widest wording is about font-size x 6.84 in Comic Sans ("Little Kids")
+   and x 7.9 in Arial Black ("Bigger Kids"); the divisors add 8 % for other fonts
+   and for the random letters of the language switch. */
+@supports (width: 1cqi) {
+    .age-title {
+        white-space: nowrap;
+    }
+
+    .age-title.fun-font {
+        font-size: min(clamp(2.2rem, 5.2vw, 4.1rem), 100cqi / 7.4);
+    }
+
+    .age-title.cool-font {
+        font-size: min(clamp(2.2rem, 5.2vw, 4.1rem), 100cqi / 8.55);
+    }
 }
 
 .age-subtitle {

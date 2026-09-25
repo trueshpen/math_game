@@ -1,5 +1,5 @@
 // Bump APP_VERSION together with the ?v= values in index.html whenever this file changes.
-const APP_VERSION = '2026-09-25.5';
+const APP_VERSION = '2026-09-25.6';
 
 // A page the browser cached from another version may still load this file (the
 // server keeps no old copies). The page asks for script.js?v=<its version>; if that
