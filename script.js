@@ -1,5 +1,5 @@
 // Bump APP_VERSION together with the ?v= values in index.html whenever this file changes.
-const APP_VERSION = '2026-09-24.4';
+const APP_VERSION = '2026-09-25.1';
 
 // A page the browser cached from another version may still load this file (the
 // server keeps no old copies). The page asks for script.js?v=<its version>; if that
@@ -621,8 +621,8 @@ const LITTLE_KIDS_GAMES = [countFruitsBtn, addFruitsBtn, compareFruitsBtn, match
 const BIGGER_KIDS_GAMES = [addSubBtn, multiplyBtn, divideBtn];
 
 // Event listeners
-littleKidsBtn.addEventListener('click', () => selectAgeGroup('little'));
-biggerKidsBtn.addEventListener('click', () => selectAgeGroup('bigger'));
+littleKidsBtn.addEventListener('click', () => chooseAgeGroup('little', littleKidsBtn));
+biggerKidsBtn.addEventListener('click', () => chooseAgeGroup('bigger', biggerKidsBtn));
 countFruitsBtn.addEventListener('click', () => chooseGame('count'));
 addFruitsBtn.addEventListener('click', () => chooseGame('add'));
 compareFruitsBtn.addEventListener('click', () => chooseGame('compare'));
@@ -1173,8 +1173,10 @@ function endlessStars(answered, correct) {
 // A page about to be hidden (or closed) tries once more to write what it could
 // not; a page coming back on another day ends its endless run where it was.
 document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'hidden') retryUnsavedRuns();
-    else if (endlessRunCrossedDay()) endRun();
+    if (document.visibilityState === 'hidden') {
+        retryUnsavedRuns();
+        finishAgeTransition(); // (the games, not a frozen transition, when the child comes back)
+    } else if (endlessRunCrossedDay()) endRun();
 });
 
 function formatDay(key) {
@@ -1570,6 +1572,7 @@ function selectPlayMode(mode) {
 }
 
 function chooseGame(game) {
+    cancelAgeTransition();
     cancelPendingCallbacks();
     stopSpeech();
     selectedGame = game; // 'count' | 'add' | 'compare' | 'match' | 'addsub' | 'multiply' | 'divide'
@@ -1634,7 +1637,8 @@ function configureDifficulty(level) {
 }
 
 // Age group selection
-function selectAgeGroup(ageGroup) {
+function selectAgeGroup(ageGroup, fromTransition = false) {
+    if (!fromTransition) cancelAgeTransition();
     selectedAgeGroup = ageGroup; // 'little' | 'bigger'
     filterGamesByAgeGroup();
     updateProgressPanel();
@@ -1651,7 +1655,207 @@ function filterGamesByAgeGroup() {
     if (themeColorMeta) themeColorMeta.setAttribute('content', bigger ? '#2a5298' : '#3fae55');
 }
 
+// ------------------------------------------------------------
+// Age group transition (the two Play halves): the chosen half takes over the
+// screen; little kids then get flowers and animals, bigger kids smoke,
+// flickering and falling glowing numbers (a bit Harry Potter, a bit Matrix);
+// then the games appear. A tap or a key skips it; with reduced motion there is
+// none. selectAgeGroup() itself stays instant.
+// ------------------------------------------------------------
+const AGE_TRANSITION_MS = {
+    little: { switchAt: 700, revealAt: 1150, endAt: 2150 },
+    bigger: { switchAt: 700, revealAt: 1750, endAt: 2750 },
+};
+const AGE_TRANSITION_SKIP_AFTER_MS = 600; // an earlier tap is a double tap, not "skip"
+const BLOSSOM_EMOJI = ['🌸', '🐰', '🌼', '🦋', '🌷', '🐥', '🌻', '🐞', '🌺', '🐱', '🐶', '🦊', '🐼', '🐸', '🐝', '🐻'];
+const MAGIC_GLYPHS = '0123456789+−×÷=√π∞';
+let ageTransition = null;   // { group, layer, timers, raf, switched, startedAt }
+let gamesEntranceTimer = 0;
+
+function prefersReducedMotion() {
+    return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+}
+
+function chooseAgeGroup(group, section) {
+    if (ageTransition) return;
+    if (prefersReducedMotion()) {
+        selectAgeGroup(group);
+        return;
+    }
+    const timing = AGE_TRANSITION_MS[group];
+    const rect = section.getBoundingClientRect();
+    const layer = document.createElement('div');
+    layer.className = `age-transition at-${group}`;
+    layer.setAttribute('aria-hidden', 'true');
+    // A copy of the chosen half, exactly where it is, that grows over everything
+    const panel = document.createElement('div');
+    panel.className = `${section.className} at-panel`;
+    panel.innerHTML = section.innerHTML; // (static markup of our own button, no ids)
+    Object.assign(panel.style, { left: `${rect.left}px`, top: `${rect.top}px`, width: `${rect.width}px`, height: `${rect.height}px` });
+    const fx = document.createElement('div');
+    fx.className = 'at-fx';
+    layer.append(panel, fx);
+    document.body.appendChild(layer);
+    ageTransition = { group, layer, timers: [], raf: 0, switched: false, startedAt: performance.now() };
+    clearTimeout(gamesEntranceTimer);
+    homeScreen.classList.remove('enter-soft', 'enter-magic');
+    void panel.offsetWidth; // grow from the half's own size
+    layer.classList.add('at-grow');
+    if (group === 'bigger') buildMagicEffects(fx);
+    else buildBlossomEffects(fx);
+    const at = (ms, fn) => ageTransition.timers.push(setTimeout(fn, ms));
+    at(timing.switchAt, switchToGames);
+    at(timing.revealAt, revealGames);
+    at(timing.endAt, finishAgeTransition);
+    layer.addEventListener('pointerdown', skipAgeTransition);
+    document.addEventListener('keydown', skipAgeTransition, true);
+}
+
+// Behind the covering layer: the games screen of that age group
+function switchToGames() {
+    const t = ageTransition;
+    if (!t || t.switched) return;
+    t.switched = true;
+    selectAgeGroup(t.group, true);
+}
+
+// The layer fades away while the games come in one by one
+function revealGames() {
+    const t = ageTransition;
+    if (!t) return;
+    switchToGames();
+    [...gameSelection.querySelectorAll('.game-btn:not(.hidden)')].forEach((btn, i) => btn.style.setProperty('--enter-i', i));
+    homeScreen.classList.add(t.group === 'bigger' ? 'enter-magic' : 'enter-soft');
+    t.layer.classList.add('at-reveal');
+}
+
+function finishAgeTransition() {
+    if (!ageTransition) return;
+    switchToGames();
+    stopAgeTransition();
+    // Drop the entrance once it has played, so the games don't replay it later
+    gamesEntranceTimer = setTimeout(() => homeScreen.classList.remove('enter-soft', 'enter-magic'), 1300);
+}
+
+// Something else navigates while the transition runs (e.g. a screen reader
+// activating a control under the layer): just stop it, wherever that leads.
+function cancelAgeTransition() {
+    if (!ageTransition) return;
+    stopAgeTransition();
+    clearTimeout(gamesEntranceTimer);
+    homeScreen.classList.remove('enter-soft', 'enter-magic');
+}
+
+function stopAgeTransition() {
+    const t = ageTransition;
+    t.timers.forEach(clearTimeout);
+    cancelAnimationFrame(t.raf);
+    document.removeEventListener('keydown', skipAgeTransition, true);
+    t.layer.remove();
+    ageTransition = null;
+}
+
+function skipAgeTransition(e) {
+    const t = ageTransition;
+    if (!t || performance.now() - t.startedAt < AGE_TRANSITION_SKIP_AFTER_MS) return;
+    if (e.type === 'keydown' && ['Shift', 'Control', 'Alt', 'Meta'].includes(e.key)) return;
+    e.preventDefault(); // (the tap or key only skips; nothing underneath gets it)
+    finishAgeTransition();
+}
+
+// Little kids: flowers and animals bloom from the middle and float away
+function buildBlossomEffects(fx) {
+    const glow = document.createElement('div');
+    glow.className = 'at-glow';
+    fx.appendChild(glow);
+    const count = window.innerWidth < 600 ? 18 : 26;
+    for (let i = 0; i < count; i++) {
+        const item = document.createElement('span');
+        item.className = 'at-bloom';
+        item.textContent = BLOSSOM_EMOJI[i % BLOSSOM_EMOJI.length];
+        const angle = (i / count) * Math.PI * 2 + Math.random() * 0.5;
+        const dist = 16 + Math.random() * 30; // vmin from the middle
+        item.style.setProperty('--dx', `${(Math.cos(angle) * dist).toFixed(1)}vmin`);
+        item.style.setProperty('--dy', `${(Math.sin(angle) * dist - 6).toFixed(1)}vmin`);
+        item.style.setProperty('--rot', `${Math.round(Math.random() * 60 - 30)}deg`);
+        item.style.fontSize = `${Math.round(28 + Math.random() * 30)}px`;
+        item.style.animationDelay = `${250 + i * 25}ms`;
+        fx.appendChild(item);
+    }
+}
+
+// Bigger kids: darkness, smoke, golden sparks and a rain of glowing numbers
+function buildMagicEffects(fx) {
+    ['at-veil', 'at-smoke s1', 'at-smoke s2', 'at-smoke s3', 'at-smoke s4'].forEach(cls => {
+        const el = document.createElement('div');
+        el.className = cls;
+        fx.appendChild(el);
+    });
+    const canvas = document.createElement('canvas');
+    canvas.className = 'at-rain';
+    fx.appendChild(canvas);
+    for (let i = 0; i < 14; i++) {
+        const spark = document.createElement('span');
+        spark.className = 'at-spark';
+        spark.textContent = i % 3 ? '✦' : '✧';
+        spark.style.left = `${Math.round(4 + Math.random() * 92)}%`;
+        spark.style.top = `${Math.round(6 + Math.random() * 88)}%`;
+        spark.style.fontSize = `${Math.round(14 + Math.random() * 22)}px`;
+        spark.style.animationDelay = `${Math.round(500 + Math.random() * 1500)}ms`;
+        fx.appendChild(spark);
+    }
+    startGlyphRain(canvas);
+}
+
+function startGlyphRain(canvas) {
+    const ctx = canvas.getContext && canvas.getContext('2d');
+    if (!ctx) return;
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    ctx.scale(dpr, dpr);
+    const size = w < 600 ? 16 : 20;
+    const columns = Math.ceil(w / size);
+    // Each column: where its head is and how fast it falls (px per second),
+    // so the rain looks the same on slow and fast devices
+    const newSpeed = () => 450 + Math.random() * 700;
+    const heads = Array.from({ length: columns }, () => -Math.random() * h * 0.5);
+    const speeds = Array.from({ length: columns }, newSpeed);
+    ctx.font = `700 ${size}px ui-monospace, Consolas, "Courier New", monospace`;
+    ctx.textAlign = 'center';
+    let last = performance.now();
+    const draw = (now) => {
+        if (!ageTransition) return;
+        const dt = Math.min(0.05, Math.max(0, (now - last) / 1000));
+        last = now;
+        // Older glyphs fade to transparent (a trail)
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.fillStyle = `rgba(0, 0, 0, ${(1 - Math.pow(0.86, dt * 60)).toFixed(3)})`;
+        ctx.fillRect(0, 0, w, h);
+        ctx.globalCompositeOperation = 'source-over';
+        for (let i = 0; i < columns; i++) {
+            const from = heads[i];
+            heads[i] += speeds[i] * dt;
+            // a glyph in every cell the head passed, so a slow frame leaves no gaps
+            for (let y = Math.max(0, Math.ceil(from / size) * size); y <= heads[i]; y += size) {
+                // mostly Matrix green, now and then a golden (magic) one
+                ctx.fillStyle = Math.random() < 0.15 ? '#fff1b8' : (i % 3 ? '#3dff9a' : '#8cffd9');
+                ctx.fillText(MAGIC_GLYPHS[Math.floor(Math.random() * MAGIC_GLYPHS.length)], i * size + size / 2, y);
+            }
+            if (heads[i] > h + size * 4) {
+                heads[i] = -Math.random() * h * 0.3;
+                speeds[i] = newSpeed();
+            }
+        }
+        ageTransition.raf = requestAnimationFrame(draw);
+    };
+    ageTransition.raf = requestAnimationFrame(draw);
+}
+
 function goToAgeSelection() {
+    cancelAgeTransition();
     cancelPendingCallbacks();
     stopSpeech();
     selectedAgeGroup = null;
