@@ -1,5 +1,5 @@
 // Bump APP_VERSION together with the ?v= values in index.html whenever this file changes.
-const APP_VERSION = '2026-09-25.2';
+const APP_VERSION = '2026-09-25.3';
 
 // A page the browser cached from another version may still load this file (the
 // server keeps no old copies). The page asks for script.js?v=<its version>; if that
@@ -1657,13 +1657,13 @@ function filterGamesByAgeGroup() {
 
 // ------------------------------------------------------------
 // Age group transition (the two Play halves): the chosen half takes over the
-// screen; little kids then get flowers and animals, bigger kids smoke,
+// screen; little kids then get flowers and animals, bigger kids darkness,
 // flickering and falling glowing numbers (a bit Harry Potter, a bit Matrix);
 // then the games appear. A tap or a key skips it; with reduced motion there is
 // none. selectAgeGroup() itself stays instant.
 // Smoothness: only transform and opacity are animated (the graphics card moves
 // ready-made layers, nothing is laid out or re-drawn), the flowers are small
-// pictures drawn once in advance, and the smoke and the rain are canvases.
+// pictures drawn once in advance, and the rain is a canvas.
 // ------------------------------------------------------------
 const AGE_TRANSITION_MS = {
     little: { switchAt: 700, revealAt: 1150, endAt: 2150 },
@@ -1850,8 +1850,8 @@ function buildBlossomEffects(fx) {
     }
 }
 
-// Bigger kids: darkness, smoke, golden sparks, a rain of glowing numbers and a
-// gentle flicker
+// Bigger kids: darkness, golden sparks, a rain of glowing numbers and a gentle
+// flicker
 function buildMagicEffects(fx) {
     const make = (tag, cls, parent = fx) => {
         const el = document.createElement(tag);
@@ -1860,7 +1860,6 @@ function buildMagicEffects(fx) {
         return el;
     };
     make('div', 'at-veil');
-    const smoke = make('canvas', 'at-smoke');
     const rain = make('canvas', 'at-rain');
     const sparks = make('div', 'at-sparks');
     for (let i = 0; i < 10; i++) {
@@ -1877,7 +1876,7 @@ function buildMagicEffects(fx) {
         ], { duration: 1100, delay: Math.round(500 + Math.random() * 1400), easing: 'ease-in-out', fill: 'both' });
     }
     make('div', 'at-flash');
-    startMagicCanvas(rain, smoke);
+    startGlyphRain(rain);
 }
 
 // The glyphs in each colour, drawn once; the rain copies them from here
@@ -1896,56 +1895,28 @@ function glyphAtlas(size) {
     return atlas;
 }
 
-// Smoke and falling glyphs, drawn each frame. The smoke canvas is tiny and the
-// browser stretches it over the screen (soft, and nearly free); the rain is at
-// CSS-pixel resolution, copies glyphs from the atlas and falls at a speed in px
-// per second, so it looks the same on slow and fast devices.
-function startMagicCanvas(rain, smoke) {
+// Falling glyphs, drawn each frame at CSS-pixel resolution, copied from the
+// atlas, at a speed in px per second (the same on slow and fast devices)
+function startGlyphRain(rain) {
     const rctx = rain.getContext && rain.getContext('2d');
-    const sctx = smoke.getContext && smoke.getContext('2d');
-    if (!rctx || !sctx) return;
+    if (!rctx) return;
     const w = Math.max(1, window.innerWidth);
     const h = Math.max(1, window.innerHeight);
     rain.width = w;
     rain.height = h;
-    const sw = Math.max(32, Math.round(w / 10));
-    const sh = Math.max(24, Math.round(h / 10));
-    smoke.width = sw;
-    smoke.height = sh;
     const size = w < 600 ? 16 : 20;
     const atlas = glyphAtlas(size);
     const columns = Math.ceil(w / size);
     const newSpeed = () => 450 + Math.random() * 700;
     const heads = Array.from({ length: columns }, () => -Math.random() * h * 0.5);
     const speeds = Array.from({ length: columns }, newSpeed);
-    const clouds = [ // colour, strength, drifts from -> to (share of the screen), size
-        { rgb: '147, 97, 255', a: 0.55, from: [-0.15, 0.1], to: [0.4, 0.42], r: 0.55 },
-        { rgb: '45, 212, 191', a: 0.42, from: [1.1, 0.2], to: [0.62, 0.4], r: 0.5 },
-        { rgb: '255, 196, 64', a: 0.26, from: [0.3, 1.15], to: [0.45, 0.7], r: 0.45 },
-        { rgb: '99, 102, 241', a: 0.5, from: [0.95, 1.05], to: [0.7, 0.66], r: 0.55 },
-    ];
-    const start = performance.now();
-    let last = start;
+    let last = performance.now();
     const draw = (now) => {
         if (!ageTransition) return;
         const dt = Math.min(0.05, Math.max(0, (now - last) / 1000));
         last = now;
-        // Smoke: a few soft clouds drifting in
-        const p = Math.min(1, Math.max(0, (now - start) / 2400));
-        const ease = p * p * (3 - 2 * p);
-        sctx.clearRect(0, 0, sw, sh);
-        clouds.forEach(c => {
-            const x = (c.from[0] + (c.to[0] - c.from[0]) * ease) * sw;
-            const y = (c.from[1] + (c.to[1] - c.from[1]) * ease) * sh;
-            const r = c.r * Math.max(sw, sh) * (0.8 + 0.4 * ease);
-            const gradient = sctx.createRadialGradient(x, y, 0, x, y, r);
-            gradient.addColorStop(0, `rgba(${c.rgb}, ${c.a})`);
-            gradient.addColorStop(1, `rgba(${c.rgb}, 0)`);
-            sctx.fillStyle = gradient;
-            sctx.fillRect(x - r, y - r, r * 2, r * 2);
-        });
-        // Rain: older glyphs fade to transparent (a trail), then each column adds
-        // a glyph in every cell its head passed
+        // Older glyphs fade to transparent (a trail), then each column adds a
+        // glyph in every cell its head passed
         rctx.globalCompositeOperation = 'destination-out';
         rctx.fillStyle = `rgba(0, 0, 0, ${(1 - Math.pow(0.86, dt * 60)).toFixed(3)})`;
         rctx.fillRect(0, 0, w, h);

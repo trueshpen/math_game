@@ -211,8 +211,11 @@ body.in-game .lang-switcher {
 }
 
 :root {
-    --little-half-bg: radial-gradient(circle at 30% 20%, rgba(255, 214, 128, 0.9) 0%, rgba(255, 214, 128, 0) 50%),
-                      linear-gradient(145deg, #ffb347 0%, #ff6b6b 55%, #ff8fa3 100%);
+    /* the little kids' half is green like their games (a deeper shade, so its white
+       text stays readable: at least 4.5:1 where the text is), with a small light
+       corner kept away from the text */
+    --little-half-bg: radial-gradient(circle 30vmin at 12% 8%, rgba(210, 255, 200, 0.3) 0%, rgba(210, 255, 200, 0) 100%),
+                      linear-gradient(145deg, #339049 0%, #287a3d 45%, #1c6634 100%);
     --bigger-half-bg: radial-gradient(circle at 70% 20%, rgba(120, 190, 255, 0.5) 0%, rgba(120, 190, 255, 0) 50%),
                       linear-gradient(145deg, #1e3c72 0%, #2a5298 55%, #4a90e2 100%);
 }
@@ -277,8 +280,8 @@ body.in-game .lang-switcher {
 .age-title.fun-font {
     font-family: var(--font-fun);
     letter-spacing: 1px;
-    color: #fffaf0;
-    text-shadow: 0 4px 0 rgba(170, 50, 40, 0.35), 0 8px 18px rgba(0, 0, 0, 0.18);
+    color: #fffdf2;
+    text-shadow: 0 4px 0 rgba(10, 60, 25, 0.45), 0 8px 18px rgba(0, 0, 0, 0.18);
     animation: wiggle 2.6s ease-in-out infinite;
 }
 
@@ -296,8 +299,12 @@ body.in-game .lang-switcher {
 }
 
 .little-kids-section .age-subtitle {
-    color: #fff3d6;
-    text-shadow: 0 2px 0 rgba(170, 50, 40, 0.3);
+    color: #ffffff;
+    text-shadow: 0 2px 0 rgba(10, 60, 25, 0.4);
+}
+
+.little-kids-section .age-description {
+    text-shadow: 0 1px 3px rgba(5, 40, 15, 0.45);
 }
 
 .bigger-kids-section .age-subtitle {
@@ -334,7 +341,7 @@ body.in-game .lang-switcher {
     box-shadow: 0 5px 0 rgba(0, 0, 0, 0.18), 0 10px 20px rgba(0, 0, 0, 0.16);
 }
 
-.little-kids-section .age-cta { color: #d9434f; }
+.little-kids-section .age-cta { color: #1d6b2d; }
 .bigger-kids-section .age-cta { color: #1e4b9a; }
 
 @media (max-width: 1000px) {
@@ -390,7 +397,7 @@ body.in-game .lang-switcher {
 /* ------------------------------------------------------------
    Age group transition (chooseAgeGroup in script.js). Only transform and
    opacity are animated (the graphics card moves ready-made layers; nothing is
-   laid out, re-drawn, blurred or blended); the smoke and the rain are canvases.
+   laid out, re-drawn, blurred or blended); the rain is a canvas.
    ------------------------------------------------------------ */
 .age-transition {
     position: fixed;
@@ -458,7 +465,7 @@ body.in-game .lang-switcher {
 .at-glow {
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at 50% 50%, rgba(255, 251, 228, 0.9) 0%, rgba(255, 214, 236, 0.55) 22%, rgba(255, 214, 236, 0) 55%);
+    background: radial-gradient(circle at 50% 50%, rgba(255, 255, 236, 0.9) 0%, rgba(214, 255, 200, 0.5) 24%, rgba(214, 255, 200, 0) 55%);
     opacity: 0;
     will-change: opacity;
     animation: atGlow 1.7s ease-out 0.2s both;
@@ -493,9 +500,9 @@ body.in-game .lang-switcher {
     transition: opacity 0.8s ease;
 }
 
-/* Bigger kids: the title glows, glitches and dissolves; darkness, smoke, rain,
-   golden sparks (animated from script.js) and a gentle flicker - small dips,
-   under 3 a second; then the games materialise */
+/* Bigger kids: the title glows, glitches and dissolves; darkness, rain, golden
+   sparks (animated from script.js) and a gentle flicker - small dips, under 3
+   a second; then the games materialise */
 .at-bigger.at-grow .at-panel .age-content {
     animation: atDissolve 0.8s ease-in 0.1s both;
 }
@@ -513,7 +520,6 @@ body.in-game .lang-switcher {
     animation: atFadeIn 0.6s ease 0.35s both;
 }
 
-.at-smoke,
 .at-rain {
     position: absolute;
     inset: 0;
@@ -521,13 +527,6 @@ body.in-game .lang-switcher {
     height: 100%;
     opacity: 0;
     will-change: opacity, transform;
-}
-
-.at-smoke {
-    animation: atFadeIn 0.8s ease 0.3s both;
-}
-
-.at-rain {
     animation: atFadeIn 0.5s ease 0.5s both, atGlitch 0.36s steps(3) 1.2s 2;
 }
 
@@ -557,7 +556,6 @@ body.in-game .lang-switcher {
 
 .at-bigger.at-reveal .at-bg,
 .at-bigger.at-reveal .at-veil,
-.at-bigger.at-reveal .at-smoke,
 .at-bigger.at-reveal .at-rain,
 .at-bigger.at-reveal .at-sparks {
     animation: atMaterialize 1s ease-in both;
