@@ -26,6 +26,8 @@ A fun and educational math game for kids, featuring counting, arithmetic, compar
 ### Age-Based Selection
 - Game mode and difficulty adapt to the selected age group
 - Younger children get simpler counting games; older children get arithmetic with problem-only layouts
+- Animated age-choice screen: the chosen half takes over the screen with a smooth transform/opacity transition — little kids' side blooms into flowers, bigger kids' side dissolves into falling green code and numbers before the games appear
+- Age screen titles stay on a single line in both languages
 
 ### Gamification & Progress
 - **Streak tracking** — consecutive correct answer streaks (a day filled in late re-joins streaks)
@@ -45,6 +47,7 @@ A fun and educational math game for kids, featuring counting, arithmetic, compar
 
 ### Language Support
 - **EN / CS language switcher** — full i18n for all UI text and spoken prompts
+- Switching languages plays a "decode" animation as on-screen text resolves into the newly selected language
 
 ### Deployment
 - GitHub Actions auto-deploy to Server 3 on push to `main`
@@ -93,7 +96,7 @@ Fruits are rendered as Unicode emoji (🍎🍌🍊🍉🍍) — no image assets 
 <!-- AUTO-GENERATED: START -->
 *Auto-maintained by the nightly README agent. This block is refreshed only when new commits land in the repo.*
 
-**Last reflected change:** 2026-09-24T23:13:34Z
+**Last reflected change:** 2026-09-25T23:12:49Z
 
 **Project status:** Active — git remote: https://github.com/trueshpen/math_game
 <!-- AUTO-GENERATED: END -->
