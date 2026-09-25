@@ -1,5 +1,5 @@
 // Bump APP_VERSION together with the ?v= values in index.html whenever this file changes.
-const APP_VERSION = '2026-09-25.1';
+const APP_VERSION = '2026-09-25.2';
 
 // A page the browser cached from another version may still load this file (the
 // server keeps no old copies). The page asks for script.js?v=<its version>; if that
@@ -1661,6 +1661,9 @@ function filterGamesByAgeGroup() {
 // flickering and falling glowing numbers (a bit Harry Potter, a bit Matrix);
 // then the games appear. A tap or a key skips it; with reduced motion there is
 // none. selectAgeGroup() itself stays instant.
+// Smoothness: only transform and opacity are animated (the graphics card moves
+// ready-made layers, nothing is laid out or re-drawn), the flowers are small
+// pictures drawn once in advance, and the smoke and the rain are canvases.
 // ------------------------------------------------------------
 const AGE_TRANSITION_MS = {
     little: { switchAt: 700, revealAt: 1150, endAt: 2150 },
@@ -1669,8 +1672,11 @@ const AGE_TRANSITION_MS = {
 const AGE_TRANSITION_SKIP_AFTER_MS = 600; // an earlier tap is a double tap, not "skip"
 const BLOSSOM_EMOJI = ['🌸', '🐰', '🌼', '🦋', '🌷', '🐥', '🌻', '🐞', '🌺', '🐱', '🐶', '🦊', '🐼', '🐸', '🐝', '🐻'];
 const MAGIC_GLYPHS = '0123456789+−×÷=√π∞';
+const MAGIC_COLORS = ['#3dff9a', '#8cffd9', '#fff1b8']; // Matrix green and aqua, and a golden (magic) one
 let ageTransition = null;   // { group, layer, timers, raf, switched, startedAt }
 let gamesEntranceTimer = 0;
+const bloomSprites = [];    // the flowers and animals as small, decoded pictures (see prepareBloomSprites)
+let nextBloomSprite = 0;    // the next one to draw
 
 function prefersReducedMotion() {
     return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -1684,22 +1690,31 @@ function chooseAgeGroup(group, section) {
     }
     const timing = AGE_TRANSITION_MS[group];
     const rect = section.getBoundingClientRect();
+    const vw = Math.max(1, window.innerWidth);
+    const vh = Math.max(1, window.innerHeight);
     const layer = document.createElement('div');
     layer.className = `age-transition at-${group}`;
     layer.setAttribute('aria-hidden', 'true');
-    // A copy of the chosen half, exactly where it is, that grows over everything
+    // The chosen half's colours, stretched from where the half is to the whole screen
+    const bg = document.createElement('div');
+    bg.className = `at-bg at-bg-${group}`;
+    bg.style.transform = `translate(${rect.left}px, ${rect.top}px) scale(${rect.width / vw}, ${rect.height / vh})`;
+    // ...and a copy of its text, which glides to the middle
     const panel = document.createElement('div');
     panel.className = `${section.className} at-panel`;
-    panel.innerHTML = section.innerHTML; // (static markup of our own button, no ids)
+    panel.appendChild(section.querySelector('.age-content').cloneNode(true));
     Object.assign(panel.style, { left: `${rect.left}px`, top: `${rect.top}px`, width: `${rect.width}px`, height: `${rect.height}px` });
+    panel.style.setProperty('--to-x', `${Math.round(vw / 2 - (rect.left + rect.width / 2))}px`);
+    panel.style.setProperty('--to-y', `${Math.round(vh / 2 - (rect.top + rect.height / 2))}px`);
     const fx = document.createElement('div');
     fx.className = 'at-fx';
-    layer.append(panel, fx);
+    layer.append(bg, panel, fx);
     document.body.appendChild(layer);
-    ageTransition = { group, layer, timers: [], raf: 0, switched: false, startedAt: performance.now() };
+    section.classList.add('at-source'); // its own text hides while the copy moves (restored at the end)
+    ageTransition = { group, layer, section, timers: [], raf: 0, switched: false, startedAt: performance.now() };
     clearTimeout(gamesEntranceTimer);
     homeScreen.classList.remove('enter-soft', 'enter-magic');
-    void panel.offsetWidth; // grow from the half's own size
+    void layer.offsetWidth; // start from the half's own place
     layer.classList.add('at-grow');
     if (group === 'bigger') buildMagicEffects(fx);
     else buildBlossomEffects(fx);
@@ -1751,6 +1766,7 @@ function stopAgeTransition() {
     t.timers.forEach(clearTimeout);
     cancelAnimationFrame(t.raf);
     document.removeEventListener('keydown', skipAgeTransition, true);
+    t.section.classList.remove('at-source');
     t.layer.remove();
     ageTransition = null;
 }
@@ -1763,86 +1779,184 @@ function skipAgeTransition(e) {
     finishAgeTransition();
 }
 
+// Draws the flowers and animals into small pictures while the child is still
+// choosing (text emoji in many sizes stalled the start of the transition): one
+// at a time in the browser's idle moments, encoded off the main thread. Never
+// done on the tap itself.
+function scheduleBloomSprites() {
+    if (nextBloomSprite >= BLOSSOM_EMOJI.length) return;
+    if (window.requestIdleCallback) requestIdleCallback(prepareBloomSprites, { timeout: 2000 });
+    else setTimeout(prepareBloomSprites, 50);
+}
+
+function prepareBloomSprites(deadline) {
+    const size = 112; // twice the size shown: sharp on high-DPI screens
+    do {
+        const emoji = BLOSSOM_EMOJI[nextBloomSprite++];
+        const canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext && canvas.getContext('2d');
+        if (!ctx || !canvas.toBlob || !window.URL || !URL.createObjectURL) {
+            nextBloomSprite = BLOSSOM_EMOJI.length; // no pictures: the transition goes without flowers
+            return;
+        }
+        ctx.font = `${Math.round(size * 0.78)}px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(emoji, size / 2, size / 2 + size * 0.04);
+        canvas.toBlob(blob => {
+            if (!blob) return;
+            const url = URL.createObjectURL(blob);
+            bloomSprites.push(url);
+            const img = new Image(); // decoded ahead where the browser can (a 112 px picture is cheap anyway)
+            img.src = url;
+            if (img.decode) img.decode().catch(() => {});
+        }, 'image/png');
+    } while (nextBloomSprite < BLOSSOM_EMOJI.length && deadline && deadline.timeRemaining && deadline.timeRemaining() > 8);
+    scheduleBloomSprites();
+}
+
 // Little kids: flowers and animals bloom from the middle and float away
 function buildBlossomEffects(fx) {
     const glow = document.createElement('div');
     glow.className = 'at-glow';
     fx.appendChild(glow);
-    const count = window.innerWidth < 600 ? 18 : 26;
+    // Only the pictures ready by now (a tap in the first moments after the page
+    // opened gets fewer, or just the glow)
+    const sprites = bloomSprites.slice();
+    const count = sprites.length ? (window.innerWidth < 600 ? 10 : 14) : 0;
+    const unit = Math.min(window.innerWidth, window.innerHeight) / 100; // 1vmin in px
     for (let i = 0; i < count; i++) {
-        const item = document.createElement('span');
+        const item = document.createElement('img');
+        item.src = sprites[i % sprites.length];
+        item.alt = '';
         item.className = 'at-bloom';
-        item.textContent = BLOSSOM_EMOJI[i % BLOSSOM_EMOJI.length];
+        fx.appendChild(item);
+        if (!item.animate) continue;
         const angle = (i / count) * Math.PI * 2 + Math.random() * 0.5;
         const dist = 16 + Math.random() * 30; // vmin from the middle
-        item.style.setProperty('--dx', `${(Math.cos(angle) * dist).toFixed(1)}vmin`);
-        item.style.setProperty('--dy', `${(Math.sin(angle) * dist - 6).toFixed(1)}vmin`);
-        item.style.setProperty('--rot', `${Math.round(Math.random() * 60 - 30)}deg`);
-        item.style.fontSize = `${Math.round(28 + Math.random() * 30)}px`;
-        item.style.animationDelay = `${250 + i * 25}ms`;
-        fx.appendChild(item);
+        const dx = Math.cos(angle) * dist * unit;
+        const dy = (Math.sin(angle) * dist - 6) * unit;
+        const rot = Math.round(Math.random() * 60 - 30);
+        const scale = +(0.7 + Math.random() * 0.3).toFixed(2); // never above 1: drawn once, only shrunk
+        const ease = 'cubic-bezier(0.2, 0.8, 0.3, 1)';
+        item.animate([
+            { opacity: 0, transform: 'translate(0px, 0px) scale(0.3) rotate(0deg)', easing: ease },
+            { opacity: 1, transform: `translate(${dx}px, ${dy}px) scale(${scale}) rotate(${rot}deg)`, offset: 0.3, easing: ease },
+            { opacity: 1, transform: `translate(${dx}px, ${dy - 3 * unit}px) scale(${scale * 0.92}) rotate(${-rot / 2}deg)`, offset: 0.55, easing: ease },
+            { opacity: 0, transform: `translate(${dx * 1.2}px, ${dy - 16 * unit}px) scale(${scale * 0.85}) rotate(${rot}deg)` },
+        ], { duration: 1250, delay: 250 + i * 40, fill: 'both' });
     }
 }
 
-// Bigger kids: darkness, smoke, golden sparks and a rain of glowing numbers
+// Bigger kids: darkness, smoke, golden sparks, a rain of glowing numbers and a
+// gentle flicker
 function buildMagicEffects(fx) {
-    ['at-veil', 'at-smoke s1', 'at-smoke s2', 'at-smoke s3', 'at-smoke s4'].forEach(cls => {
-        const el = document.createElement('div');
+    const make = (tag, cls, parent = fx) => {
+        const el = document.createElement(tag);
         el.className = cls;
-        fx.appendChild(el);
-    });
-    const canvas = document.createElement('canvas');
-    canvas.className = 'at-rain';
-    fx.appendChild(canvas);
-    for (let i = 0; i < 14; i++) {
-        const spark = document.createElement('span');
-        spark.className = 'at-spark';
+        parent.appendChild(el);
+        return el;
+    };
+    make('div', 'at-veil');
+    const smoke = make('canvas', 'at-smoke');
+    const rain = make('canvas', 'at-rain');
+    const sparks = make('div', 'at-sparks');
+    for (let i = 0; i < 10; i++) {
+        const spark = make('span', 'at-spark', sparks);
         spark.textContent = i % 3 ? '✦' : '✧';
         spark.style.left = `${Math.round(4 + Math.random() * 92)}%`;
         spark.style.top = `${Math.round(6 + Math.random() * 88)}%`;
-        spark.style.fontSize = `${Math.round(14 + Math.random() * 22)}px`;
-        spark.style.animationDelay = `${Math.round(500 + Math.random() * 1500)}ms`;
-        fx.appendChild(spark);
+        if (!spark.animate) continue;
+        const scale = +(0.5 + Math.random() * 0.5).toFixed(2);
+        spark.animate([
+            { opacity: 0, transform: 'scale(0.3) rotate(0deg)' },
+            { opacity: 1, transform: `scale(${scale}) rotate(45deg)`, offset: 0.45 },
+            { opacity: 0, transform: `scale(${scale * 0.5}) rotate(90deg)` },
+        ], { duration: 1100, delay: Math.round(500 + Math.random() * 1400), easing: 'ease-in-out', fill: 'both' });
     }
-    startGlyphRain(canvas);
+    make('div', 'at-flash');
+    startMagicCanvas(rain, smoke);
 }
 
-function startGlyphRain(canvas) {
-    const ctx = canvas.getContext && canvas.getContext('2d');
-    if (!ctx) return;
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-    canvas.width = Math.round(w * dpr);
-    canvas.height = Math.round(h * dpr);
-    ctx.scale(dpr, dpr);
+// The glyphs in each colour, drawn once; the rain copies them from here
+function glyphAtlas(size) {
+    const atlas = document.createElement('canvas');
+    atlas.width = size * MAGIC_GLYPHS.length;
+    atlas.height = size * MAGIC_COLORS.length;
+    const ctx = atlas.getContext('2d');
+    ctx.font = `700 ${Math.round(size * 0.9)}px ui-monospace, Consolas, "Segoe UI Symbol", monospace`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    MAGIC_COLORS.forEach((color, row) => {
+        ctx.fillStyle = color;
+        [...MAGIC_GLYPHS].forEach((glyph, i) => ctx.fillText(glyph, i * size + size / 2, row * size + size / 2));
+    });
+    return atlas;
+}
+
+// Smoke and falling glyphs, drawn each frame. The smoke canvas is tiny and the
+// browser stretches it over the screen (soft, and nearly free); the rain is at
+// CSS-pixel resolution, copies glyphs from the atlas and falls at a speed in px
+// per second, so it looks the same on slow and fast devices.
+function startMagicCanvas(rain, smoke) {
+    const rctx = rain.getContext && rain.getContext('2d');
+    const sctx = smoke.getContext && smoke.getContext('2d');
+    if (!rctx || !sctx) return;
+    const w = Math.max(1, window.innerWidth);
+    const h = Math.max(1, window.innerHeight);
+    rain.width = w;
+    rain.height = h;
+    const sw = Math.max(32, Math.round(w / 10));
+    const sh = Math.max(24, Math.round(h / 10));
+    smoke.width = sw;
+    smoke.height = sh;
     const size = w < 600 ? 16 : 20;
+    const atlas = glyphAtlas(size);
     const columns = Math.ceil(w / size);
-    // Each column: where its head is and how fast it falls (px per second),
-    // so the rain looks the same on slow and fast devices
     const newSpeed = () => 450 + Math.random() * 700;
     const heads = Array.from({ length: columns }, () => -Math.random() * h * 0.5);
     const speeds = Array.from({ length: columns }, newSpeed);
-    ctx.font = `700 ${size}px ui-monospace, Consolas, "Courier New", monospace`;
-    ctx.textAlign = 'center';
-    let last = performance.now();
+    const clouds = [ // colour, strength, drifts from -> to (share of the screen), size
+        { rgb: '147, 97, 255', a: 0.55, from: [-0.15, 0.1], to: [0.4, 0.42], r: 0.55 },
+        { rgb: '45, 212, 191', a: 0.42, from: [1.1, 0.2], to: [0.62, 0.4], r: 0.5 },
+        { rgb: '255, 196, 64', a: 0.26, from: [0.3, 1.15], to: [0.45, 0.7], r: 0.45 },
+        { rgb: '99, 102, 241', a: 0.5, from: [0.95, 1.05], to: [0.7, 0.66], r: 0.55 },
+    ];
+    const start = performance.now();
+    let last = start;
     const draw = (now) => {
         if (!ageTransition) return;
         const dt = Math.min(0.05, Math.max(0, (now - last) / 1000));
         last = now;
-        // Older glyphs fade to transparent (a trail)
-        ctx.globalCompositeOperation = 'destination-out';
-        ctx.fillStyle = `rgba(0, 0, 0, ${(1 - Math.pow(0.86, dt * 60)).toFixed(3)})`;
-        ctx.fillRect(0, 0, w, h);
-        ctx.globalCompositeOperation = 'source-over';
+        // Smoke: a few soft clouds drifting in
+        const p = Math.min(1, Math.max(0, (now - start) / 2400));
+        const ease = p * p * (3 - 2 * p);
+        sctx.clearRect(0, 0, sw, sh);
+        clouds.forEach(c => {
+            const x = (c.from[0] + (c.to[0] - c.from[0]) * ease) * sw;
+            const y = (c.from[1] + (c.to[1] - c.from[1]) * ease) * sh;
+            const r = c.r * Math.max(sw, sh) * (0.8 + 0.4 * ease);
+            const gradient = sctx.createRadialGradient(x, y, 0, x, y, r);
+            gradient.addColorStop(0, `rgba(${c.rgb}, ${c.a})`);
+            gradient.addColorStop(1, `rgba(${c.rgb}, 0)`);
+            sctx.fillStyle = gradient;
+            sctx.fillRect(x - r, y - r, r * 2, r * 2);
+        });
+        // Rain: older glyphs fade to transparent (a trail), then each column adds
+        // a glyph in every cell its head passed
+        rctx.globalCompositeOperation = 'destination-out';
+        rctx.fillStyle = `rgba(0, 0, 0, ${(1 - Math.pow(0.86, dt * 60)).toFixed(3)})`;
+        rctx.fillRect(0, 0, w, h);
+        rctx.globalCompositeOperation = 'source-over';
         for (let i = 0; i < columns; i++) {
             const from = heads[i];
             heads[i] += speeds[i] * dt;
-            // a glyph in every cell the head passed, so a slow frame leaves no gaps
             for (let y = Math.max(0, Math.ceil(from / size) * size); y <= heads[i]; y += size) {
-                // mostly Matrix green, now and then a golden (magic) one
-                ctx.fillStyle = Math.random() < 0.15 ? '#fff1b8' : (i % 3 ? '#3dff9a' : '#8cffd9');
-                ctx.fillText(MAGIC_GLYPHS[Math.floor(Math.random() * MAGIC_GLYPHS.length)], i * size + size / 2, y);
+                const row = Math.random() < 0.15 ? 2 : (i % 3 ? 0 : 1); // now and then a golden one
+                const glyph = Math.floor(Math.random() * MAGIC_GLYPHS.length);
+                rctx.drawImage(atlas, glyph * size, row * size, size, size, i * size, y - size, size, size);
             }
             if (heads[i] > h + size * 4) {
                 heads[i] = -Math.random() * h * 0.3;
@@ -2842,6 +2956,8 @@ function init() {
 
     // Show age selection screen first
     showOnly(ageSelectionScreen);
+    // The little kids' transition flowers, drawn while the page is idle
+    scheduleBloomSprites();
 }
 
 // Start the app

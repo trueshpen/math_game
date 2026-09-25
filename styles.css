@@ -210,14 +210,19 @@ body.in-game .lang-switcher {
     filter: brightness(0.96);
 }
 
+:root {
+    --little-half-bg: radial-gradient(circle at 30% 20%, rgba(255, 214, 128, 0.9) 0%, rgba(255, 214, 128, 0) 50%),
+                      linear-gradient(145deg, #ffb347 0%, #ff6b6b 55%, #ff8fa3 100%);
+    --bigger-half-bg: radial-gradient(circle at 70% 20%, rgba(120, 190, 255, 0.5) 0%, rgba(120, 190, 255, 0) 50%),
+                      linear-gradient(145deg, #1e3c72 0%, #2a5298 55%, #4a90e2 100%);
+}
+
 .little-kids-section {
-    background: radial-gradient(circle at 30% 20%, rgba(255, 214, 128, 0.9) 0%, rgba(255, 214, 128, 0) 50%),
-                linear-gradient(145deg, #ffb347 0%, #ff6b6b 55%, #ff8fa3 100%);
+    background: var(--little-half-bg);
 }
 
 .bigger-kids-section {
-    background: radial-gradient(circle at 70% 20%, rgba(120, 190, 255, 0.5) 0%, rgba(120, 190, 255, 0) 50%),
-                linear-gradient(145deg, #1e3c72 0%, #2a5298 55%, #4a90e2 100%);
+    background: var(--bigger-half-bg);
 }
 
 /* Decorations live at the edges of each half, away from the text */
@@ -383,28 +388,59 @@ body.in-game .lang-switcher {
 }
 
 /* ------------------------------------------------------------
-   Age group transition (chooseAgeGroup in script.js)
+   Age group transition (chooseAgeGroup in script.js). Only transform and
+   opacity are animated (the graphics card moves ready-made layers; nothing is
+   laid out, re-drawn, blurred or blended); the smoke and the rain are canvases.
    ------------------------------------------------------------ */
 .age-transition {
     position: fixed;
     inset: 0;
     z-index: 1000;
     overflow: hidden;
+    contain: strict;
 }
 
-/* The chosen half grows from where it was to the whole screen */
+/* The chosen half's colours grow from the half to the whole screen */
+.at-bg {
+    position: absolute;
+    inset: 0;
+    transform-origin: 0 0;
+    opacity: 0;
+    will-change: transform, opacity;
+}
+
+.at-bg-little {
+    background: var(--little-half-bg);
+}
+
+.at-bg-bigger {
+    background: var(--bigger-half-bg);
+}
+
+.at-grow .at-bg {
+    transform: none !important;
+    opacity: 1;
+    transition: transform 0.7s cubic-bezier(0.65, 0, 0.25, 1), opacity 0.12s linear;
+}
+
+/* ...and a copy of its text glides to the middle (the half's own text hides
+   meanwhile, keeping its place, so it never shows twice) */
+.at-source .age-content {
+    visibility: hidden;
+}
+
+
 .age-transition .at-panel {
     position: fixed;
     margin: 0;
-    transition: left 0.7s cubic-bezier(0.65, 0, 0.25, 1), top 0.7s cubic-bezier(0.65, 0, 0.25, 1),
-                width 0.7s cubic-bezier(0.65, 0, 0.25, 1), height 0.7s cubic-bezier(0.65, 0, 0.25, 1);
+    background: none;
+    filter: none !important;
+    will-change: transform;
+    transition: transform 0.7s cubic-bezier(0.65, 0, 0.25, 1);
 }
 
-.age-transition.at-grow .at-panel {
-    left: 0 !important;
-    top: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
+.at-grow .at-panel {
+    transform: translate(var(--to-x), var(--to-y));
 }
 
 .at-fx {
@@ -413,21 +449,18 @@ body.in-game .lang-switcher {
     pointer-events: none;
 }
 
-/* Little kids: the half hops goodbye, flowers and animals bloom and float away */
+/* Little kids: the text hops goodbye, a soft glow, flowers and animals bloom
+   (pictures animated from script.js) */
 .at-little.at-grow .at-panel .age-content {
     animation: atHop 0.7s ease-in both;
 }
 
 .at-glow {
     position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 140vmax;
-    height: 140vmax;
-    margin: -70vmax 0 0 -70vmax;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(255, 251, 228, 0.9) 0%, rgba(255, 214, 236, 0.55) 26%, rgba(255, 214, 236, 0) 60%);
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(255, 251, 228, 0.9) 0%, rgba(255, 214, 236, 0.55) 22%, rgba(255, 214, 236, 0) 55%);
     opacity: 0;
+    will-change: opacity;
     animation: atGlow 1.7s ease-out 0.2s both;
 }
 
@@ -435,19 +468,34 @@ body.in-game .lang-switcher {
     position: absolute;
     left: 50%;
     top: 50%;
-    line-height: 1;
+    width: 64px;
+    height: 64px;
+    margin: -32px 0 0 -32px;
+    font-size: 50px;
+    line-height: 64px;
+    text-align: center;
     opacity: 0;
-    animation: atBloom 1.25s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+    will-change: transform, opacity;
 }
 
-.at-little.at-reveal .at-panel {
+@media (max-width: 599.98px) {
+    .at-bloom {
+        width: 48px;
+        height: 48px;
+        margin: -24px 0 0 -24px;
+        font-size: 38px;
+        line-height: 48px;
+    }
+}
+
+.at-little.at-reveal .at-bg {
     opacity: 0;
     transition: opacity 0.8s ease;
 }
 
-/* Bigger kids: the title glows, glitches and dissolves into darkness, smoke,
-   golden sparks and falling glowing numbers; everything flickers (gently:
-   small dips, under 3 a second) and the games materialise */
+/* Bigger kids: the title glows, glitches and dissolves; darkness, smoke, rain,
+   golden sparks (animated from script.js) and a gentle flicker - small dips,
+   under 3 a second; then the games materialise */
 .at-bigger.at-grow .at-panel .age-content {
     animation: atDissolve 0.8s ease-in 0.1s both;
 }
@@ -461,73 +509,57 @@ body.in-game .lang-switcher {
     inset: 0;
     background: radial-gradient(circle at 50% 45%, rgba(18, 28, 64, 0.9) 0%, rgba(3, 6, 18, 0.97) 70%);
     opacity: 0;
+    will-change: opacity;
     animation: atFadeIn 0.6s ease 0.35s both;
 }
 
-.at-smoke {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 110vmax;
-    height: 70vmax;
-    margin: -35vmax 0 0 -55vmax;
-    border-radius: 50%;
-    opacity: 0;
-    mix-blend-mode: screen;
-    animation: atSmoke 2.4s ease-in-out 0.3s both;
-}
-
-.at-smoke.s1 {
-    --sx: -34vmax;
-    --sy: -22vmax;
-    --turn: 40deg;
-    background: radial-gradient(closest-side, rgba(147, 97, 255, 0.55), rgba(147, 97, 255, 0));
-}
-
-.at-smoke.s2 {
-    --sx: 32vmax;
-    --sy: -14vmax;
-    --turn: -35deg;
-    background: radial-gradient(closest-side, rgba(45, 212, 191, 0.42), rgba(45, 212, 191, 0));
-}
-
-.at-smoke.s3 {
-    --sx: -18vmax;
-    --sy: 28vmax;
-    --turn: 25deg;
-    background: radial-gradient(closest-side, rgba(255, 196, 64, 0.26), rgba(255, 196, 64, 0));
-}
-
-.at-smoke.s4 {
-    --sx: 26vmax;
-    --sy: 24vmax;
-    --turn: -30deg;
-    background: radial-gradient(closest-side, rgba(99, 102, 241, 0.5), rgba(99, 102, 241, 0));
-}
-
+.at-smoke,
 .at-rain {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     opacity: 0;
+    will-change: opacity, transform;
+}
+
+.at-smoke {
+    animation: atFadeIn 0.8s ease 0.3s both;
+}
+
+.at-rain {
     animation: atFadeIn 0.5s ease 0.5s both, atGlitch 0.36s steps(3) 1.2s 2;
+}
+
+.at-sparks {
+    position: absolute;
+    inset: 0;
 }
 
 .at-spark {
     position: absolute;
     color: #ffd76a;
+    font-size: 30px;
     line-height: 1;
     text-shadow: 0 0 8px #ffcf4d, 0 0 18px rgba(255, 200, 80, 0.7);
     opacity: 0;
-    animation: atTwinkle 1.1s ease-in-out both;
+    will-change: transform, opacity;
 }
 
-.at-bigger .at-fx {
-    animation: atFlicker 1.4s linear 1s both;
+.at-flash {
+    position: absolute;
+    inset: 0;
+    background: #000000;
+    opacity: 0;
+    will-change: opacity;
+    animation: atFlash 1.4s linear 1s both;
 }
 
-.at-bigger.at-reveal {
+.at-bigger.at-reveal .at-bg,
+.at-bigger.at-reveal .at-veil,
+.at-bigger.at-reveal .at-smoke,
+.at-bigger.at-reveal .at-rain,
+.at-bigger.at-reveal .at-sparks {
     animation: atMaterialize 1s ease-in both;
 }
 
@@ -538,25 +570,18 @@ body.in-game .lang-switcher {
 }
 
 @keyframes atGlow {
-    0% { opacity: 0; transform: scale(0.1); }
+    0% { opacity: 0; }
     35% { opacity: 1; }
     60% { opacity: 0.6; }
-    100% { opacity: 0; transform: scale(1); }
-}
-
-@keyframes atBloom {
-    0% { opacity: 0; transform: translate(-50%, -50%) scale(0) rotate(0deg); }
-    30% { opacity: 1; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.15) rotate(var(--rot)); }
-    55% { opacity: 1; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy) - 3vmin)) scale(1) rotate(calc(var(--rot) * -0.5)); }
-    100% { opacity: 0; transform: translate(calc(-50% + var(--dx) * 1.2), calc(-50% + var(--dy) - 16vmin)) scale(0.9) rotate(var(--rot)); }
+    100% { opacity: 0; }
 }
 
 @keyframes atDissolve {
-    0% { opacity: 1; filter: none; transform: none; }
-    30% { opacity: 1; filter: brightness(1.6); transform: skewX(-4deg) translateX(-4px); }
+    0% { opacity: 1; transform: none; }
+    30% { opacity: 1; transform: skewX(-4deg) translateX(-4px); }
     40% { transform: skewX(3deg) translateX(5px); }
-    55% { opacity: 0.85; filter: brightness(1.4); transform: none; }
-    100% { opacity: 0; filter: blur(12px) brightness(2); transform: scale(1.15); }
+    55% { opacity: 0.85; transform: none; }
+    100% { opacity: 0; transform: scale(1.15); }
 }
 
 @keyframes atTitleGlitch {
@@ -572,29 +597,17 @@ body.in-game .lang-switcher {
     to { opacity: 1; }
 }
 
-@keyframes atSmoke {
-    0% { opacity: 0; transform: translate(var(--sx), var(--sy)) rotate(0deg) scale(0.7); }
-    35% { opacity: 1; }
-    100% { opacity: 0.85; transform: translate(calc(var(--sx) * -0.35), calc(var(--sy) * -0.35)) rotate(var(--turn)) scale(1.2); }
-}
-
 @keyframes atGlitch {
     0%, 100% { transform: none; }
     33% { transform: translateX(-6px) skewX(-2deg); }
     66% { transform: translateX(5px); }
 }
 
-@keyframes atTwinkle {
-    0% { opacity: 0; transform: scale(0.2) rotate(0deg); }
-    45% { opacity: 1; transform: scale(1.25) rotate(45deg); }
-    100% { opacity: 0; transform: scale(0.5) rotate(90deg); }
-}
-
-@keyframes atFlicker {
-    0%, 10%, 15%, 45%, 50%, 80%, 85%, 100% { opacity: 1; }
-    12% { opacity: 0.78; }
-    47% { opacity: 0.82; }
-    82% { opacity: 0.8; }
+@keyframes atFlash {
+    0%, 10%, 15%, 45%, 50%, 80%, 85%, 100% { opacity: 0; }
+    12% { opacity: 0.22; }
+    47% { opacity: 0.18; }
+    82% { opacity: 0.2; }
 }
 
 @keyframes atMaterialize {
@@ -645,9 +658,9 @@ body.in-game .lang-switcher {
 }
 
 @keyframes enterMagic {
-    0% { opacity: 0; filter: blur(10px) brightness(1.8); transform: scale(1.05); }
-    60% { opacity: 1; filter: blur(2px) brightness(1.2); }
-    100% { opacity: 1; filter: none; transform: none; }
+    0% { opacity: 0; transform: scale(1.08); }
+    60% { opacity: 1; }
+    100% { opacity: 1; transform: none; }
 }
 
 /* ------------------------------------------------------------
