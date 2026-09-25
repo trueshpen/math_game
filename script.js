@@ -1,5 +1,5 @@
 // Bump APP_VERSION together with the ?v= values in index.html whenever this file changes.
-const APP_VERSION = '2026-09-25.4';
+const APP_VERSION = '2026-09-25.5';
 
 // A page the browser cached from another version may still load this file (the
 // server keeps no old copies). The page asks for script.js?v=<its version>; if that
@@ -437,6 +437,181 @@ function setLanguage(lang) {
     currentLang = lang;
     saveChoice(LANG_STORAGE_KEY, lang);
     applyTranslations();
+}
+
+// ------------------------------------------------------------
+// Switching language with the EN / CZ buttons: the texts on screen "decode"
+// into the new language. Their letters flicker through random letters and
+// settle from left to right, in a quick wave down the screen (under 0.7 s);
+// what both wordings start and end with (an emoji, an arrow) stays put.
+// setLanguage() itself stays instant - the effect only repaints texts that have
+// already switched, and leaves alone any text something else changes meanwhile.
+// While a text decodes, its element holds the new wording for screen readers
+// (visually hidden) and beside it the decoding letters, hidden from them - so
+// button names and labels never read as a jumble.
+// ------------------------------------------------------------
+const SCRAMBLE_LETTERS = { en: 'abcdefghijklnopqrstuvxyz', cs: 'abcdeghijklnoprstuvyzáčďéěíňóřšťúůýž' };
+const SCRAMBLE_DIGITS = '0123456789';
+const graphemeSegmenter = window.Intl && Intl.Segmenter ? new Intl.Segmenter(undefined, { granularity: 'grapheme' }) : null;
+let languageScramble = null; // { items, raf, safety } while the effect runs
+
+function switchLanguage(lang) {
+    if ((lang !== 'en' && lang !== 'cs') || lang === currentLang) return;
+    // What is on screen now - mid-effect texts too, so a quick second switch carries on from them
+    const before = prefersReducedMotion() ? null : textsOnScreen();
+    finishLanguageScramble();
+    setLanguage(lang);
+    if (before) startLanguageScramble(before);
+}
+
+// Text-only elements of the shown screen that are on screen, with the text they
+// show, by their place in the page (a part re-rendered in the new language has
+// new elements in the same places). Live regions are left out: a screen reader
+// would read the scramble.
+function textsOnScreen() {
+    const decoding = new Map(); // element -> the letters it shows right now
+    if (languageScramble) languageScramble.items.forEach(item => { if (!item.done) decoding.set(item.el, item.shown); });
+    const texts = new Map();
+    const height = window.innerHeight;
+    document.querySelectorAll('.screen:not(.hidden) *').forEach(el => {
+        let text = decoding.get(el);
+        if (text === undefined) {
+            if (el.children.length || decoding.has(el.parentElement) || el.closest('[aria-live]')) return;
+            text = el.textContent;
+        }
+        if (!/[\p{L}\p{N}]/u.test(text)) return;
+        const r = el.getBoundingClientRect();
+        if (!r.width || r.bottom < 0 || r.top > height) return;
+        const place = placeKey(el);
+        if (place) texts.set(place, { el, text, top: r.top });
+    });
+    return texts;
+}
+
+// "id/child index/..." from the nearest ancestor with an id
+function placeKey(el) {
+    const path = [];
+    for (let node = el; node.parentElement; node = node.parentElement) {
+        if (node.id) return `${node.id}/${path.reverse().join('/')}`;
+        path.push(Array.prototype.indexOf.call(node.parentElement.children, node));
+    }
+    return null;
+}
+
+function graphemes(text) {
+    return graphemeSegmenter ? Array.from(graphemeSegmenter.segment(text), part => part.segment) : Array.from(text);
+}
+
+function scrambleGlyph(like) {
+    if (/\p{N}/u.test(like)) return SCRAMBLE_DIGITS[Math.floor(Math.random() * SCRAMBLE_DIGITS.length)];
+    const letters = SCRAMBLE_LETTERS[currentLang] || SCRAMBLE_LETTERS.en;
+    const glyph = letters[Math.floor(Math.random() * letters.length)];
+    return like === like.toLowerCase() ? glyph : glyph.toUpperCase();
+}
+
+function startLanguageScramble(before) {
+    const items = [];
+    const height = Math.max(1, window.innerHeight);
+    textsOnScreen().forEach((now, place) => {
+        const old = before.get(place);
+        if (!old || old.text === now.text) return;
+        const from = graphemes(old.text);
+        const to = graphemes(now.text);
+        let head = 0; // the same start...
+        while (head < from.length && head < to.length && from[head] === to[head]) head++;
+        let tail = 0; // ...and the same end stay put
+        while (tail < from.length - head && tail < to.length - head
+            && from[from.length - 1 - tail] === to[to.length - 1 - tail]) tail++;
+        const fromMid = from.slice(head, from.length - tail);
+        const toMid = to.slice(head, to.length - tail);
+        const count = Math.max(fromMid.length, toMid.length);
+        const wave = Math.min(1, Math.max(0, now.top / height)) * 180; // lower texts a little later
+        const letters = [];
+        for (let i = 0; i < count; i++) {
+            const start = wave + (count > 1 ? i / (count - 1) : 0) * 220 + Math.random() * 40;
+            letters.push({ from: fromMid[i] || '', to: toMid[i] || '', start, settle: start + 110 + Math.random() * 130, glyph: '', nextGlyphAt: 0 });
+        }
+        // The new wording for screen readers, and beside it what the eye sees: the
+        // old wording, which then decodes (custom tags, so no style for spans hits them)
+        const sr = document.createElement('lang-fx');
+        sr.className = 'sr';
+        sr.textContent = now.text;
+        const fx = document.createElement('lang-fx');
+        fx.setAttribute('aria-hidden', 'true');
+        const fxText = document.createTextNode(old.text);
+        fx.append(fxText);
+        now.el.replaceChildren(sr, fx); // (before anything is painted)
+        items.push({ el: now.el, sr, fx, fxText, prefix: to.slice(0, head).join(''), suffix: to.slice(to.length - tail).join(''), letters,
+            newText: now.text, shown: old.text, done: false });
+    });
+    if (!items.length) return;
+    const run = { items, raf: 0, safety: 0 };
+    let startedAt = null;
+    const frame = (time) => {
+        if (languageScramble !== run) return;
+        if (startedAt === null) startedAt = time;
+        const elapsed = time - startedAt;
+        let running = false;
+        items.forEach(item => {
+            if (item.done) return;
+            if (!item.el.isConnected || item.el.childNodes.length !== 2 || item.el.firstChild !== item.sr || item.el.lastChild !== item.fx) {
+                endDecoding(item); // changed by something else (or gone): leave it
+                return;
+            }
+            let out = item.prefix;
+            let settled = true;
+            item.letters.forEach(letter => {
+                if (elapsed >= letter.settle) {
+                    out += letter.to;
+                    return;
+                }
+                settled = false;
+                const like = letter.to || letter.from;
+                if (elapsed < letter.start) out += letter.from;
+                else if (!/[\p{L}\p{N}]/u.test(like)) out += letter.to; // spaces, punctuation and emoji just switch
+                else {
+                    if (elapsed >= letter.nextGlyphAt) {
+                        letter.glyph = scrambleGlyph(like);
+                        letter.nextGlyphAt = elapsed + 50;
+                    }
+                    out += letter.glyph;
+                }
+            });
+            if (settled) {
+                endDecoding(item);
+                return;
+            }
+            out += item.suffix;
+            if (out !== item.shown) {
+                item.fxText.data = out;
+                item.shown = out;
+            }
+            running = true;
+        });
+        if (running) run.raf = requestAnimationFrame(frame);
+        else finishLanguageScramble();
+    };
+    languageScramble = run;
+    run.raf = requestAnimationFrame(frame);
+    run.safety = setTimeout(finishLanguageScramble, 1500); // (no animation frames on a hidden page)
+}
+
+// Back to plain text: the new wording in place of the effect's two parts
+// (whatever else was put into the element meanwhile stays)
+function endDecoding(item) {
+    item.done = true;
+    if (item.fx.parentNode === item.el) item.fx.remove();
+    if (item.sr.parentNode === item.el) item.sr.replaceWith(item.newText);
+}
+
+// Ends the effect at once: every text still decoding gets its new wording
+function finishLanguageScramble() {
+    const run = languageScramble;
+    if (!run) return;
+    languageScramble = null;
+    cancelAnimationFrame(run.raf);
+    clearTimeout(run.safety);
+    run.items.forEach(item => { if (!item.done) endDecoding(item); });
 }
 
 // ============================================================
@@ -1490,6 +1665,7 @@ function cancelPendingCallbacks() {
 }
 
 function showOnly(screen) {
+    finishLanguageScramble(); // (texts settle before the screen changes)
     [ageSelectionScreen, homeScreen, playModeScreen, gameScreen, resultScreen].forEach(s => {
         s.classList.toggle('hidden', s !== screen);
     });
@@ -1684,6 +1860,7 @@ function prefersReducedMotion() {
 
 function chooseAgeGroup(group, section) {
     if (ageTransition) return;
+    finishLanguageScramble(); // (its text is copied below)
     if (prefersReducedMotion()) {
         selectAgeGroup(group);
         return;
@@ -2926,7 +3103,7 @@ function buildConsecutiveOptions(x, minBound, maxBound) {
 
 // Language switcher wiring
 document.querySelectorAll('.lang-btn').forEach(btn => {
-    btn.addEventListener('click', () => setLanguage(btn.dataset.lang));
+    btn.addEventListener('click', () => switchLanguage(btn.dataset.lang));
 });
 
 // Keep the board fitted when the window changes size (rotation, resizing): the
