@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#3fae55">
-    <meta name="description" content="Fun math games for kids: counting, adding, comparing, matching, multiplication and division.">
+    <meta name="description" content="Fun learning games for kids: math (counting, adding, comparing, matching, multiplication and division) and Czech spelling (i/y, ú/ů, paired consonants).">
     <title>Kids Math Game</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍎</text></svg>">
     <!-- The server sends no cache headers, so browsers keep old copies for days.
          Bump ?v= whenever styles.css or script.js change (and APP_VERSION at the top of script.js), so new HTML never runs with old files
          (a cached page that gets a newer script.js loads the current page once, see its top). -->
-    <link rel="stylesheet" href="styles.css?v=2026-09-29.7">
+    <link rel="stylesheet" href="styles.css?v=2026-09-29.8">
 </head>
 <body class="little-kids-theme">
     <!-- Language switcher (fixed top-right; hidden during a game) -->
@@ -32,8 +32,8 @@
                     <span class="deco deco-6">🐰</span>
                 </span>
                 <span class="age-content">
-                    <span class="age-title fun-font" data-i18n="age.littleKids">Little Kids</span>
-                    <span class="age-subtitle" data-i18n="age.littleKids.ages">Ages 3-6</span>
+                    <span class="age-title fun-font" data-i18n="age.littleKids">Math</span>
+                    <span class="age-subtitle" data-i18n="age.littleKids.ages">Ages 3–6</span>
                     <span class="age-icons-row" aria-hidden="true">🍎🍌🍊🍇🍓</span>
                     <span class="age-description">
                         <span data-i18n="age.littleKids.desc1">Fun counting &amp; matching!</span>
@@ -53,8 +53,8 @@
                     <span class="deco deco-6">%</span>
                 </span>
                 <span class="age-content">
-                    <span class="age-title cool-font" data-i18n="age.biggerKids">Bigger Kids</span>
-                    <span class="age-subtitle" data-i18n="age.biggerKids.ages">Ages 7-10</span>
+                    <span class="age-title cool-font" data-i18n="age.biggerKids">Math</span>
+                    <span class="age-subtitle" data-i18n="age.biggerKids.ages">Ages 7–10</span>
                     <span class="age-icons-row" aria-hidden="true">📐📊🔢💡⚡</span>
                     <span class="age-description">
                         <span data-i18n="age.biggerKids.desc1">Advanced Math Challenges!</span>
@@ -76,7 +76,7 @@
                 </span>
                 <span class="age-content">
                     <span class="age-title book-font" data-i18n="age.czech">Czech</span>
-                    <span class="age-subtitle" data-i18n="age.czech.ages">Ages 7-10</span>
+                    <span class="age-subtitle" data-i18n="age.czech.ages">Ages 7–10</span>
                     <span class="age-icons-row" aria-hidden="true">📖✏️🔤📝⭐</span>
                     <span class="age-description">
                         <span data-i18n="age.czech.desc1">i/y, ú/ů &amp; paired consonants</span>
@@ -91,6 +91,8 @@
     <!-- Home Screen -->
     <div id="homeScreen" class="screen hidden">
         <div class="home-container">
+            <!-- Back to the three parts: at the top left, across from the language switcher -->
+            <button id="changeAgeGroupBtn" type="button" class="menu-btn" data-i18n="home.changeAge">☰ Menu</button>
             <header class="home-header">
                 <h1 class="game-title" id="homeTitle" data-i18n="home.title">🍎 Kids Math Game 🍊</h1>
                 <p class="game-subtitle" id="homeWelcome" data-i18n="home.welcome">Welcome! Pick a game to play:</p>
@@ -228,7 +230,6 @@
                 </div>
             </details>
 
-            <button id="changeAgeGroupBtn" type="button" class="back-btn" data-i18n="home.changeAge">☰ Menu</button>
         </div>
     </div>
 
@@ -264,12 +265,12 @@
                 <div class="mode-buttons" id="modeButtons">
                     <button id="timeModeBtn" type="button" class="mode-btn">
                         <span class="mode-icon" aria-hidden="true">⏱️</span>
-                        <span class="mode-name" data-i18n="playMode.time">Time Mode</span>
+                        <span class="mode-name" data-i18n="playMode.time">Timed</span>
                         <span class="mode-desc" id="timeModeDesc">20 seconds</span>
                     </button>
                     <button id="questionsModeBtn" type="button" class="mode-btn alt">
                         <span class="mode-icon" aria-hidden="true">❓</span>
-                        <span class="mode-name" data-i18n="playMode.questions">Questions Mode</span>
+                        <span class="mode-name" data-i18n="playMode.questions">Questions</span>
                         <span class="mode-desc" data-i18n="playMode.questions.desc">10 questions</span>
                     </button>
                     <!-- Bigger kids only: play until "Finish" -->
@@ -405,6 +406,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=2026-09-29.7"></script>
+    <script src="script.js?v=2026-09-29.8"></script>
 </body>
 </html>

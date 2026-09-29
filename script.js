@@ -1,5 +1,5 @@
 // Bump APP_VERSION together with the ?v= values in index.html whenever this file changes.
-const APP_VERSION = '2026-09-29.7';
+const APP_VERSION = '2026-09-29.8';
 
 // A page the browser cached from another version may still load this file (the
 // server keeps no old copies). The page asks for script.js?v=<its version>; if that
@@ -29,16 +29,16 @@ const translations = {
         'app.title': 'Kids Math Game',
         'lang.label': 'Language',
         // Age selection
-        'age.littleKids': 'Little Kids',
-        'age.littleKids.ages': 'Ages 3-6',
+        'age.littleKids': 'Math',
+        'age.littleKids.ages': 'Ages 3–6',
         'age.littleKids.desc1': 'Fun counting & matching!',
         'age.littleKids.desc2': '🌈 Colorful & Playful 🌈',
-        'age.biggerKids': 'Bigger Kids',
-        'age.biggerKids.ages': 'Ages 7-10',
+        'age.biggerKids': 'Math',
+        'age.biggerKids.ages': 'Ages 7–10',
         'age.biggerKids.desc1': 'Advanced Math Challenges!',
         'age.biggerKids.desc2': '🚀 Level Up Your Skills 🚀',
         'age.czech': 'Czech',
-        'age.czech.ages': 'Ages 7-10',
+        'age.czech.ages': 'Ages 7–10',
         'age.czech.desc1': 'i/y, ú/ů & paired consonants',
         'age.czech.desc2': '✏️ 2nd grade review ✏️',
         'age.play': 'Play ▶',
@@ -115,9 +115,9 @@ const translations = {
         'settings.hint': 'Games will use these settings and start immediately.',
         'playMode.title': 'Pick Play Mode',
         'playMode.subtitle': 'Choose how you want to play',
-        'playMode.time': 'Time Mode',
+        'playMode.time': 'Timed',
         'playMode.time.desc': '{n} seconds',
-        'playMode.questions': 'Questions Mode',
+        'playMode.questions': 'Questions',
         'playMode.questions.desc': '10 questions',
         'playMode.pickNumbers': 'or pick the numbers you want to practice',
         // Game screen chrome
@@ -243,16 +243,16 @@ const translations = {
     cs: {
         'app.title': 'Dětská matematika',
         'lang.label': 'Jazyk',
-        'age.littleKids': 'Menší děti',
-        'age.littleKids.ages': 'Věk 3-6',
+        'age.littleKids': 'Matematika',
+        'age.littleKids.ages': 'Věk 3–6',
         'age.littleKids.desc1': 'Zábavné počítání a spojování!',
         'age.littleKids.desc2': '🌈 Barevné a hravé 🌈',
-        'age.biggerKids': 'Větší děti',
-        'age.biggerKids.ages': 'Věk 7-10',
+        'age.biggerKids': 'Matematika',
+        'age.biggerKids.ages': 'Věk 7–10',
         'age.biggerKids.desc1': 'Pokročilé matematické úlohy!',
         'age.biggerKids.desc2': '🚀 Zlepši své dovednosti 🚀',
         'age.czech': 'Čeština',
-        'age.czech.ages': 'Věk 7-10',
+        'age.czech.ages': 'Věk 7–10',
         'age.czech.desc1': 'i/y, ú/ů a párové souhlásky',
         'age.czech.desc2': '✏️ Opakování 2. třídy ✏️',
         'age.play': 'Hrát ▶',
@@ -2019,7 +2019,11 @@ function chooseAgeGroup(group, section) {
     const panel = document.createElement('div');
     panel.className = `${section.className} at-panel`;
     panel.appendChild(section.querySelector('.age-content').cloneNode(true));
-    Object.assign(panel.style, { left: `${rect.left}px`, top: `${rect.top}px`, width: `${rect.width}px`, height: `${rect.height}px` });
+    const pad = getComputedStyle(section); // (the stacked top part's own room for the language switcher, too)
+    Object.assign(panel.style, {
+        left: `${rect.left}px`, top: `${rect.top}px`, width: `${rect.width}px`, height: `${rect.height}px`,
+        paddingTop: pad.paddingTop, paddingRight: pad.paddingRight, paddingBottom: pad.paddingBottom, paddingLeft: pad.paddingLeft,
+    });
     panel.style.setProperty('--to-x', `${Math.round(vw / 2 - (rect.left + rect.width / 2))}px`);
     panel.style.setProperty('--to-y', `${Math.round(vh / 2 - (rect.top + rect.height / 2))}px`);
     const fx = document.createElement('div');
@@ -3901,27 +3905,18 @@ CZECH_GAME_BUTTONS.forEach(btn => btn.addEventListener('click', () => chooseGame
 czNextBtn.addEventListener('click', czContinue);
 
 // ============================================================
-// Addresses: every page a child can stay on has its own address, like the
-// football game: #/ (the three parts), #/male-deti, #/vetsi-deti, #/cestina, a
-// game's level and mode (#/vetsi-deti/nasobeni) and a Czech kind
-// (#/cestina/i-y). A game and its results have one too (…/start, …/hotovo),
-// but can't be opened again from it: that leads to the page above them, as in
-// the football game (a Czech kind's address starts a new round of it). The
-// browser's Back goes to the page before (every press moves: steps that would
-// show the same page again are passed over); the last page is remembered on
-// this device, and opening the game without an address goes back there.
+// Addresses: the pages a child comes back to have their own address, like the
+// football game: #/ (the three parts), #/male-deti, #/vetsi-deti and
+// #/cestina. A task (a game's level and mode, the game, its results, a Czech
+// round) has none - it would start again anyway: the address stays its part's,
+// and reopening it, reloading, or opening the game without an address (which
+// goes back where the child was last time on this device) shows that part's
+// menu. The browser's Back goes up a level: from a task to its menu (a task
+// has a step of its own in the history, with its menu's address), from a menu
+// to the start. Every press moves - steps that would show the same page again
+// are passed over - but never out of the game.
 // ============================================================
 const ROUTE_GROUPS = { little: 'male-deti', bigger: 'vetsi-deti', czech: 'cestina' };
-const ROUTE_GAMES = {
-    count: 'pocitani', add: 'scitani', compare: 'porovnavani', match: 'prirazovani',
-    addsub: 'scitani-a-odcitani', multiply: 'nasobeni', divide: 'deleni',
-    cz_iy: 'i-y', cz_uu: 'dlouhe-u', cz_pairs: 'parove-souhlasky', cz_test: 'test',
-};
-const GAMES_OF_GROUP = {
-    little: ['count', 'add', 'compare', 'match'],
-    bigger: ['addsub', 'multiply', 'divide'],
-    czech: Object.keys(CZ_GAMES),
-};
 const LAST_ROUTE_KEY = 'km_last_route';
 let applyingRoute = false; // (opening an address: the screens change without new history entries)
 let routeStep = 0;         // this page's step in the browser history (kept in history.state.km)
@@ -3945,59 +3940,63 @@ function rememberRoute(route) {
     if (document.visibilityState !== 'hidden') saveChoice(LAST_ROUTE_KEY, route);
 }
 
-// A history step for a route: a new one, or this one rewritten
-function writeRoute(route, replace) {
+// A history step for a route: a new one, or this one rewritten. A task's step
+// has its menu's address and says it is a task's (history.state.task).
+function writeRoute(route, replace, task) {
     if (!replace) routeStep += 1;
     handledStep = `${routeStep}|#/${route}`;
-    try { history[replace ? 'replaceState' : 'pushState']({ km: routeStep }, '', `#/${route}`); } catch (_) {}
+    try { history[replace ? 'replaceState' : 'pushState']({ km: routeStep, task: !!task }, '', `#/${route}`); } catch (_) {}
 }
 
-// The address of what is on screen
+function onTaskStep() {
+    const state = history.state;
+    return !!(state && state.task);
+}
+
+// The address of what is on screen: the start or a part's menu (a task has its part's)
 function routeOfScreen() {
     const group = ROUTE_GROUPS[selectedAgeGroup];
-    if (!group || !ageSelectionScreen.classList.contains('hidden')) return '';
-    const game = GAMES_OF_GROUP[selectedAgeGroup].includes(selectedGame) ? ROUTE_GAMES[selectedGame] : null;
-    if (!game || !homeScreen.classList.contains('hidden')) return group;
-    if (!resultScreen.classList.contains('hidden')) return `${group}/${game}/hotovo`;
-    if (!gameScreen.classList.contains('hidden')) return isCzechGame(selectedGame) ? `${group}/${game}` : `${group}/${game}/start`;
-    if (!playModeScreen.classList.contains('hidden')) return `${group}/${game}`;
-    return group;
+    return group && ageSelectionScreen.classList.contains('hidden') ? group : '';
 }
 
-// After every change of screen (showOnly): the address follows - a new history
-// entry, except between a game and its results (one entry, so Back skips the
-// finished game) - and is remembered
+// A task on screen: a game's level and mode, the game or its results
+function inTask() {
+    return routeOfScreen() !== '' && homeScreen.classList.contains('hidden');
+}
+
+// (what Back and Forward compare: a task counts as a page of its own)
+function pageOfScreen() {
+    return routeOfScreen() + (inTask() ? ' task' : '');
+}
+
+// After every change of screen (showOnly): the address follows and is
+// remembered. A task opened from its menu gets a step of its own, so Back
+// leaves it for the menu; that step serves every task played from the menu
+// after it (Home and "Back to Games" add nothing).
 function syncRoute() {
     if (applyingRoute) return; // (openRoute sets the address once, at its end)
     const route = routeOfScreen();
     rememberRoute(route);
-    const shown = currentRoute();
-    if (shown === route) return;
-    const run = r => r.replace(/\/(start|hotovo)$/, '');
-    writeRoute(route, (/\/hotovo$/.test(shown) || /\/hotovo$/.test(route)) && run(shown) === run(route));
+    if (currentRoute() !== route) writeRoute(route, false, false);
+    if (inTask() && !onTaskStep()) writeRoute(route, false, true);
 }
 
 // Opens a page by its address (Back and Forward, an edited, shared or
-// remembered address). A game that is running stops as with Home; what can't
-// be opened again leads to the page above it; an unknown address to the start.
+// remembered address): a part's menu or the start. A task on screen is left
+// as with Home (an endless run keeps its result); a task's old address
+// (#/vetsi-deti/nasobeni, #/cestina/i-y/…) leads to its part's menu, an
+// unknown one to the start.
 function openRoute(route) {
-    if (route === routeOfScreen()) return;
-    const [groupPart, gamePart, step] = route.split('/');
-    const group = Object.keys(ROUTE_GROUPS).find(g => ROUTE_GROUPS[g] === groupPart);
-    const game = group ? GAMES_OF_GROUP[group].find(g => ROUTE_GAMES[g] === gamePart) : null;
-    applyingRoute = true;
-    try {
-        if (!gameScreen.classList.contains('hidden')) goHome(); // (an endless run keeps its result)
-        if (!group) {
-            goToAgeSelection();
-        } else {
-            selectAgeGroup(group);
-            // a game's level and mode (its run and results lead there too); a Czech kind: a new round
-            const opens = game && (isCzechGame(game) ? !step : (!step || step === 'start' || step === 'hotovo'));
-            if (opens) chooseGame(game);
+    const group = Object.keys(ROUTE_GROUPS).find(g => ROUTE_GROUPS[g] === route.split('/')[0]);
+    if ((group ? ROUTE_GROUPS[group] : '') !== routeOfScreen() || inTask()) {
+        applyingRoute = true;
+        try {
+            if (!gameScreen.classList.contains('hidden')) goHome(); // (an endless run keeps its result)
+            if (group) selectAgeGroup(group);
+            else goToAgeSelection();
+        } finally {
+            applyingRoute = false;
         }
-    } finally {
-        applyingRoute = false;
     }
     showRouteOfScreen();
 }
@@ -4007,13 +4006,13 @@ function showRouteOfScreen() {
     const route = routeOfScreen();
     rememberRoute(route);
     const state = history.state;
-    if (location.hash !== `#/${route}` || !state || state.km !== routeStep) writeRoute(route, true);
+    if (location.hash !== `#/${route}` || !state || state.km !== routeStep) writeRoute(route, true, onTaskStep());
 }
 
-// Back, Forward, or an address typed in: open that step's page. A step that
-// would change nothing (the results of a finished game, a menu left twice) is
-// passed over in the same direction, so every press of Back or Forward moves
-// the child - never back out of the game, though.
+// Back, Forward, or an address typed in: open that step's page (a task's step
+// opens its menu - the task isn't started again). A step that would change
+// nothing (a menu left twice) is passed over in the same direction, so every
+// press of Back or Forward moves the child - never back out of the game, though.
 function onHistoryStep() {
     const state = history.state;
     const step = state && typeof state.km === 'number' ? state.km : null;
@@ -4021,15 +4020,15 @@ function onHistoryStep() {
     let direction = 0;
     if (step === null) { // an address typed in or followed: a new step
         routeStep += 1;
-        try { history.replaceState({ km: routeStep }, '', location.href); } catch (_) {}
+        try { history.replaceState({ km: routeStep, task: false }, '', location.href); } catch (_) {}
     } else {
         direction = Math.sign(step - routeStep);
         routeStep = step;
     }
     handledStep = `${routeStep}|${location.hash}`;
-    const before = routeOfScreen();
+    const before = pageOfScreen();
     openRoute(currentRoute());
-    if (direction && routeOfScreen() === before && skippedSteps < 60 && (direction > 0 || routeStep > 0)) {
+    if (direction && pageOfScreen() === before && skippedSteps < 60 && (direction > 0 || routeStep > 0)) {
         skippedSteps += 1;
         history.go(direction);
     } else {
@@ -4099,7 +4098,6 @@ function init() {
     showOnly(ageSelectionScreen);
     applyingRoute = false;
     openRoute(startRoute);
-    showRouteOfScreen();
     // The little kids' transition flowers, drawn while the page is idle
     scheduleBloomSprites();
 }

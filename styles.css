@@ -154,8 +154,34 @@ button:disabled {
 }
 
 /* ------------------------------------------------------------
-   Language switcher
+   Language switcher (and, on a part's menu, "☰ Menu" across from it)
    ------------------------------------------------------------ */
+.menu-btn {
+    position: fixed;
+    top: max(10px, env(safe-area-inset-top));
+    left: max(12px, env(safe-area-inset-left));
+    z-index: 50;
+    min-height: 40px;
+    padding: 8px 16px;
+    border: 0;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.92);
+    color: #1f2d3d;
+    font-size: 0.95rem;
+    font-weight: 900;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.16);
+    transition: background 0.15s ease, transform 0.15s ease;
+    --focus: #1e4fd8;
+}
+
+.menu-btn:hover {
+    background: #ffffff;
+}
+
+.menu-btn:active {
+    transform: translateY(1px);
+}
+
 .lang-switcher {
     position: fixed;
     top: max(10px, env(safe-area-inset-top));
@@ -225,12 +251,13 @@ lang-fx.sr {
 }
 
 .age-section {
+    --age-pad: 24px; /* (side padding; a title may reach into it, see .age-title) */
     position: relative;
     flex: 1 1 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 24px;
+    padding: 24px var(--age-pad);
     overflow: hidden;
     border: 0;
     color: #ffffff;
@@ -352,25 +379,49 @@ lang-fx.sr {
     text-shadow: 0 0 22px rgba(140, 200, 255, 0.7), 0 4px 0 rgba(10, 30, 70, 0.45);
 }
 
-/* Both titles stay on one line in both languages: never wider than their half.
-   The widest wording is about font-size x 6.84 in Comic Sans ("Little Kids")
-   and x 7.9 in Arial Black ("Bigger Kids"); the divisors add 8 % for other fonts
-   and for the random letters of the language switch. */
+/* The titles stay on one line in both languages, as big as their part allows:
+   as wide as the part less 12px at each side at most (a title may reach into
+   the part's padding). The widest wording is about font-size x 7.28 in Comic
+   Sans and x 7.92 in Arial Black ("Matematika"); the divisors add 6 % for other
+   fonts and for the random letters of the language switch. "Čeština" (x 5.09
+   in Georgia) keeps about the size it had, a little bigger than the math
+   titles. */
 @supports (width: 1cqi) {
+    .age-title {
+        --title-room: calc(100cqi + 2 * var(--age-pad) - 24px);
+        white-space: nowrap;
+    }
+
+    .age-title.fun-font {
+        font-size: min(5rem, var(--title-room) / 7.72);
+    }
+
+    .age-title.cool-font {
+        font-size: min(5rem, var(--title-room) / 8.4);
+    }
+
+    .age-title.book-font {
+        font-size: min(5rem, var(--title-room) / 6.5);
+    }
+}
+
+/* Without container units (older browsers): the same from the screen's width -
+   a part is a third of it side by side (all of it stacked, see below) */
+@supports not (width: 1cqi) {
     .age-title {
         white-space: nowrap;
     }
 
     .age-title.fun-font {
-        font-size: min(clamp(2.2rem, 5.2vw, 4.1rem), 100cqi / 7.4);
+        font-size: min(5rem, (33.33vw - 24px) / 7.72);
     }
 
     .age-title.cool-font {
-        font-size: min(clamp(2.2rem, 5.2vw, 4.1rem), 100cqi / 8.55);
+        font-size: min(5rem, (33.33vw - 24px) / 8.4);
     }
 
     .age-title.book-font {
-        font-size: min(clamp(2.2rem, 5.2vw, 4.1rem), 100cqi / 6.1);
+        font-size: min(5rem, (33.33vw - 24px) / 6.5);
     }
 }
 
@@ -457,10 +508,13 @@ lang-fx.sr {
     }
 }
 
-/* Upright phones: the three parts stack; held sideways they stay side by side.
-   Stacked, each is a third of the height: no icons or second line, and on
-   short phones no description at all */
-@media (max-width: 700px) and (orientation: portrait) {
+/* Upright phones and tablets: the three parts stack (side by side on a tablet
+   they would be narrow strips with small titles); held sideways, or in a short
+   upright window, they stay side by side. Stacked, each is a third of the
+   height: no icons or second line, on short phones no description at all, and
+   the top part keeps clear of the language switcher */
+@media (max-width: 700px) and (orientation: portrait),
+       (max-width: 1100px) and (min-height: 960px) and (orientation: portrait) {
     .age-split-container {
         flex-direction: column;
     }
@@ -468,6 +522,31 @@ lang-fx.sr {
     .age-icons-row,
     .age-description span + span {
         display: none;
+    }
+
+    .age-split-container > .age-section:first-child {
+        padding-top: max(58px, calc(env(safe-area-inset-top) + 48px));
+    }
+
+    @supports not (width: 1cqi) {
+        .age-title.fun-font {
+            font-size: min(5rem, (100vw - 24px) / 7.72);
+        }
+
+        .age-title.cool-font {
+            font-size: min(5rem, (100vw - 24px) / 8.4);
+        }
+
+        .age-title.book-font {
+            font-size: min(5rem, (100vw - 24px) / 6.5);
+        }
+    }
+}
+
+/* (a stacked tablet: the age line under the big title a little bigger too) */
+@media (min-width: 701px) and (max-width: 1100px) and (min-height: 960px) and (orientation: portrait) {
+    .age-subtitle {
+        font-size: 1.6rem;
     }
 }
 
@@ -479,7 +558,8 @@ lang-fx.sr {
 
 @media (max-width: 700px), (max-height: 500px) {
     .age-section {
-        padding: 16px 20px;
+        --age-pad: 20px;
+        padding: 16px var(--age-pad);
     }
 
     .age-content {
@@ -798,6 +878,7 @@ lang-fx.sr {
     font-weight: 900;
     line-height: 1.15;
     text-align: center;
+    text-wrap: balance; /* (on a narrow phone two even lines, not an emoji alone) */
     text-shadow: 0 3px 0 rgba(0, 0, 0, 0.12), 0 6px 18px rgba(0, 0, 0, 0.18);
 }
 
@@ -1246,6 +1327,7 @@ lang-fx.sr {
     height: 46px;
     border-radius: 12px;
     background: var(--muted-bg);
+    box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.1); /* (reads as a button before any is picked) */
     color: var(--ink);
     font-size: 1.3rem;
     font-weight: 900;
@@ -2678,6 +2760,10 @@ lang-fx.sr {
         padding-top: 52px;
     }
 
+    #homeScreen .home-container {
+        padding-top: max(58px, calc(env(safe-area-inset-top) + 48px)); /* (the heading below "☰ Menu") */
+    }
+
     .play-setup {
         gap: 14px;
     }
@@ -2917,6 +3003,10 @@ lang-fx.sr {
         padding-top: max(48px, calc(env(safe-area-inset-top) + 40px));
         padding-bottom: 10px;
         gap: 10px;
+    }
+
+    #homeScreen .home-container {
+        padding-top: max(54px, calc(env(safe-area-inset-top) + 46px)); /* (the heading below "☰ Menu") */
     }
 
     #playModeScreen .game-subtitle {
