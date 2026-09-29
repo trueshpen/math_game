@@ -1,5 +1,5 @@
 // Bump APP_VERSION together with the ?v= values in index.html whenever this file changes.
-const APP_VERSION = '2026-09-29.2';
+const APP_VERSION = '2026-09-29.7';
 
 // A page the browser cached from another version may still load this file (the
 // server keeps no old copies). The page asks for script.js?v=<its version>; if that
@@ -7,7 +7,7 @@ const APP_VERSION = '2026-09-29.2';
 // never seen (?fresh=...), and if that already happened, offer a link instead.
 const requestedVersion = ((document.currentScript && document.currentScript.src) || '').match(/[?&]v=([^&#]+)/);
 if (!requestedVersion || requestedVersion[1] !== APP_VERSION) {
-    const freshUrl = location.pathname + '?fresh=' + Date.now();
+    const freshUrl = location.pathname + '?fresh=' + Date.now() + location.hash;
     if (!/[?&]fresh=/.test(location.search)) {
         location.replace(freshUrl);
     } else {
@@ -45,7 +45,7 @@ const translations = {
         // Home
         'home.title': '🍎 Kids Math Game 🍊',
         'home.welcome': 'Welcome! Pick a game to play:',
-        'home.changeAge': '🔄 Change Age Group',
+        'home.changeAge': '☰ Menu',
         // Czech (the words themselves are always Czech)
         'cz.home.title': '📚 Czech ✏️',
         'cz.home.welcome': 'Pick what to practice:',
@@ -258,7 +258,7 @@ const translations = {
         'age.play': 'Hrát ▶',
         'home.title': '🍎 Dětská matematika 🍊',
         'home.welcome': 'Vítej! Vyber si hru:',
-        'home.changeAge': '🔄 Změnit věkovou skupinu',
+        'home.changeAge': '☰ Menu',
         'cz.home.title': '📚 Čeština ✏️',
         'cz.home.welcome': 'Vyber si, co chceš procvičit:',
         'game.cz_iy.name': 'i/í – y/ý',
@@ -1772,6 +1772,7 @@ function showOnly(screen) {
     });
     document.body.classList.toggle('in-game', screen === gameScreen);
     screen.scrollTop = 0;
+    syncRoute();
 }
 
 // Starts a run of the selected game (first play and Play Again alike).
@@ -1972,7 +1973,7 @@ function filterGamesByAgeGroup() {
 const AGE_TRANSITION_MS = {
     little: { switchAt: 700, revealAt: 1150, endAt: 2150 },
     bigger: { switchAt: 700, revealAt: 750, endAt: 2750 },
-    czech: { switchAt: 700, revealAt: 800, endAt: 2000 },
+    czech: { switchAt: 700, burstAt: 600, revealAt: 1000, endAt: 2500 },
 };
 const CZECH_BURST_LETTERS = ['á', 'č', 'ď', 'é', 'ě', 'í', 'ň', 'ó', 'ř', 'š', 'ť', 'ú', 'ů', 'ý', 'ž', 'i', 'y', 'Č', 'Ř', 'Ž'];
 const AGE_TRANSITION_SKIP_AFTER_MS = 600; // an earlier tap is a double tap, not "skip"
@@ -2044,6 +2045,7 @@ function chooseAgeGroup(group, section) {
     at(timing.switchAt, switchToGames);
     at(timing.revealAt, group === 'bigger' ? dissolveToGames : group === 'czech' ? turnPage : revealGames);
     at(timing.endAt, finishAgeTransition);
+    if (group === 'czech') at(timing.burstAt, () => { if (ageTransition) buildLetterBurst(fx); });
     layer.addEventListener('pointerdown', skipAgeTransition);
     document.addEventListener('keydown', skipAgeTransition, true);
 }
@@ -2078,18 +2080,17 @@ function dissolveToGames() {
     startMatrixDissolve(t.layer.querySelector('.at-cover'), rain);
 }
 
-// Czech: letters with háčky and čárky fly out of the title and the purple page
-// turns over like a page of a book, uncovering the Czech tasks underneath
+// Czech: big golden letters with háčky and čárky burst out of the title, then
+// the purple page turns over like a page of a book, uncovering the Czech tasks
 function turnPage() {
     const t = ageTransition;
     if (!t) return;
     switchToGames();
-    buildLetterBurst(t.layer.querySelector('.at-fx'));
     t.layer.classList.add('at-turn');
 }
 
 function buildLetterBurst(fx) {
-    const count = window.innerWidth < 600 ? 14 : 20;
+    const count = window.innerWidth < 600 ? 18 : 28;
     const unit = Math.min(window.innerWidth, window.innerHeight) / 100; // 1vmin in px
     for (let i = 0; i < count; i++) {
         const letter = document.createElement('span');
@@ -2097,17 +2098,19 @@ function buildLetterBurst(fx) {
         letter.textContent = CZECH_BURST_LETTERS[i % CZECH_BURST_LETTERS.length];
         fx.appendChild(letter);
         if (!letter.animate) continue;
-        const angle = (i / count) * Math.PI * 2 + Math.random() * 0.4;
-        const dist = 22 + Math.random() * 26; // vmin from the middle
+        const angle = (i / count) * Math.PI * 2 + Math.random() * 0.35;
+        const dist = 24 + Math.random() * 24; // vmin from the middle
         const dx = Math.cos(angle) * dist * unit;
         const dy = Math.sin(angle) * dist * unit;
-        const rot = Math.round(Math.random() * 120 - 60);
-        const scale = +(0.75 + Math.random() * 0.25).toFixed(2); // never above 1 (drawn once, only shrunk)
+        const rot = Math.round(Math.random() * 90 - 45);
+        const scale = +(0.8 + Math.random() * 0.2).toFixed(2); // never above 1 (drawn once, only shrunk)
+        // out quickly, then a long moment in full view, fading only at the end
         letter.animate([
-            { opacity: 0, transform: 'translate(0px, 0px) scale(0.4) rotate(0deg)' },
-            { opacity: 1, transform: `translate(${dx * 0.55}px, ${dy * 0.55}px) scale(${scale}) rotate(${rot / 2}deg)`, offset: 0.3 },
-            { opacity: 0, transform: `translate(${dx}px, ${dy + 10 * unit}px) scale(${+(scale * 0.9).toFixed(2)}) rotate(${rot}deg)` },
-        ], { duration: 1100, delay: i * 25, easing: 'cubic-bezier(0.2, 0.7, 0.3, 1)', fill: 'both' });
+            { opacity: 0, transform: 'translate(0px, 0px) scale(0.3) rotate(0deg)' },
+            { opacity: 1, transform: `translate(${dx * 0.45}px, ${dy * 0.45}px) scale(${scale}) rotate(${rot / 2}deg)`, offset: 0.2 },
+            { opacity: 1, transform: `translate(${dx * 0.85}px, ${dy * 0.85}px) scale(${scale}) rotate(${rot}deg)`, offset: 0.7 },
+            { opacity: 0, transform: `translate(${dx}px, ${dy + 6 * unit}px) scale(${+(scale * 0.9).toFixed(2)}) rotate(${rot}deg)` },
+        ], { duration: 1400, delay: i * 15, easing: 'cubic-bezier(0.2, 0.7, 0.3, 1)', fill: 'both' });
     }
 }
 
@@ -3897,6 +3900,160 @@ function renderCzechMenu() {
 CZECH_GAME_BUTTONS.forEach(btn => btn.addEventListener('click', () => chooseGame(btn.dataset.game)));
 czNextBtn.addEventListener('click', czContinue);
 
+// ============================================================
+// Addresses: every page a child can stay on has its own address, like the
+// football game: #/ (the three parts), #/male-deti, #/vetsi-deti, #/cestina, a
+// game's level and mode (#/vetsi-deti/nasobeni) and a Czech kind
+// (#/cestina/i-y). A game and its results have one too (…/start, …/hotovo),
+// but can't be opened again from it: that leads to the page above them, as in
+// the football game (a Czech kind's address starts a new round of it). The
+// browser's Back goes to the page before (every press moves: steps that would
+// show the same page again are passed over); the last page is remembered on
+// this device, and opening the game without an address goes back there.
+// ============================================================
+const ROUTE_GROUPS = { little: 'male-deti', bigger: 'vetsi-deti', czech: 'cestina' };
+const ROUTE_GAMES = {
+    count: 'pocitani', add: 'scitani', compare: 'porovnavani', match: 'prirazovani',
+    addsub: 'scitani-a-odcitani', multiply: 'nasobeni', divide: 'deleni',
+    cz_iy: 'i-y', cz_uu: 'dlouhe-u', cz_pairs: 'parove-souhlasky', cz_test: 'test',
+};
+const GAMES_OF_GROUP = {
+    little: ['count', 'add', 'compare', 'match'],
+    bigger: ['addsub', 'multiply', 'divide'],
+    czech: Object.keys(CZ_GAMES),
+};
+const LAST_ROUTE_KEY = 'km_last_route';
+let applyingRoute = false; // (opening an address: the screens change without new history entries)
+let routeStep = 0;         // this page's step in the browser history (kept in history.state.km)
+let handledStep = '';      // (popstate and hashchange often both come for one step)
+let skippedSteps = 0;      // (steps passed over in one press of Back or Forward)
+
+function currentRoute() {
+    return location.hash.replace(/^#\/?/, '').replace(/\/+$/, '');
+}
+
+// Where the game opens: the address (#/ is the three parts), or, when opened
+// without one, where the child was last time on this device
+function startingRoute() {
+    return location.hash ? currentRoute() : (lsGet(LAST_ROUTE_KEY) || '');
+}
+
+// Only the tab the child has in front of them remembers its page: one in the
+// background (a timed game can run out there) leaves the page of the tab in
+// use, and remembers its own once it is shown again
+function rememberRoute(route) {
+    if (document.visibilityState !== 'hidden') saveChoice(LAST_ROUTE_KEY, route);
+}
+
+// A history step for a route: a new one, or this one rewritten
+function writeRoute(route, replace) {
+    if (!replace) routeStep += 1;
+    handledStep = `${routeStep}|#/${route}`;
+    try { history[replace ? 'replaceState' : 'pushState']({ km: routeStep }, '', `#/${route}`); } catch (_) {}
+}
+
+// The address of what is on screen
+function routeOfScreen() {
+    const group = ROUTE_GROUPS[selectedAgeGroup];
+    if (!group || !ageSelectionScreen.classList.contains('hidden')) return '';
+    const game = GAMES_OF_GROUP[selectedAgeGroup].includes(selectedGame) ? ROUTE_GAMES[selectedGame] : null;
+    if (!game || !homeScreen.classList.contains('hidden')) return group;
+    if (!resultScreen.classList.contains('hidden')) return `${group}/${game}/hotovo`;
+    if (!gameScreen.classList.contains('hidden')) return isCzechGame(selectedGame) ? `${group}/${game}` : `${group}/${game}/start`;
+    if (!playModeScreen.classList.contains('hidden')) return `${group}/${game}`;
+    return group;
+}
+
+// After every change of screen (showOnly): the address follows - a new history
+// entry, except between a game and its results (one entry, so Back skips the
+// finished game) - and is remembered
+function syncRoute() {
+    if (applyingRoute) return; // (openRoute sets the address once, at its end)
+    const route = routeOfScreen();
+    rememberRoute(route);
+    const shown = currentRoute();
+    if (shown === route) return;
+    const run = r => r.replace(/\/(start|hotovo)$/, '');
+    writeRoute(route, (/\/hotovo$/.test(shown) || /\/hotovo$/.test(route)) && run(shown) === run(route));
+}
+
+// Opens a page by its address (Back and Forward, an edited, shared or
+// remembered address). A game that is running stops as with Home; what can't
+// be opened again leads to the page above it; an unknown address to the start.
+function openRoute(route) {
+    if (route === routeOfScreen()) return;
+    const [groupPart, gamePart, step] = route.split('/');
+    const group = Object.keys(ROUTE_GROUPS).find(g => ROUTE_GROUPS[g] === groupPart);
+    const game = group ? GAMES_OF_GROUP[group].find(g => ROUTE_GAMES[g] === gamePart) : null;
+    applyingRoute = true;
+    try {
+        if (!gameScreen.classList.contains('hidden')) goHome(); // (an endless run keeps its result)
+        if (!group) {
+            goToAgeSelection();
+        } else {
+            selectAgeGroup(group);
+            // a game's level and mode (its run and results lead there too); a Czech kind: a new round
+            const opens = game && (isCzechGame(game) ? !step : (!step || step === 'start' || step === 'hotovo'));
+            if (opens) chooseGame(game);
+        }
+    } finally {
+        applyingRoute = false;
+    }
+    showRouteOfScreen();
+}
+
+// The address bar shows where the child really is (after a redirect, too)
+function showRouteOfScreen() {
+    const route = routeOfScreen();
+    rememberRoute(route);
+    const state = history.state;
+    if (location.hash !== `#/${route}` || !state || state.km !== routeStep) writeRoute(route, true);
+}
+
+// Back, Forward, or an address typed in: open that step's page. A step that
+// would change nothing (the results of a finished game, a menu left twice) is
+// passed over in the same direction, so every press of Back or Forward moves
+// the child - never back out of the game, though.
+function onHistoryStep() {
+    const state = history.state;
+    const step = state && typeof state.km === 'number' ? state.km : null;
+    if (`${step === null ? routeStep : step}|${location.hash}` === handledStep) return;
+    let direction = 0;
+    if (step === null) { // an address typed in or followed: a new step
+        routeStep += 1;
+        try { history.replaceState({ km: routeStep }, '', location.href); } catch (_) {}
+    } else {
+        direction = Math.sign(step - routeStep);
+        routeStep = step;
+    }
+    handledStep = `${routeStep}|${location.hash}`;
+    const before = routeOfScreen();
+    openRoute(currentRoute());
+    if (direction && routeOfScreen() === before && skippedSteps < 60 && (direction > 0 || routeStep > 0)) {
+        skippedSteps += 1;
+        history.go(direction);
+    } else {
+        skippedSteps = 0;
+    }
+}
+
+window.addEventListener('popstate', onHistoryStep);
+window.addEventListener('hashchange', onHistoryStep);
+
+// The remembered page is the one the child really has in front of them: also
+// after Back from another page brings this one back from the browser's cache
+// (the game doesn't start again then), and when this tab is shown again among
+// others. (Not when a page is left: a tab closed in the background would
+// overwrite the page of the tab in use.)
+window.addEventListener('pageshow', (e) => {
+    if (!e.persisted) return; // (a fresh load: init)
+    const state = history.state;
+    if (state && typeof state.km === 'number') routeStep = state.km;
+    handledStep = `${routeStep}|${location.hash}`;
+    showRouteOfScreen();
+});
+document.addEventListener('visibilitychange', () => rememberRoute(routeOfScreen()));
+
 // Language switcher wiring
 document.querySelectorAll('.lang-btn').forEach(btn => {
     btn.addEventListener('click', () => switchLanguage(btn.dataset.lang));
@@ -3922,7 +4079,7 @@ window.addEventListener('resize', () => {
 function init() {
     // Arrived from an outdated cached page (see the top of this file): tidy the address
     if (/[?&]fresh=/.test(location.search)) {
-        try { history.replaceState(null, '', location.pathname); } catch (_) {}
+        try { history.replaceState(null, '', location.pathname + location.hash); } catch (_) {}
     }
 
     // Apply language first so all subsequent text uses the right locale
@@ -3934,8 +4091,15 @@ function init() {
     updateSettingsUI();
     updateProgressPanel();
 
-    // Show age selection screen first
+    // The page of the address, or where the child was last time on this device
+    const startRoute = startingRoute();
+    const state = history.state;
+    routeStep = state && typeof state.km === 'number' ? state.km : 0; // (a reload keeps its step)
+    applyingRoute = true;
     showOnly(ageSelectionScreen);
+    applyingRoute = false;
+    openRoute(startRoute);
+    showRouteOfScreen();
     // The little kids' transition flowers, drawn while the page is idle
     scheduleBloomSprites();
 }
