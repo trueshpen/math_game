@@ -1,5 +1,5 @@
 // Bump APP_VERSION together with the ?v= values in index.html whenever this file changes.
-const APP_VERSION = '2026-09-25.6';
+const APP_VERSION = '2026-09-29.1';
 
 // A page the browser cached from another version may still load this file (the
 // server keeps no old copies). The page asks for script.js?v=<its version>; if that
@@ -37,11 +37,49 @@ const translations = {
         'age.biggerKids.ages': 'Ages 7-10',
         'age.biggerKids.desc1': 'Advanced Math Challenges!',
         'age.biggerKids.desc2': '🚀 Level Up Your Skills 🚀',
+        'age.czech': 'Czech',
+        'age.czech.ages': 'Ages 7-10',
+        'age.czech.desc1': 'i/y, ú/ů & paired consonants',
+        'age.czech.desc2': '✏️ 2nd grade review ✏️',
         'age.play': 'Play ▶',
         // Home
         'home.title': '🍎 Kids Math Game 🍊',
         'home.welcome': 'Welcome! Pick a game to play:',
         'home.changeAge': '🔄 Change Age Group',
+        // Czech (the words themselves are always Czech)
+        'cz.home.title': '📚 Czech ✏️',
+        'cz.home.welcome': 'Pick what to practice:',
+        'game.cz_iy.name': 'i/í – y/ý',
+        'game.cz_iy.desc': 'after soft and hard consonants',
+        'game.cz_uu.name': 'ú – ů',
+        'game.cz_uu.desc': 'at the start, inside and at the end of a word',
+        'game.cz_pairs.name': 'Paired consonants',
+        'game.cz_test.name': 'Test',
+        'game.cz_test.desc': 'Everything mixed · 20 questions',
+        'cz.review.one': '🔁 {n} word to practice again',
+        'cz.review.other': '🔁 {n} words to practice again',
+        // ({x}, {c}, {a}, {check}...: Czech letters and words, marked Czech on the page - see tCzech)
+        'cz.q.iy': 'Fill in {x} or {y}',
+        'cz.q.uu': 'Fill in {x} or {y}',
+        'cz.q.pairs': 'Fill in the paired consonant',
+        'cz.why.soft': '“{c}” is a soft consonant → we write {letters}',
+        'cz.why.hard': '“{c}” is a hard consonant → we write {letters}',
+        'cz.why.dtnSoft': '“{cv}” sounds soft, like “{sv}” → we write {letters}',
+        'cz.why.dtnHard': '“{cv}” sounds hard → we write {letters}',
+        'cz.why.long': 'The right letter – but here it is long: “{a}”',
+        'cz.why.short': 'The right letter – but here it is short: “{a}”',
+        'cz.why.uStart': 'At the start of a word we write {a}',
+        'cz.why.uInside': 'Inside a word we write {a}',
+        'cz.why.uEnd': 'At the end of a word we write {a}',
+        'cz.why.pair': 'Check with “{check}” – you can hear “{a}”',
+        'cz.correctIs': 'Correct:',
+        'cz.next': 'Continue ▶',
+        'cz.aria.blank': 'missing letter',
+        'cz.cat.pairs': 'paired consonants',
+        'cz.result.testTitle': 'Test result',
+        'cz.review.title': 'Watch out for these:',
+        'cz.review.allRight': 'All correct – great job! 🎉',
+        'cz.review.chose': 'your choice: “{a}”',
         // Games
         'game.count.name': 'Count the Fruits',
         'game.count.desc': 'Count how many fruits you see!',
@@ -114,6 +152,14 @@ const translations = {
         'gameTitles.divide.long': '➗ Divide',
         'gameTitles.divide.short': 'Divide!',
         'gameTitles.divide.numbers': 'Division: {list}',
+        'gameTitles.cz_iy.long': 'i/í – y/ý',
+        'gameTitles.cz_iy.short': 'i/í – y/ý',
+        'gameTitles.cz_uu.long': 'ú – ů',
+        'gameTitles.cz_uu.short': 'ú – ů',
+        'gameTitles.cz_pairs.long': 'Paired consonants',
+        'gameTitles.cz_pairs.short': 'Paired consonants',
+        'gameTitles.cz_test.long': 'Czech test',
+        'gameTitles.cz_test.short': 'Czech test',
         // Question text
         'q.count': 'How many {fruit} do you see?',
         'q.add': 'How many fruits in total?',
@@ -205,10 +251,47 @@ const translations = {
         'age.biggerKids.ages': 'Věk 7-10',
         'age.biggerKids.desc1': 'Pokročilé matematické úlohy!',
         'age.biggerKids.desc2': '🚀 Zlepši své dovednosti 🚀',
+        'age.czech': 'Čeština',
+        'age.czech.ages': 'Věk 7-10',
+        'age.czech.desc1': 'i/y, ú/ů a párové souhlásky',
+        'age.czech.desc2': '✏️ Opakování 2. třídy ✏️',
         'age.play': 'Hrát ▶',
         'home.title': '🍎 Dětská matematika 🍊',
         'home.welcome': 'Vítej! Vyber si hru:',
         'home.changeAge': '🔄 Změnit věkovou skupinu',
+        'cz.home.title': '📚 Čeština ✏️',
+        'cz.home.welcome': 'Vyber si, co chceš procvičit:',
+        'game.cz_iy.name': 'i/í – y/ý',
+        'game.cz_iy.desc': 'po měkkých a tvrdých souhláskách',
+        'game.cz_uu.name': 'ú – ů',
+        'game.cz_uu.desc': 'na začátku, uprostřed a na konci slova',
+        'game.cz_pairs.name': 'Párové souhlásky',
+        'game.cz_test.name': 'Test',
+        'game.cz_test.desc': 'Všechno namíchané · 20 otázek',
+        'cz.review.one': '🔁 {n} slovo k opakování',
+        'cz.review.few': '🔁 {n} slova k opakování',
+        'cz.review.many': '🔁 {n} slov k opakování',
+        'cz.q.iy': 'Doplň {x} nebo {y}',
+        'cz.q.uu': 'Doplň {x} nebo {y}',
+        'cz.q.pairs': 'Doplň párovou souhlásku',
+        'cz.why.soft': '„{c}“ je měkká souhláska → píšeme {letters}',
+        'cz.why.hard': '„{c}“ je tvrdá souhláska → píšeme {letters}',
+        'cz.why.dtnSoft': '„{cv}“ zní měkce, jako „{sv}“ → píšeme {letters}',
+        'cz.why.dtnHard': '„{cv}“ zní tvrdě → píšeme {letters}',
+        'cz.why.long': 'Písmeno máš dobře, jen je tady dlouhé: „{a}“',
+        'cz.why.short': 'Písmeno máš dobře, jen je tady krátké: „{a}“',
+        'cz.why.uStart': 'Na začátku slova píšeme {a}',
+        'cz.why.uInside': 'Uprostřed slova píšeme {a}',
+        'cz.why.uEnd': 'Na konci slova píšeme {a}',
+        'cz.why.pair': 'Ověř si slovem „{check}“ – slyšíš „{a}“',
+        'cz.correctIs': 'Správně:',
+        'cz.next': 'Pokračovat ▶',
+        'cz.aria.blank': 'vynechané písmeno',
+        'cz.cat.pairs': 'párové souhlásky',
+        'cz.result.testTitle': 'Výsledek testu',
+        'cz.review.title': 'Na tohle si dej pozor:',
+        'cz.review.allRight': 'Všechno správně – skvělá práce! 🎉',
+        'cz.review.chose': 'tvoje volba: „{a}“',
         'game.count.name': 'Počítej ovoce',
         'game.count.desc': 'Spočítej, kolik ovoce vidíš!',
         'game.add.name': 'Sčítej ovoce',
@@ -277,6 +360,14 @@ const translations = {
         'gameTitles.divide.long': '➗ Dělení',
         'gameTitles.divide.short': 'Dělení!',
         'gameTitles.divide.numbers': 'Dělení: {list}',
+        'gameTitles.cz_iy.long': 'i/í – y/ý',
+        'gameTitles.cz_iy.short': 'i/í – y/ý',
+        'gameTitles.cz_uu.long': 'ú – ů',
+        'gameTitles.cz_uu.short': 'ú – ů',
+        'gameTitles.cz_pairs.long': 'Párové souhlásky',
+        'gameTitles.cz_pairs.short': 'Párové souhlásky',
+        'gameTitles.cz_test.long': 'Test z češtiny',
+        'gameTitles.cz_test.short': 'Test z češtiny',
         'q.count': 'Kolik vidíš {fruit}?',
         'q.add': 'Kolik je to dohromady?',
         'q.compare': 'Která skupina má víc?',
@@ -430,6 +521,8 @@ function refreshDynamicI18nText() {
         renderResult(lastResult);
     }
     if (!playModeScreen.classList.contains('hidden')) renderEndlessPanel();
+    if (selectedAgeGroup === 'czech') renderCzechMenu();
+    if (czExplained && !czExplain.classList.contains('hidden')) renderCzechExplain();
 }
 
 function setLanguage(lang) {
@@ -450,7 +543,8 @@ function setLanguage(lang) {
 // (visually hidden) and beside it the decoding letters, hidden from them - so
 // button names and labels never read as a jumble.
 // ------------------------------------------------------------
-const SCRAMBLE_LETTERS = { en: 'abcdefghijklnopqrstuvxyz', cs: 'abcdeghijklnoprstuvyzáčďéěíňóřšťúůýž' };
+const SCRAMBLE_LETTERS = { en: 'abcdefghknopqrstuvxyz', cs: 'abcdeghknoprstuvyzáčďéěňóřšťúůýž' };
+const SCRAMBLE_THIN = 'ijí'; // thin letters (i, j, l) flicker through thin ones - also in capitals - so a word keeps about its width
 const SCRAMBLE_DIGITS = '0123456789';
 const graphemeSegmenter = window.Intl && Intl.Segmenter ? new Intl.Segmenter(undefined, { granularity: 'grapheme' }) : null;
 let languageScramble = null; // { items, raf, safety } while the effect runs
@@ -504,7 +598,7 @@ function graphemes(text) {
 
 function scrambleGlyph(like) {
     if (/\p{N}/u.test(like)) return SCRAMBLE_DIGITS[Math.floor(Math.random() * SCRAMBLE_DIGITS.length)];
-    const letters = SCRAMBLE_LETTERS[currentLang] || SCRAMBLE_LETTERS.en;
+    const letters = 'ijíl'.includes(like.toLowerCase()) ? SCRAMBLE_THIN : (SCRAMBLE_LETTERS[currentLang] || SCRAMBLE_LETTERS.en);
     const glyph = letters[Math.floor(Math.random() * letters.length)];
     return like === like.toLowerCase() ? glyph : glyph.toUpperCase();
 }
@@ -714,6 +808,7 @@ const themeColorMeta = document.querySelector('meta[name="theme-color"]');
 const ageSelectionScreen = document.getElementById('ageSelectionScreen');
 const littleKidsBtn = document.getElementById('littleKidsBtn');
 const biggerKidsBtn = document.getElementById('biggerKidsBtn');
+const czechBtn = document.getElementById('czechBtn');
 const homeScreen = document.getElementById('homeScreen');
 const gameScreen = document.getElementById('gameScreen');
 const gameSelection = document.getElementById('gameSelection');
@@ -798,6 +893,7 @@ const BIGGER_KIDS_GAMES = [addSubBtn, multiplyBtn, divideBtn];
 // Event listeners
 littleKidsBtn.addEventListener('click', () => chooseAgeGroup('little', littleKidsBtn));
 biggerKidsBtn.addEventListener('click', () => chooseAgeGroup('bigger', biggerKidsBtn));
+czechBtn.addEventListener('click', () => chooseAgeGroup('czech', czechBtn));
 countFruitsBtn.addEventListener('click', () => chooseGame('count'));
 addFruitsBtn.addEventListener('click', () => chooseGame('add'));
 compareFruitsBtn.addEventListener('click', () => chooseGame('compare'));
@@ -1454,7 +1550,7 @@ settingsSoundOff.addEventListener('click', () => persistSettings({ sound: 'off' 
 optionsContainer.addEventListener('click', (e) => {
     const btn = e.target.closest('.option-btn');
     if (!btn || btn.disabled || inputMode !== 'click') return;
-    checkAnswer(Number(btn.dataset.answer), btn);
+    checkAnswer(btn.dataset.answer, btn); // (compared as text: a number or a Czech letter)
 });
 
 // Global keyboard: typing mode takes digits / Backspace / Enter from a real
@@ -1481,9 +1577,9 @@ document.addEventListener('keydown', (e) => {
     const idx = ['1', '2', '3', '4'].indexOf(e.key);
     if (idx === -1) return;
     const btn = optionsContainer.querySelectorAll('.option-btn')[idx];
-    if (!btn || btn.disabled) return;
+    if (!btn || btn.disabled || btn.classList.contains('hidden') || optionsContainer.classList.contains('hidden')) return;
     e.preventDefault();
-    checkAnswer(Number(btn.dataset.answer), btn);
+    checkAnswer(btn.dataset.answer, btn);
 });
 
 // On-screen number pad. Only digits can be entered, so "3.9" or "3e1" can
@@ -1541,7 +1637,7 @@ function voiceFor(lang) {
     return cachedVoices.find(v => norm(v) === want) || cachedVoices.find(v => norm(v).startsWith(base)) || null;
 }
 
-function speakText(text) {
+function speakText(text, lang = currentLang) {
     if (!window.speechSynthesis || typeof SpeechSynthesisUtterance === 'undefined') return;
     try {
         window.speechSynthesis.cancel(); // Stop any current speech
@@ -1549,8 +1645,8 @@ function speakText(text) {
         utterance.rate = SPEECH_RATES[loadSettings().speech] || SPEECH_RATES.normal;
         utterance.pitch = 1.2;
         utterance.volume = 0.8;
-        utterance.lang = SPEECH_LANG[currentLang] || 'en-US';
-        const voice = voiceFor(currentLang);
+        utterance.lang = SPEECH_LANG[lang] || 'en-US';
+        const voice = voiceFor(lang);
         if (voice) utterance.voice = voice;
         window.speechSynthesis.speak(utterance);
     } catch (_) {}
@@ -1608,6 +1704,10 @@ function isMathGame() {
 }
 
 function speakQuestion() {
+    if (isCzechGame(selectedGame)) {
+        if (czItem) speakCzech(czFilled(czItem)); // the word as a teacher reads it in a dictation
+        return;
+    }
     let question;
     if (isMathGame()) {
         question = t('tts.math', { a: addSubNum1, op: operatorWord(addSubOperator), b: addSubNum2 });
@@ -1662,6 +1762,7 @@ function cancelPendingCallbacks() {
     if (advanceTimeout) { clearTimeout(advanceTimeout); advanceTimeout = null; }
     if (announceTimeout) { clearTimeout(announceTimeout); announceTimeout = null; }
     hideAnswerFeedback();
+    hideCzechExplain();
 }
 
 function showOnly(screen) {
@@ -1698,6 +1799,9 @@ function startGame(mode) {
     endlessBox.classList.toggle('hidden', playMode !== 'endless');
     finishBtn.classList.toggle('hidden', playMode !== 'endless');
     gameScreen.dataset.mode = playMode; // phones held sideways make room for the wider chips
+    gameScreen.classList.toggle('cz-mode', isCzechGame(selectedGame));
+    // Czech words are read only by a Czech voice (see speakCzech)
+    speakBtn.classList.toggle('hidden', isCzechGame(selectedGame) && !voiceFor('cs'));
     endlessRunId = playMode === 'endless' ? newRunId() : null;
     endlessRunDate = null;
     endlessRunAt = 0;
@@ -1715,6 +1819,10 @@ function startGame(mode) {
 
 // Restart the same game+difficulty+playMode without going back to menus.
 function playAgain() {
+    if (isCzechGame(selectedGame)) {
+        startCzechRun(); // a new round of words
+        return;
+    }
     startGame(inputMode);
 }
 
@@ -1725,6 +1833,9 @@ function updateGameTitles() {
     } else if (selectedGame) {
         gameHeaderTitle.textContent = t(`gameTitles.${selectedGame}.short`);
     }
+    // (the Czech kinds named by their letters: said the Czech way)
+    if (selectedGame === 'cz_iy' || selectedGame === 'cz_uu') gameHeaderTitle.lang = 'cs';
+    else gameHeaderTitle.removeAttribute('lang');
 }
 
 function showPlayModeSelection() {
@@ -1739,6 +1850,7 @@ function showPlayModeSelection() {
 
 function selectPlayMode(mode) {
     playMode = mode; // 'time' | 'questions' | 'endless'
+    questionTarget = 10;
     const saved = loadSettings();
     configureDifficulty(saved.difficulty);
     updateGameTitles(); // the header names chosen times tables
@@ -1751,7 +1863,11 @@ function chooseGame(game) {
     cancelAgeTransition();
     cancelPendingCallbacks();
     stopSpeech();
-    selectedGame = game; // 'count' | 'add' | 'compare' | 'match' | 'addsub' | 'multiply' | 'divide'
+    selectedGame = game; // 'count' | 'add' | 'compare' | 'match' | 'addsub' | 'multiply' | 'divide' | Czech: 'cz_…'
+    if (isCzechGame(game)) {
+        startCzechRun();
+        return;
+    }
     // Always show Play Mode selection first; difficulty and input mode come from Settings
     showPlayModeSelection();
 }
@@ -1815,28 +1931,40 @@ function configureDifficulty(level) {
 // Age group selection
 function selectAgeGroup(ageGroup, fromTransition = false) {
     if (!fromTransition) cancelAgeTransition();
-    selectedAgeGroup = ageGroup; // 'little' | 'bigger'
+    selectedAgeGroup = ageGroup; // 'little' | 'bigger' | 'czech' (Czech for bigger kids)
     filterGamesByAgeGroup();
     updateProgressPanel();
     showOnly(homeScreen);
 }
 
+// The home screen of the chosen group: its games (or the Czech tasks), its
+// colours and, for Czech, its own heading
 function filterGamesByAgeGroup() {
+    const czech = selectedAgeGroup === 'czech';
     const bigger = selectedAgeGroup === 'bigger';
-    LITTLE_KIDS_GAMES.forEach(btn => btn.classList.toggle('hidden', bigger));
+    LITTLE_KIDS_GAMES.forEach(btn => btn.classList.toggle('hidden', bigger || czech));
     BIGGER_KIDS_GAMES.forEach(btn => btn.classList.toggle('hidden', !bigger));
-    gameSelection.dataset.count = String(bigger ? BIGGER_KIDS_GAMES.length : LITTLE_KIDS_GAMES.length);
+    CZECH_GAME_BUTTONS.forEach(btn => btn.classList.toggle('hidden', !czech));
+    gameSelection.dataset.count = czech ? 'czech' : String(bigger ? BIGGER_KIDS_GAMES.length : LITTLE_KIDS_GAMES.length);
     document.body.classList.toggle('bigger-kids-theme', bigger);
-    document.body.classList.toggle('little-kids-theme', !bigger);
-    if (themeColorMeta) themeColorMeta.setAttribute('content', bigger ? '#2a5298' : '#3fae55');
+    document.body.classList.toggle('czech-theme', czech);
+    document.body.classList.toggle('little-kids-theme', !bigger && !czech);
+    if (themeColorMeta) themeColorMeta.setAttribute('content', czech ? '#5b2a91' : bigger ? '#2a5298' : '#3fae55');
+    homeTitle.setAttribute('data-i18n', czech ? 'cz.home.title' : 'home.title');
+    homeWelcome.setAttribute('data-i18n', czech ? 'cz.home.welcome' : 'home.welcome');
+    homeTitle.textContent = t(homeTitle.getAttribute('data-i18n'));
+    homeWelcome.textContent = t(homeWelcome.getAttribute('data-i18n'));
+    if (czech) renderCzechMenu();
 }
 
 // ------------------------------------------------------------
-// Age group transition (the two Play halves): the chosen half takes over the
+// Age group transition (the three Play parts): the chosen part takes over the
 // screen; for little kids flowers and animals bloom and the games pop in, for
 // bigger kids the blue dissolves into falling green code (Matrix) and the
-// games, already underneath, show through. A tap or a key skips it; with reduced motion there is
-// none. selectAgeGroup() itself stays instant.
+// games, already underneath, show through, and for Czech letters with háčky
+// and čárky fly out while the purple turns over like a page of a book. A tap
+// or a key skips it; with reduced motion there is none. selectAgeGroup()
+// itself stays instant.
 // Smoothness: only transform and opacity are animated (the graphics card moves
 // ready-made layers, nothing is laid out or re-drawn), the flowers are small
 // pictures drawn once in advance, and the code rain is a canvas.
@@ -1844,7 +1972,9 @@ function filterGamesByAgeGroup() {
 const AGE_TRANSITION_MS = {
     little: { switchAt: 700, revealAt: 1150, endAt: 2150 },
     bigger: { switchAt: 700, revealAt: 750, endAt: 2750 },
+    czech: { switchAt: 700, revealAt: 800, endAt: 2000 },
 };
+const CZECH_BURST_LETTERS = ['á', 'č', 'ď', 'é', 'ě', 'í', 'ň', 'ó', 'ř', 'š', 'ť', 'ú', 'ů', 'ý', 'ž', 'i', 'y', 'Č', 'Ř', 'Ž'];
 const AGE_TRANSITION_SKIP_AFTER_MS = 600; // an earlier tap is a double tap, not "skip"
 const BLOSSOM_EMOJI = ['🌸', '🐰', '🌼', '🦋', '🌷', '🐥', '🌻', '🐞', '🌺', '🐱', '🐶', '🦊', '🐼', '🐸', '🐝', '🐻'];
 const MAGIC_GLYPHS = '0123456789+−×÷=√π∞';
@@ -1881,7 +2011,7 @@ function chooseAgeGroup(group, section) {
         paintCover(bg, vw, vh);
     } else {
         bg = document.createElement('div');
-        bg.className = 'at-bg at-bg-little';
+        bg.className = `at-bg at-bg-${group}`;
     }
     bg.style.transform = `translate(${rect.left}px, ${rect.top}px) scale(${rect.width / vw}, ${rect.height / vh})`;
     // ...and a copy of its text, which glides to the middle
@@ -1893,7 +2023,15 @@ function chooseAgeGroup(group, section) {
     panel.style.setProperty('--to-y', `${Math.round(vh / 2 - (rect.top + rect.height / 2))}px`);
     const fx = document.createElement('div');
     fx.className = 'at-fx';
-    layer.append(bg, panel, fx);
+    if (group === 'czech') {
+        // the purple and the text on it are a page, which later turns over
+        const page = document.createElement('div');
+        page.className = 'at-page';
+        page.append(bg, panel);
+        layer.append(page, fx);
+    } else {
+        layer.append(bg, panel, fx);
+    }
     document.body.appendChild(layer);
     section.classList.add('at-source'); // its own text hides while the copy moves (restored at the end)
     ageTransition = { group, layer, section, timers: [], raf: 0, switched: false, startedAt: performance.now() };
@@ -1904,7 +2042,7 @@ function chooseAgeGroup(group, section) {
     if (group === 'little') buildBlossomEffects(fx);
     const at = (ms, fn) => ageTransition.timers.push(setTimeout(fn, ms));
     at(timing.switchAt, switchToGames);
-    at(timing.revealAt, group === 'bigger' ? dissolveToGames : revealGames);
+    at(timing.revealAt, group === 'bigger' ? dissolveToGames : group === 'czech' ? turnPage : revealGames);
     at(timing.endAt, finishAgeTransition);
     layer.addEventListener('pointerdown', skipAgeTransition);
     document.addEventListener('keydown', skipAgeTransition, true);
@@ -1938,6 +2076,39 @@ function dissolveToGames() {
     rain.className = 'at-rain';
     t.layer.querySelector('.at-fx').appendChild(rain);
     startMatrixDissolve(t.layer.querySelector('.at-cover'), rain);
+}
+
+// Czech: letters with háčky and čárky fly out of the title and the purple page
+// turns over like a page of a book, uncovering the Czech tasks underneath
+function turnPage() {
+    const t = ageTransition;
+    if (!t) return;
+    switchToGames();
+    buildLetterBurst(t.layer.querySelector('.at-fx'));
+    t.layer.classList.add('at-turn');
+}
+
+function buildLetterBurst(fx) {
+    const count = window.innerWidth < 600 ? 14 : 20;
+    const unit = Math.min(window.innerWidth, window.innerHeight) / 100; // 1vmin in px
+    for (let i = 0; i < count; i++) {
+        const letter = document.createElement('span');
+        letter.className = 'at-letter';
+        letter.textContent = CZECH_BURST_LETTERS[i % CZECH_BURST_LETTERS.length];
+        fx.appendChild(letter);
+        if (!letter.animate) continue;
+        const angle = (i / count) * Math.PI * 2 + Math.random() * 0.4;
+        const dist = 22 + Math.random() * 26; // vmin from the middle
+        const dx = Math.cos(angle) * dist * unit;
+        const dy = Math.sin(angle) * dist * unit;
+        const rot = Math.round(Math.random() * 120 - 60);
+        const scale = +(0.75 + Math.random() * 0.25).toFixed(2); // never above 1 (drawn once, only shrunk)
+        letter.animate([
+            { opacity: 0, transform: 'translate(0px, 0px) scale(0.4) rotate(0deg)' },
+            { opacity: 1, transform: `translate(${dx * 0.55}px, ${dy * 0.55}px) scale(${scale}) rotate(${rot / 2}deg)`, offset: 0.3 },
+            { opacity: 0, transform: `translate(${dx}px, ${dy + 10 * unit}px) scale(${+(scale * 0.9).toFixed(2)}) rotate(${rot}deg)` },
+        ], { duration: 1100, delay: i * 25, easing: 'cubic-bezier(0.2, 0.7, 0.3, 1)', fill: 'both' });
+    }
 }
 
 function finishAgeTransition() {
@@ -2179,6 +2350,7 @@ function goHome() {
     updateScore();
     // Refresh progress panel (streak/totals may have just updated)
     updateProgressPanel();
+    if (selectedAgeGroup === 'czech') renderCzechMenu(); // (words to practise again may have changed)
     showOnly(homeScreen);
 }
 
@@ -2222,6 +2394,7 @@ function generateQuestion() {
     try {
         showFeedback = false;
         hideAnswerFeedback();
+        hideCzechExplain();
         setTypedAnswer('');
 
         createQuestion();
@@ -2231,6 +2404,8 @@ function generateQuestion() {
         updateInputMode();
         if (isMathGame()) {
             arrangeMathDisplay();
+        } else if (isCzechGame(selectedGame)) {
+            arrangeCzechCard();
         } else if (selectedGame === 'add') {
             arrangeAdditionFruits();
         } else if (selectedGame === 'compare') {
@@ -2271,6 +2446,13 @@ function generateQuestion() {
 
 // Picks the numbers (and fruit) for the next question of the selected game.
 function createQuestion() {
+    if (isCzechGame(selectedGame)) {
+        // The next word of the round; the letters keep their order (i í y ý, ú ů, b p ...)
+        czItem = CZ_BY_ID.get(czRound[questionsAsked]);
+        correctAnswer = czItem.answer;
+        options = czOptions(czItem).slice();
+        return;
+    }
     currentFruit = fruits[Math.floor(Math.random() * fruits.length)];
     if (selectedGame === 'addsub') {
         // Randomly choose addition or subtraction
@@ -2386,6 +2568,7 @@ function createQuestion() {
 }
 
 function bestScoreKey() {
+    if (isCzechGame(selectedGame)) return `km_best_${selectedGame}`;
     // Chosen times tables keep their own best score per choice, e.g. km_best_multiply_n37_questions
     const level = practiceNumbers.length ? `n${practiceNumbers.join('')}` : selectedDifficulty;
     return `km_best_${selectedGame}_${level}_${playMode}`;
@@ -2404,7 +2587,9 @@ function saveBestScore(newScore) {
 function starsForScore(value) {
     if (playMode === 'time') return value >= 16 ? 3 : value >= 10 ? 2 : value >= 1 ? 1 : 0;
     if (playMode === 'endless') return endlessStars(answersGiven, value);
-    return value >= 9 ? 3 : value >= 5 ? 2 : value >= 1 ? 1 : 0;
+    // 9 and 5 of 10 (the Czech test: 18 and 10 of 20)
+    const share = value / Math.max(1, questionTarget);
+    return share >= 0.9 ? 3 : share >= 0.5 ? 2 : value >= 1 ? 1 : 0;
 }
 
 function endRun() {
@@ -2444,6 +2629,9 @@ function recordRun() {
         isNewBest: isNewBest && score > 0,
         best: Math.max(previousBest, score),
         session,
+        czech: isCzechGame(selectedGame)
+            ? { cat: CZ_GAMES[selectedGame], mistakes: czMistakes.slice(), tally: JSON.parse(JSON.stringify(czTally)) }
+            : null,
     };
 }
 
@@ -2470,7 +2658,10 @@ function updateRunStats() {
 
 function renderResult(result) {
     const endless = result.mode === 'endless';
-    resultTitle.textContent = endless ? t('result.endlessTitle') : (result.mode === 'time' ? t('result.timeUp') : t('result.allDone'));
+    const czechTest = !!result.czech && result.czech.cat === 'test';
+    resultTitle.textContent = endless ? t('result.endlessTitle')
+        : czechTest ? t('cz.result.testTitle')
+            : (result.mode === 'time' ? t('result.timeUp') : t('result.allDone'));
     resultEmoji.textContent = ['💪', '👍', '🎉', '🏆'][result.stars];
     if (endless) {
         resultScore.textContent = `${result.run.correct} / ${result.run.answered}`;
@@ -2508,9 +2699,15 @@ function renderResult(result) {
         resultStars.appendChild(s);
     }
     resultStars.setAttribute('aria-label', t('result.stars', { n: result.stars }));
+    czReview.classList.toggle('hidden', !result.czech);
+    if (result.czech) renderCzechReview(result.czech);
 }
 
 function updateQuestion() {
+    if (isCzechGame(selectedGame)) {
+        if (czItem) questionText.replaceChildren(...czInstruction(czItem));
+        return;
+    }
     if (isMathGame()) {
         questionText.textContent = t('q.math');
     } else if (selectedGame === 'add') {
@@ -2526,7 +2723,14 @@ function updateQuestion() {
 
 function updateOptions() {
     const optionButtons = optionsContainer.querySelectorAll('.option-btn');
+    const czech = isCzechGame(selectedGame);
+    optionsContainer.dataset.count = String(options.length); // Czech: 4 (i í y ý) or 2 letters
     optionButtons.forEach((btn, index) => {
+        const shown = index < options.length;
+        btn.classList.toggle('hidden', !shown);
+        if (czech) btn.lang = 'cs';
+        else btn.removeAttribute('lang');
+        if (!shown) return;
         btn.textContent = options[index];
         btn.dataset.answer = options[index];
         btn.disabled = false;
@@ -2751,6 +2955,11 @@ function checkAnswer(selectedAnswer, sourceBtn) {
     const buttons = typing ? [] : answerButtons();
     const chosen = sourceBtn || buttons.find(b => b.dataset.answer === String(selectedAnswer)) || null;
     const rightBtn = buttons.find(b => b.dataset.answer === String(correctAnswer)) || null;
+
+    if (isCzechGame(selectedGame)) {
+        czAnswer(String(selectedAnswer), isCorrect, chosen, rightBtn);
+        return;
+    }
 
     if (isCorrect) {
         playCorrectSound();
@@ -3100,6 +3309,459 @@ function buildConsecutiveOptions(x, minBound, maxBound) {
     }
     return arr;
 }
+
+// ============================================================
+// Czech for bigger kids: the 2nd grade review worksheet ("opakování učiva
+// 2. ročníku"). Every blank of the worksheet is one question ("_" marks it; a
+// phrase with two blanks is two questions, each with the other blank filled
+// in): i/í or y/ý after soft and hard consonants, ú or ů, and paired
+// consonants at the end of words, with a check word in which the letter can be
+// heard. The words stay Czech in both languages; only the instructions and the
+// explanations follow the language switch. The answers were checked against an
+// independent fill-in of the worksheet and the Internetová jazyková příručka.
+// ============================================================
+const CZ_IY = [
+    ['iy01', 'suché šat_', 'y'],
+    ['iy02', 'př_kré schody', 'í'],
+    ['iy03', 'příkré schod_', 'y'],
+    ['iy04', 'ž_vočichové', 'i'],
+    ['iy05', 'za hod_nu', 'i'],
+    ['iy06', 'krátk_ úkol', 'ý'],
+    ['iy07', 'pěkn_ dům', 'ý'],
+    ['iy08', 'do r_bníka', 'y'],
+    ['iy09', 'pro č_tanku', 'í'],
+    ['iy10', 'dlouh_ úsek', 'ý'],
+    ['iy11', 'teplé j_dlo', 'í'],
+    ['iy12', 'před span_m', 'í'],
+    ['iy13', 't_chá hudba', 'i'],
+    ['iy14', 'lež_ na zemi', 'í'],
+    ['iy15', 'tento t_den', 'ý'],
+    ['iy16', 'příšt_ úterý', 'í'],
+    ['iy17', 'příští úter_', 'ý'],
+    ['iy18', 'u Helen_', 'y'],
+    ['iy19', 'polic_sta', 'i'],
+    ['iy20', 'luk a š_p', 'í'],
+    ['iy21', 'hlasitě kř_čí', 'i'],
+    ['iy22', 'ostrá d_ka', 'ý'],
+    ['iy23', 'č_sté boty', 'i'],
+    ['iy24', 'čisté bot_', 'y'],
+    ['iy25', 'plyn un_kal', 'i'],
+    ['iy26', 'such_ chléb', 'ý'],
+    ['iy27', 'Sářin seš_t', 'i'],
+    ['iy28', 'tajný úkr_t', 'y'],
+    ['iy29', 'češt_na', 'i'],
+    ['iy30', 'ch_trý Jiřík', 'y'],
+    ['iy31', 'chytrý J_řík', 'i'],
+    ['iy32', 'závodn_k', 'í'],
+    ['iy33', 'ř_ční břehy', 'í'],
+    ['iy34', 'říční břeh_', 'y'],
+    ['iy35', 'létá na j_h', 'i'],
+    ['iy36', 'prst_nek', 'ý'],
+    ['iy37', 'klad_vko', 'í'],
+    ['iy38', 'dva rok_', 'y'],
+];
+const CZ_UU = [
+    ['uu01', 'zavřená _sta', 'ú'],
+    ['uu02', 'těší se dom_', 'ů'],
+    ['uu03', 'stará k_lna', 'ů'],
+    ['uu04', 'velká _nava', 'ú'],
+    ['uu05', '_žasně vaří', 'ú'],
+    ['uu06', 'zavírací n_ž', 'ů'],
+    ['uu07', 'd_ležitý úkol', 'ů'],
+    ['uu08', 'důležitý _kol', 'ú'],
+    ['uu09', 'na p_dě', 'ů'],
+    ['uu10', '_tulný byt', 'ú'],
+    ['uu11', 'velký _div', 'ú'],
+    ['uu12', 'f_ra sena', 'ů'],
+    ['uu13', 'pár strom_', 'ů'],
+    ['uu14', 'k_ra břízy', 'ů'],
+    ['uu15', '_plný seznam', 'ú'],
+    ['uu16', 'jdeme dol_', 'ů'],
+    ['uu17', 'krásné _dolí', 'ú'],
+    ['uu18', 'zp_sobit škodu', 'ů'],
+    ['uu19', '_zká cesta', 'ú'],
+];
+// [id, phrase, answer, check word]
+const CZ_PAIRS = [
+    ['pc01', 'dětský smí_', 'ch', 'smíchu'],
+    ['pc02', 'dobrý gulá_', 'š', 'guláše'],
+    ['pc03', 'má nás rá_', 'd', 'ráda'],
+    ['pc04', 'ru_ a líc', 'b', 'rubu'],
+    ['pc05', 'vysoký slou_', 'p', 'sloupy'],
+    ['pc06', 'hráli gol_', 'f', 'golfu'],
+    ['pc07', 'bílý sní_', 'h', 'sněhu'],
+    ['pc08', 'tupý nů_', 'ž', 'nože'],
+    ['pc09', 'významný obje_', 'v', 'objevy'],
+    ['pc10', 'nejí špená_', 't', 'špenátu'],
+    ['pc11', 'roztrhaná sí_', 'ť', 'sítě'],
+    ['pc12', 'se_ klidně', 'ď', 'sedí'],
+    ['pc13', 'bílá labu_', 'ť', 'labutě'],
+    ['pc14', 'časopi_', 's', 'časopisy'],
+    ['pc15', 'žízeň a hla_', 'd', 'hladový'],
+    ['pc16', 'přísný záka_', 'z', 'zákazy'],
+    ['pc17', 'košík plný hu_', 'b', 'houby'],
+    ['pc18', 'vltavský bře_', 'h', 'břehy'],
+    ['pc19', 'kalu_ vody', 'ž', 'kaluže'],
+    ['pc20', 'zápi_ do školy', 's', 'zápisy'],
+    ['pc21', 'našli pokla_', 'd', 'poklady'],
+    ['pc22', 'naře_ dřevo', 'ž', 'nařeže'],
+    ['pc23', 'hluboký příko_', 'p', 'příkopy'],
+    ['pc24', 'Jose_', 'f', 'Josefa'],
+    ['pc25', 'zamotaný drá_', 't', 'dráty'],
+    ['pc26', 'příkrý sva_', 'h', 'svahy'],
+    ['pc27', 'šedivý holu_', 'b', 'holubi'],
+    ['pc28', 'letní déš_', 'ť', 'deště'],
+    ['pc29', 'pi_ čitelně', 'š', 'píše'],
+    ['pc30', 'zatažený závě_', 's', 'závěsy'],
+    ['pc31', 'le_ je šelma', 'v', 'lvi'],
+    ['pc32', 'ovocný salá_', 't', 'saláty'],
+    ['pc33', 'nala_ kytaru', 'ď', 'naladit'],
+    ['pc34', 'velký úspě_', 'ch', 'úspěchy'],
+    ['pc35', 'vyři_ vzkaz', 'ď', 'vyřídit'],
+    ['pc36', 'vyřiď vzka_', 'z', 'vzkazy'],
+    ['pc37', 'vylomený zu_', 'b', 'zuby'],
+    ['pc38', 'útulný by_', 't', 'byty'],
+    ['pc39', 'měkký chlé_', 'b', 'chleba'],
+    ['pc40', 'fotogra_', 'f', 'fotografa'],
+    ['pc41', 'beraní ro_', 'h', 'rohy'],
+    ['pc42', 'zbořená ze_', 'ď', 'zdi'],
+    ['pc43', 'kočka a my_', 'š', 'myši'],
+    ['pc44', 'kone_ vody', 'v', 'konve'],
+    ['pc45', 'listnatý le_', 's', 'lesy'],
+    ['pc46', 'vra_ mi to', 'ť', 'vrátit'],
+    ['pc47', 'tuhý mrá_', 'z', 'mrazy'],
+    ['pc48', 'kočičí drá_', 'p', 'drápy'],
+    ['pc49', 'zasel hrá_', 'ch', 'hrachu'],
+    ['pc50', 'pěvecká soutě_', 'ž', 'soutěže'],
+];
+const CZ_ITEMS = [
+    ...CZ_IY.map(([id, text, answer]) => ({ cat: 'iy', id, text, answer })),
+    ...CZ_UU.map(([id, text, answer]) => ({ cat: 'uu', id, text, answer })),
+    ...CZ_PAIRS.map(([id, text, answer, check]) => ({ cat: 'pairs', id, text, answer, check })),
+];
+const CZ_BY_ID = new Map(CZ_ITEMS.map(item => [item.id, item]));
+const CZ_PAIR_SETS = [['b', 'p'], ['d', 't'], ['ď', 'ť'], ['z', 's'], ['ž', 'š'], ['v', 'f'], ['h', 'ch']];
+const CZ_GAMES = { cz_iy: 'iy', cz_uu: 'uu', cz_pairs: 'pairs', cz_test: 'test' };
+const CZ_ROUND = 10;                             // questions in a practice round
+const CZ_TEST_MIX = { iy: 8, uu: 4, pairs: 8 };  // the test: 20 questions
+const CZ_MISSED_KEY = 'km_cz_missed';            // ids answered wrong (until answered right)
+const CZ_DECK_PREFIX = 'km_cz_deck_';            // + category: ids not asked yet in this pass
+const CZ_SOFT = ['ž', 'š', 'č', 'ř', 'c', 'j'];
+const CZ_HARD = ['h', 'ch', 'k', 'r'];
+const CZ_DTN_SOFT = { d: 'ď', t: 'ť', n: 'ň' };  // d, t, n: soft or hard by how they sound
+const CZ_RIGHT_ADVANCE_MS = 700;                 // the filled-in word stays a moment
+const CZ_TEST_WRONG_ADVANCE_MS = 900;
+const CZ_EXPLAIN_AFTER_MS = 450;                 // the wrong and the right button show first
+const CZECH_GAME_BUTTONS = [...document.querySelectorAll('.czech-game')];
+const homeTitle = document.getElementById('homeTitle');
+const homeWelcome = document.getElementById('homeWelcome');
+const czExplain = document.getElementById('czExplain');
+const czExplainWord = document.getElementById('czExplainWord');
+const czExplainRule = document.getElementById('czExplainRule');
+const czNextBtn = document.getElementById('czNextBtn');
+const czReview = document.getElementById('czReview');
+const czReviewSummary = document.getElementById('czReviewSummary');
+const czReviewTitle = document.getElementById('czReviewTitle');
+const czReviewList = document.getElementById('czReviewList');
+let czRound = [];            // item ids of this run, in order
+let czItem = null;           // the item asked now
+let czMistakes = [];         // [{ id, chosen }] of this run
+let czTally = {};            // per category: { asked, right } (the test by kind of task)
+let czExplained = null;      // { item, chosen } while the explanation is shown
+let czExplainTimeout = null;
+
+function isCzechGame(game) {
+    return Object.prototype.hasOwnProperty.call(CZ_GAMES, game);
+}
+
+function czOptions(item) {
+    if (item.cat === 'iy') return ['i', 'í', 'y', 'ý'];
+    if (item.cat === 'uu') return ['ú', 'ů'];
+    return CZ_PAIR_SETS.find(pair => pair.includes(item.answer));
+}
+
+// The consonant just before the blank ("ch" is one)
+function czConsonantBefore(item) {
+    const before = item.text.slice(0, item.text.indexOf('_')).toLowerCase();
+    return before.endsWith('ch') ? 'ch' : before.slice(-1);
+}
+
+function czFilled(item, letter = item.answer) {
+    return item.text.replace('_', letter);
+}
+
+// Why the answer is right: a sentence in the language of the page and its
+// Czech bits (letters, syllables, check words). With the right letter but the
+// wrong length, it says just that.
+function czWhy(item, chosen) {
+    const a = item.answer;
+    if (item.cat === 'iy') {
+        const base = x => (x === 'í' ? 'i' : x === 'ý' ? 'y' : x);
+        if (chosen && chosen !== a && base(chosen) === base(a)) return [a === 'í' || a === 'ý' ? 'cz.why.long' : 'cz.why.short', { a }];
+        const c = czConsonantBefore(item);
+        if (CZ_SOFT.includes(c)) return ['cz.why.soft', { c, letters: 'i/í' }];
+        if (CZ_HARD.includes(c)) return ['cz.why.hard', { c, letters: 'y/ý' }];
+        return base(a) === 'i'
+            ? ['cz.why.dtnSoft', { cv: c + a, sv: CZ_DTN_SOFT[c] + a, letters: 'i/í' }]
+            : ['cz.why.dtnHard', { cv: c + a, letters: 'y/ý' }];
+    }
+    if (item.cat === 'uu') {
+        const i = item.text.indexOf('_');
+        if (i === 0 || item.text[i - 1] === ' ') return ['cz.why.uStart', { a: 'ú' }];
+        return [i === item.text.length - 1 || item.text[i + 1] === ' ' ? 'cz.why.uEnd' : 'cz.why.uInside', { a: 'ů' }];
+    }
+    return ['cz.why.pair', { check: item.check, a }];
+}
+
+function czReason(item, chosen) {
+    const [key, vars] = czWhy(item, chosen);
+    return t(key, vars);
+}
+
+function czReasonNodes(item, chosen) {
+    const [key, vars] = czWhy(item, chosen);
+    return tCzech(key, vars);
+}
+
+// A translation whose {placeholders} are Czech letters or words, as nodes: those
+// are marked Czech, so a screen reader says them the Czech way on an English page
+function tCzech(key, vars) {
+    return t(key).split(/\{(\w+)\}/).map((part, i) => {
+        if (i % 2 === 0) return part;
+        const span = document.createElement('span');
+        span.lang = 'cs';
+        span.textContent = String(vars[part]);
+        return span;
+    });
+}
+
+// The instruction above the word
+function czInstruction(item) {
+    const letters = { iy: { x: 'i/í', y: 'y/ý' }, uu: { x: 'ú', y: 'ů' }, pairs: {} }[item.cat];
+    return tCzech(`cz.q.${item.cat}`, letters);
+}
+
+// The names of the two kinds that are just letters (Czech in both languages)
+const CZ_CAT_LETTERS = { iy: 'i/í – y/ý', uu: 'ú – ů' };
+
+// The phrase as nodes, the blank filled with a highlighted letter (or an empty slot)
+function czPhraseNodes(item, letter, slotClass) {
+    const [before, after] = item.text.split('_');
+    const slot = document.createElement(letter ? 'b' : 'span');
+    slot.className = slotClass;
+    slot.textContent = letter || '?';
+    // the word with the blank never breaks across lines
+    const start = before.lastIndexOf(' ') + 1;
+    const endAt = after.indexOf(' ');
+    const end = endAt === -1 ? after.length : endAt;
+    const word = document.createElement('span');
+    word.className = 'cz-word';
+    word.append(before.slice(start), slot, after.slice(0, end));
+    return [before.slice(0, start), word, after.slice(end)];
+}
+
+function czLoadIds(key) {
+    try {
+        const ids = JSON.parse(lsGet(key) || '[]');
+        return Array.isArray(ids) ? ids.filter(id => CZ_BY_ID.has(id)) : [];
+    } catch (_) {
+        return [];
+    }
+}
+
+// Saved like a choice: when the storage can't take it (full, blocked), it is kept
+// for this visit, so the rounds still move on and mistakes still come back
+function czSaveIds(key, ids) {
+    saveChoice(key, JSON.stringify(ids));
+}
+
+function czMissedIn(cat) {
+    return czLoadIds(CZ_MISSED_KEY).filter(id => CZ_BY_ID.get(id).cat === cat);
+}
+
+// A practice round: first (up to half the round) words answered wrong before -
+// they come back until answered right - then the next words of a shuffled pass
+// through the whole category (saved, so the rounds go through every word)
+function czPracticeRound(cat) {
+    const all = CZ_ITEMS.filter(item => item.cat === cat).map(item => item.id);
+    const size = Math.min(CZ_ROUND, all.length);
+    const round = czMissedIn(cat).slice(0, Math.ceil(size / 2));
+    let deck = czLoadIds(CZ_DECK_PREFIX + cat).filter(id => CZ_BY_ID.get(id).cat === cat);
+    while (round.length < size) {
+        if (!deck.length) deck = shuffleInPlace(all.slice());
+        const id = deck.shift();
+        if (!round.includes(id)) round.push(id);
+    }
+    czSaveIds(CZ_DECK_PREFIX + cat, deck);
+    return shuffleInPlace(round);
+}
+
+// The test: a few words of each kind, all mixed
+function czTestRound() {
+    const round = [];
+    Object.entries(CZ_TEST_MIX).forEach(([cat, n]) => {
+        round.push(...shuffleInPlace(CZ_ITEMS.filter(item => item.cat === cat).map(item => item.id)).slice(0, n));
+    });
+    return shuffleInPlace(round);
+}
+
+// A word answered wrong comes back in practice until it is answered right
+function czNoteAnswer(item, right) {
+    const missed = czLoadIds(CZ_MISSED_KEY).filter(id => id !== item.id);
+    if (!right) missed.push(item.id);
+    czSaveIds(CZ_MISSED_KEY, missed);
+}
+
+// A Czech card on the menu: no level or mode to pick, the round starts at once
+function startCzechRun() {
+    const cat = CZ_GAMES[selectedGame];
+    playMode = 'questions';
+    czRound = cat === 'test' ? czTestRound() : czPracticeRound(cat);
+    questionTarget = czRound.length;
+    czMistakes = [];
+    czTally = {};
+    czExplained = null;
+    updateGameTitles();
+    startGame('click');
+}
+
+// The question: the phrase on a card, the blank as an empty slot
+function arrangeCzechCard() {
+    resetBoard('layout-czech');
+    const card = document.createElement('div');
+    card.className = 'cz-card';
+    const phrase = document.createElement('p');
+    phrase.className = 'cz-phrase';
+    phrase.lang = 'cs';
+    phrase.append(...czPhraseNodes(czItem, '', 'cz-slot'));
+    const slot = phrase.querySelector('.cz-slot');
+    slot.setAttribute('aria-label', t('cz.aria.blank'));
+    slot.setAttribute('role', 'img');
+    card.appendChild(phrase);
+    fruitsContainer.appendChild(card);
+}
+
+function czSetSlot(letter, state) {
+    const slot = fruitsContainer.querySelector('.cz-slot');
+    if (!slot) return;
+    slot.textContent = letter;
+    slot.removeAttribute('role');
+    slot.removeAttribute('aria-label');
+    slot.classList.remove('is-right', 'is-wrong');
+    slot.classList.add(state);
+}
+
+// An answer to a Czech question (checkAnswer has already counted it)
+function czAnswer(chosenLetter, isCorrect, chosen, rightBtn) {
+    const item = czItem;
+    const test = CZ_GAMES[selectedGame] === 'test';
+    showFeedback = true;
+    czNoteAnswer(item, isCorrect);
+    const tally = czTally[item.cat] || (czTally[item.cat] = { asked: 0, right: 0 });
+    tally.asked++;
+    czSetSlot(chosenLetter, isCorrect ? 'is-right' : 'is-wrong');
+    if (isCorrect) {
+        tally.right++;
+        playCorrectSound();
+        score += 1;
+        updateScore();
+        if (chosen) chosen.classList.add('is-correct');
+        scheduleNextQuestion(CZ_RIGHT_ADVANCE_MS);
+        return;
+    }
+    playIncorrectSound();
+    czMistakes.push({ id: item.id, chosen: chosenLetter });
+    if (chosen) chosen.classList.add('is-wrong');
+    if (test) {
+        // The test tells right or wrong only; everything is explained at the end
+        scheduleNextQuestion(CZ_TEST_WRONG_ADVANCE_MS);
+        return;
+    }
+    // Practice: the right letter, then the right spelling and why, until the child goes on
+    if (rightBtn) rightBtn.classList.add('is-correct');
+    speakCzech(czFilled(item));
+    czExplainTimeout = setTimeout(() => {
+        czExplainTimeout = null;
+        if (runEnded || czItem !== item) return;
+        czSetSlot(item.answer, 'is-right');
+        czExplained = { item, chosen: chosenLetter };
+        renderCzechExplain();
+        optionsContainer.classList.add('hidden');
+        czExplain.classList.remove('hidden');
+        czNextBtn.focus({ preventScroll: true });
+    }, CZ_EXPLAIN_AFTER_MS);
+}
+
+function renderCzechExplain() {
+    const { item, chosen } = czExplained;
+    czExplainWord.replaceChildren(...czPhraseNodes(item, item.answer, 'cz-letter'));
+    czExplainRule.replaceChildren(...czReasonNodes(item, chosen));
+}
+
+function hideCzechExplain() {
+    if (czExplainTimeout) { clearTimeout(czExplainTimeout); czExplainTimeout = null; }
+    czExplained = null;
+    czExplain.classList.add('hidden');
+}
+
+function czContinue() {
+    if (!czExplained || runEnded) return;
+    hideCzechExplain();
+    generateQuestion(); // (it shows the answers again)
+}
+
+// The Czech words are read by a Czech voice; without one they are not read at
+// all (another voice would mangle them)
+function speakCzech(text) {
+    if (!voiceFor('cs')) return;
+    speakText(text, 'cs');
+}
+
+// Results: the test by kind of task, and every mistake with the right spelling and why
+function renderCzechReview(r) {
+    const test = r.cat === 'test';
+    czReviewSummary.classList.toggle('hidden', !test);
+    czReviewSummary.replaceChildren();
+    if (test) {
+        ['iy', 'uu', 'pairs'].filter(cat => r.tally[cat]).forEach((cat, k) => {
+            let name = t(`cz.cat.${cat}`);
+            if (CZ_CAT_LETTERS[cat]) {
+                name = document.createElement('span');
+                name.lang = 'cs';
+                name.textContent = CZ_CAT_LETTERS[cat];
+            }
+            czReviewSummary.append(k ? ' · ' : '', name, ` ${r.tally[cat].right}/${r.tally[cat].asked}`);
+        });
+    }
+    czReviewTitle.textContent = r.mistakes.length ? t('cz.review.title') : t('cz.review.allRight');
+    czReviewList.replaceChildren(...r.mistakes.map(({ id, chosen }) => {
+        const item = CZ_BY_ID.get(id);
+        const li = document.createElement('li');
+        const word = document.createElement('span');
+        word.className = 'cz-review-word';
+        word.lang = 'cs';
+        word.append(...czPhraseNodes(item, item.answer, 'cz-letter'));
+        const why = document.createElement('span');
+        why.className = 'cz-review-why';
+        why.append(...czReasonNodes(item, chosen), ' · ', ...tCzech('cz.review.chose', { a: chosen }));
+        li.append(word, why);
+        return li;
+    }));
+}
+
+// The Czech menu: how many words of each kind wait to be practised again
+function renderCzechMenu() {
+    CZECH_GAME_BUTTONS.forEach(btn => {
+        const badge = btn.querySelector('.cz-review-badge');
+        if (!badge) return;
+        const n = czMissedIn(CZ_GAMES[btn.dataset.game]).length;
+        badge.classList.toggle('hidden', n === 0);
+        badge.textContent = n ? tn('cz.review', n) : '';
+    });
+}
+
+CZECH_GAME_BUTTONS.forEach(btn => btn.addEventListener('click', () => chooseGame(btn.dataset.game)));
+czNextBtn.addEventListener('click', czContinue);
 
 // Language switcher wiring
 document.querySelectorAll('.lang-btn').forEach(btn => {

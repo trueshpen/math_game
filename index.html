@@ -10,7 +10,7 @@
     <!-- The server sends no cache headers, so browsers keep old copies for days.
          Bump ?v= whenever styles.css or script.js change (and APP_VERSION at the top of script.js), so new HTML never runs with old files
          (a cached page that gets a newer script.js loads the current page once, see its top). -->
-    <link rel="stylesheet" href="styles.css?v=2026-09-25.6">
+    <link rel="stylesheet" href="styles.css?v=2026-09-29.1">
 </head>
 <body class="little-kids-theme">
     <!-- Language switcher (fixed top-right; hidden during a game) -->
@@ -63,6 +63,28 @@
                     <span class="age-cta" data-i18n="age.play">Play ▶</span>
                 </span>
             </button>
+
+            <!-- Czech for bigger kids (the 2nd grade review) -->
+            <button id="czechBtn" type="button" class="age-section czech-section">
+                <span class="age-deco" aria-hidden="true">
+                    <span class="deco deco-1">á</span>
+                    <span class="deco deco-2">ř</span>
+                    <span class="deco deco-3">ů</span>
+                    <span class="deco deco-4">ý</span>
+                    <span class="deco deco-5">č</span>
+                    <span class="deco deco-6">ž</span>
+                </span>
+                <span class="age-content">
+                    <span class="age-title book-font" data-i18n="age.czech">Czech</span>
+                    <span class="age-subtitle" data-i18n="age.czech.ages">Ages 7-10</span>
+                    <span class="age-icons-row" aria-hidden="true">📖✏️🔤📝⭐</span>
+                    <span class="age-description">
+                        <span data-i18n="age.czech.desc1">i/y, ú/ů &amp; paired consonants</span>
+                        <span data-i18n="age.czech.desc2">✏️ 2nd grade review ✏️</span>
+                    </span>
+                    <span class="age-cta" data-i18n="age.play">Play ▶</span>
+                </span>
+            </button>
         </div>
     </div>
 
@@ -70,8 +92,8 @@
     <div id="homeScreen" class="screen hidden">
         <div class="home-container">
             <header class="home-header">
-                <h1 class="game-title" data-i18n="home.title">🍎 Kids Math Game 🍊</h1>
-                <p class="game-subtitle" data-i18n="home.welcome">Welcome! Pick a game to play:</p>
+                <h1 class="game-title" id="homeTitle" data-i18n="home.title">🍎 Kids Math Game 🍊</h1>
+                <p class="game-subtitle" id="homeWelcome" data-i18n="home.welcome">Welcome! Pick a game to play:</p>
             </header>
 
             <div class="game-selection" id="gameSelection">
@@ -111,6 +133,32 @@
                     <span class="game-name" data-i18n="game.divide.name">Divide</span>
                     <span class="game-desc" data-i18n="game.divide.desc">Practice division!</span>
                 </button>
+                <!-- Czech: one card per kind of task, and a test with everything mixed below them -->
+                <button id="czIyBtn" type="button" class="game-btn hidden czech-game" data-game="cz_iy">
+                    <span class="game-icon cz-icon" aria-hidden="true" lang="cs">i í y ý</span>
+                    <span class="game-name" lang="cs" data-i18n="game.cz_iy.name">i/í – y/ý</span>
+                    <span class="game-desc" data-i18n="game.cz_iy.desc">after soft and hard consonants</span>
+                    <span class="cz-review-badge hidden"></span>
+                </button>
+                <button id="czUuBtn" type="button" class="game-btn hidden czech-game" data-game="cz_uu">
+                    <span class="game-icon cz-icon" aria-hidden="true" lang="cs">ú ů</span>
+                    <span class="game-name" lang="cs" data-i18n="game.cz_uu.name">ú – ů</span>
+                    <span class="game-desc" data-i18n="game.cz_uu.desc">at the start, inside and at the end of words</span>
+                    <span class="cz-review-badge hidden"></span>
+                </button>
+                <button id="czPairsBtn" type="button" class="game-btn hidden czech-game" data-game="cz_pairs">
+                    <span class="game-icon cz-icon" aria-hidden="true" lang="cs">d/t ž/š</span>
+                    <span class="game-name" data-i18n="game.cz_pairs.name">Paired consonants</span>
+                    <span class="game-desc" lang="cs">b/p, d/t, ď/ť, z/s, ž/š, v/f, h/ch</span>
+                    <span class="cz-review-badge hidden"></span>
+                </button>
+                <button id="czTestBtn" type="button" class="game-btn hidden czech-game cz-test-btn" data-game="cz_test">
+                    <span class="game-icon" aria-hidden="true">📝</span>
+                    <span class="cz-test-text">
+                        <span class="game-name" data-i18n="game.cz_test.name">Test</span>
+                        <span class="game-desc" data-i18n="game.cz_test.desc">Everything mixed · 20 questions</span>
+                    </span>
+                </button>
             </div>
 
             <section class="panel progress-panel" id="progressPanel" data-i18n-attr="aria-label:progress.title" aria-label="My Progress">
@@ -145,14 +193,14 @@
             <details class="panel settings-panel" id="settingsPanel">
                 <summary class="settings-summary"><span data-i18n="settings.title">Settings</span></summary>
                 <div class="settings-body">
-                    <div class="settings-group" role="group" aria-labelledby="settingsInputLabel">
+                    <div class="settings-group math-only" role="group" aria-labelledby="settingsInputLabel">
                         <div class="settings-label" id="settingsInputLabel" data-i18n="settings.inputMode">Input Mode</div>
                         <div class="settings-options">
                             <button id="settingsClickMode" type="button" class="settings-btn" data-mode="click" data-i18n="settings.click">👆 Click Numbers</button>
                             <button id="settingsKeyboardMode" type="button" class="settings-btn" data-mode="keyboard" data-i18n="settings.keyboard">⌨️ Type Numbers</button>
                         </div>
                     </div>
-                    <div class="settings-group" role="group" aria-labelledby="settingsDiffLabel">
+                    <div class="settings-group math-only" role="group" aria-labelledby="settingsDiffLabel">
                         <div class="settings-label" id="settingsDiffLabel" data-i18n="settings.difficulty">Difficulty</div>
                         <div class="settings-options">
                             <button id="settingsDiffEasy" type="button" class="settings-btn" data-diff="easy" data-i18n="settings.easy">Easy</button>
@@ -298,6 +346,13 @@
                     <button type="button" class="option-btn" data-answer="4" aria-keyshortcuts="4">4</button>
                 </div>
 
+                <!-- Czech practice: after a wrong answer, the right spelling and why, in place of the answers -->
+                <div class="cz-explain hidden" id="czExplain" aria-live="polite">
+                    <p class="cz-explain-word"><span class="cz-explain-label" data-i18n="cz.correctIs">Correct:</span> <span id="czExplainWord" lang="cs"></span></p>
+                    <p class="cz-explain-rule" id="czExplainRule"></p>
+                    <button type="button" class="cz-next" id="czNextBtn" data-i18n="cz.next">Continue ▶</button>
+                </div>
+
                 <!-- Typing mode: an on-screen number pad, so no phone keyboard covers the game.
                      A real keyboard types into the same display. -->
                 <div class="input-container hidden" id="keyboardContainer">
@@ -336,6 +391,12 @@
                 <p id="resultBest" class="result-best"></p>
                 <p id="resultComeback" class="result-chip result-comeback hidden" data-i18n="result.comeback">🎁 Comeback bonus! 2× stars</p>
                 <p id="resultStreakUpdate" class="result-chip result-streak hidden"></p>
+                <!-- Czech: the test by kind of task, and every mistake with the right spelling and why -->
+                <div id="czReview" class="cz-review hidden">
+                    <p id="czReviewSummary" class="cz-review-summary"></p>
+                    <h2 id="czReviewTitle" class="cz-review-title"></h2>
+                    <ul id="czReviewList" class="cz-review-list"></ul>
+                </div>
                 <div class="result-actions">
                     <button id="resultPlayAgainBtn" type="button" class="mode-btn" data-i18n="result.playAgain">🔄 Play Again</button>
                     <button id="resultBackBtn" type="button" class="back-btn" data-i18n="back">← Back to Games</button>
@@ -344,6 +405,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=2026-09-25.6"></script>
+    <script src="script.js?v=2026-09-29.1"></script>
 </body>
 </html>

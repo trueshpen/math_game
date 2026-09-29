@@ -66,6 +66,25 @@ body.bigger-kids-theme {
     --fruit-ring: #c7d6f3;
 }
 
+/* Czech: ink purple, answers as yellow highlighter letters */
+body.czech-theme {
+    --bg: radial-gradient(circle at 85% 0%, rgba(230, 170, 255, 0.32) 0%, rgba(230, 170, 255, 0) 45%),
+          linear-gradient(160deg, #3f1a6b 0%, #5b2a91 55%, #7b3fb8 100%);
+    --ink: #22163a;
+    --ink-soft: #57486e;
+    --muted-bg: #f2edf8;
+    --accent: #6a32a8;
+    --accent-edge: #4a1f7c;
+    --accent-soft: #efe5fa;
+    --title-ink: #4a1f7c;
+    --option: #ffd43b;
+    --option-edge: #d9a400;
+    --option-ink: #3b2600;
+    --board-bg: #fdfaff;
+    --board-line: #e3d3f5;
+    --fruit-ring: #dccbf2;
+}
+
 html,
 body {
     height: 100%;
@@ -83,6 +102,15 @@ body {
 
 body.bigger-kids-theme {
     background-color: #2a5298;
+}
+
+body.czech-theme {
+    background-color: #5b2a91;
+}
+
+/* (input mode and difficulty belong to the math games) */
+body.czech-theme .math-only {
+    display: none;
 }
 
 button {
@@ -233,6 +261,9 @@ lang-fx.sr {
                       linear-gradient(145deg, #339049 0%, #287a3d 45%, #1c6634 100%);
     --bigger-half-bg: radial-gradient(circle at 70% 20%, rgba(120, 190, 255, 0.5) 0%, rgba(120, 190, 255, 0) 50%),
                       linear-gradient(145deg, #1e3c72 0%, #2a5298 55%, #4a90e2 100%);
+    /* Czech: ink purple (white text at least 6:1 everywhere), a soft pink corner */
+    --czech-half-bg: radial-gradient(circle at 80% 12%, rgba(255, 190, 250, 0.32) 0%, rgba(255, 190, 250, 0) 45%),
+                     linear-gradient(145deg, #3f1a6b 0%, #5b2a91 50%, #7b3fb8 100%);
 }
 
 .little-kids-section {
@@ -241,6 +272,10 @@ lang-fx.sr {
 
 .bigger-kids-section {
     background: var(--bigger-half-bg);
+}
+
+.czech-section {
+    background: var(--czech-half-bg);
 }
 
 /* Decorations live at the edges of each half, away from the text */
@@ -262,6 +297,15 @@ lang-fx.sr {
     font-size: clamp(2.4rem, 6vw, 4.6rem);
     font-weight: 900;
     color: rgba(255, 255, 255, 0.2);
+    opacity: 1;
+    animation: floatRotate 6s ease-in-out infinite;
+}
+
+.czech-section .deco {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(2.2rem, 5.4vw, 4.2rem);
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.22);
     opacity: 1;
     animation: floatRotate 6s ease-in-out infinite;
 }
@@ -323,6 +367,25 @@ lang-fx.sr {
     .age-title.cool-font {
         font-size: min(clamp(2.2rem, 5.2vw, 4.1rem), 100cqi / 8.55);
     }
+
+    .age-title.book-font {
+        font-size: min(clamp(2.2rem, 5.2vw, 4.1rem), 100cqi / 6.1);
+    }
+}
+
+/* Czech: a book serif */
+.age-title.book-font {
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #fff8e6;
+    text-shadow: 0 0 20px rgba(255, 205, 120, 0.4), 0 4px 0 rgba(40, 10, 70, 0.45);
+}
+
+.czech-section .age-subtitle {
+    color: #f1e0ff;
+    letter-spacing: 2px;
+    text-transform: uppercase;
 }
 
 .age-subtitle {
@@ -376,6 +439,7 @@ lang-fx.sr {
 
 .little-kids-section .age-cta { color: #1d6b2d; }
 .bigger-kids-section .age-cta { color: #1e4b9a; }
+.czech-section .age-cta { color: #5b2a91; }
 
 @media (max-width: 1000px) {
     .deco-3,
@@ -384,10 +448,31 @@ lang-fx.sr {
     }
 }
 
-/* Upright phones: the two halves stack; held sideways they stay side by side */
+/* A narrow part (three side by side): the side decorations would meet the text */
+@container (max-width: 560px) {
+    .deco-3,
+    .deco-4 {
+        display: none;
+    }
+}
+
+/* Upright phones: the three parts stack; held sideways they stay side by side.
+   Stacked, each is a third of the height: no icons or second line, and on
+   short phones no description at all */
 @media (max-width: 700px) and (orientation: portrait) {
     .age-split-container {
         flex-direction: column;
+    }
+
+    .age-icons-row,
+    .age-description span + span {
+        display: none;
+    }
+}
+
+@media (max-width: 700px) and (orientation: portrait) and (max-height: 700px) {
+    .age-description {
+        display: none;
     }
 }
 
@@ -551,6 +636,74 @@ lang-fx.sr {
     inset: 0;
     width: 100%;
     height: 100%;
+}
+
+/* Czech: the purple and the text on it are a page; its title glows golden,
+   then letters with háčky and čárky fly out (script.js) and the page turns
+   over towards the child around its left edge, like a page of a book,
+   uncovering the Czech tasks. It darkens a little as it turns. */
+.at-czech {
+    perspective: 220vw;
+}
+
+.at-page {
+    position: absolute;
+    inset: 0;
+    transform-origin: 0 50%;
+    will-change: transform;
+}
+
+.at-page::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(25, 5, 45, 0) 15%, rgba(25, 5, 45, 0.55) 100%);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.at-bg-czech {
+    background: var(--czech-half-bg);
+}
+
+.at-czech.at-grow .at-panel .age-title {
+    animation: atGoldGlow 0.8s ease-out 0.1s both;
+}
+
+.at-czech.at-turn .at-page {
+    transform: rotateY(-95deg);
+    transition: transform 0.95s cubic-bezier(0.55, 0.05, 0.35, 1);
+}
+
+.at-czech.at-turn .at-page::after {
+    opacity: 1;
+    transition: opacity 0.95s ease-in;
+}
+
+.at-letter {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 60px;
+    height: 60px;
+    margin: -30px 0 0 -30px;
+    color: #ffe27a;
+    font: 700 46px/60px Georgia, "Times New Roman", serif;
+    text-align: center;
+    text-shadow: 0 3px 0 rgba(40, 10, 70, 0.4);
+    opacity: 0;
+    will-change: transform, opacity;
+}
+
+@media (max-width: 599.98px) {
+    .at-letter {
+        font-size: 34px;
+    }
+}
+
+@keyframes atGoldGlow {
+    0% { text-shadow: 0 0 20px rgba(255, 205, 120, 0.4), 0 4px 0 rgba(40, 10, 70, 0.45); }
+    100% { text-shadow: 0 0 34px rgba(255, 215, 110, 0.95), 0 4px 0 rgba(40, 10, 70, 0.45); }
 }
 
 @keyframes atHop {
@@ -775,6 +928,51 @@ lang-fx.sr {
 #addSubBtn { --tint: #e3edff; --edge: #5b8def; --name: #1f4fb0; }
 #multiplyBtn { --tint: #efe6ff; --edge: #9d7bea; --name: #5b36b8; }
 #divideBtn { --tint: #dcf5fb; --edge: #3cb3cf; --name: #0b6a82; }
+#czIyBtn { --tint: #f1e6ff; --edge: #9b6ad6; --name: #55268a; }
+#czUuBtn { --tint: #ffe6f1; --edge: #de6d9c; --name: #9c1f53; }
+#czPairsBtn { --tint: #e3f1ff; --edge: #5b9bd6; --name: #1c5690; }
+#czTestBtn { --tint: #fff2cc; --edge: #e0a82e; --name: #7a4d00; }
+
+/* Czech: the three kinds of tasks side by side, the test across below them */
+.game-selection[data-count="czech"] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.cz-icon {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.65rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--name);
+    white-space: nowrap;
+}
+
+.cz-review-badge {
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: #fff0f6;
+    color: #9c1f53;
+    font-size: 0.82rem;
+    font-weight: 900;
+    line-height: 1.35;
+}
+
+.game-btn.cz-test-btn {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    justify-content: center;
+    gap: 16px;
+    min-height: 0;
+    padding: 14px 20px;
+}
+
+.cz-test-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    text-align: left;
+}
 
 /* ------------------------------------------------------------
    Home: progress
@@ -1589,6 +1787,142 @@ lang-fx.sr {
     font-variant-numeric: tabular-nums;
 }
 
+/* Czech: the phrase on a card, the missing letter as a slot. Like the math
+   card, the play area is only as tall as the card. */
+.layout-czech {
+    place-items: center;
+}
+
+.fruits-container.layout-czech {
+    flex: 0 1 auto;
+    min-height: 0;
+}
+
+.cz-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: min(100%, 640px);
+    max-height: 100%;
+    padding: 26px 18px;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: inset 0 0 0 3px var(--board-line), var(--shadow);
+}
+
+.cz-phrase {
+    color: var(--title-ink);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(2rem, 8vw, 3.6rem);
+    font-weight: 700;
+    line-height: 1.25;
+    text-align: center;
+    overflow-wrap: anywhere;
+}
+
+/* the word with the blank stays on one line */
+.cz-word {
+    white-space: nowrap;
+}
+
+.cz-slot {
+    display: inline-block;
+    min-width: 0.9em;
+    margin: 0 0.04em;
+    padding: 0 0.08em;
+    border-radius: 0.18em;
+    background: #f4ecfc;
+    box-shadow: inset 0 0 0 0.06em #b596dc;
+    color: #b596dc;
+    line-height: 1.1;
+    text-align: center;
+}
+
+.cz-slot.is-right {
+    background: #e1f6e6;
+    box-shadow: inset 0 0 0 0.06em var(--ok);
+    color: var(--ok-edge);
+    animation: pop 0.35s ease;
+}
+
+.cz-slot.is-wrong {
+    background: #ffe3e3;
+    box-shadow: inset 0 0 0 0.06em var(--bad);
+    color: var(--bad-edge);
+    animation: shake 0.4s ease;
+}
+
+/* The two letters of ú/ů and of the paired consonants */
+.options-container[data-count="2"] {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 520px;
+}
+
+.cz-mode .option-btn {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(2rem, 6vw, 2.6rem);
+}
+
+/* After a wrong answer (practice): the right spelling and why, in place of the answers */
+.cz-explain {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 14px 16px;
+    border-radius: var(--radius);
+    background: var(--surface);
+    text-align: center;
+    box-shadow: var(--shadow);
+}
+
+.cz-explain-word {
+    color: var(--ink);
+    font-size: 1.15rem;
+    font-weight: 800;
+}
+
+.cz-explain-word [lang="cs"],
+.cz-review-word {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.35em;
+    font-weight: 700;
+}
+
+.cz-letter {
+    padding: 0 0.1em;
+    border-radius: 0.18em;
+    background: #e1f6e6;
+    color: var(--ok-edge);
+}
+
+.cz-explain-rule {
+    color: var(--ink-soft);
+    font-size: 1.05rem;
+    font-weight: 800;
+    line-height: 1.35;
+}
+
+.cz-next {
+    min-height: 50px;
+    padding: 10px 28px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #ffffff;
+    font-size: 1.15rem;
+    font-weight: 900;
+    box-shadow: 0 4px 0 var(--accent-edge);
+}
+
+.cz-next:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 var(--accent-edge);
+}
+
 /* Match: groups on top, numbers below (numbers in the middle on phones) */
 .layout-match {
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -2025,6 +2359,58 @@ lang-fx.sr {
     font-weight: 900;
 }
 
+/* Czech results: the test by kind of task, then every mistake with why */
+.cz-review {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    margin-top: 4px;
+}
+
+.cz-review-summary {
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    background: var(--muted-bg);
+    color: var(--ink);
+    font-weight: 900;
+}
+
+.cz-review-title {
+    color: var(--title-ink);
+    font-size: 1.1rem;
+    font-weight: 900;
+}
+
+.cz-review-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    list-style: none;
+    text-align: left;
+}
+
+.cz-review-list li {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    background: #fbf8ff;
+    box-shadow: inset 0 0 0 2px var(--board-line);
+}
+
+.cz-review-word {
+    color: var(--ink);
+    font-size: 1.2rem;
+}
+
+.cz-review-why {
+    color: var(--ink-soft);
+    font-size: 0.92rem;
+    font-weight: 700;
+}
+
 /* ------------------------------------------------------------
    Animations
    ------------------------------------------------------------ */
@@ -2124,11 +2510,13 @@ lang-fx.sr {
 }
 
 @media (max-width: 600px) {
-    .game-selection[data-count="3"] {
+    .game-selection[data-count="3"],
+    .game-selection[data-count="czech"] {
         grid-template-columns: 1fr;
     }
 
-    .game-selection[data-count="3"] .game-btn {
+    .game-selection[data-count="3"] .game-btn,
+    .game-selection[data-count="czech"] .game-btn {
         display: grid;
         grid-template-columns: auto 1fr;
         grid-template-rows: auto auto;
@@ -2140,11 +2528,25 @@ lang-fx.sr {
         text-align: left;
     }
 
-    .game-selection[data-count="3"] .game-icon {
+    .game-selection[data-count="3"] .game-icon,
+    .game-selection[data-count="czech"] .game-icon {
         grid-row: 1 / 3;
         width: 92px;
         padding-left: 0;
         padding-right: 0;
+    }
+
+    /* (a Czech card may have a third line: words to practise again) */
+    .game-selection[data-count="czech"] .game-icon {
+        grid-row: 1 / 4;
+    }
+
+    .game-selection[data-count="czech"] .cz-review-badge {
+        justify-self: start;
+    }
+
+    .game-selection[data-count="czech"] .cz-test-text {
+        grid-row: 1 / 4;
     }
 }
 
@@ -2455,7 +2857,8 @@ lang-fx.sr {
             "label streak"
             "score actions"
             "detail actions"
-            "stars actions";
+            "stars actions"
+            "review review";
         align-items: center;
         justify-items: center;
         gap: 4px 16px;
@@ -2471,6 +2874,7 @@ lang-fx.sr {
     .result-best { grid-area: best; }
     .result-comeback { grid-area: comeback; }
     .result-streak { grid-area: streak; }
+    .cz-review { grid-area: review; }
 
     .result-actions {
         grid-area: actions;
