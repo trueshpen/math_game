@@ -10,7 +10,7 @@
     <!-- The server sends no cache headers, so browsers keep old copies for days.
          Bump ?v= whenever styles.css or script.js change (and APP_VERSION at the top of script.js), so new HTML never runs with old files
          (a cached page that gets a newer script.js loads the current page once, see its top). -->
-    <link rel="stylesheet" href="styles.css?v=2026-10-01.1">
+    <link rel="stylesheet" href="styles.css?v=2026-10-01.2">
 </head>
 <body class="little-kids-theme">
     <!-- Language switcher (fixed top-right; hidden during a game) -->
@@ -392,9 +392,8 @@
                 <p id="resultBest" class="result-best"></p>
                 <p id="resultComeback" class="result-chip result-comeback hidden" data-i18n="result.comeback">🎁 Comeback bonus! 2× stars</p>
                 <p id="resultStreakUpdate" class="result-chip result-streak hidden"></p>
-                <!-- Czech: the test by kind of task, and every mistake with the right spelling and why -->
+                <!-- Czech: every mistake with the right spelling and why -->
                 <div id="czReview" class="cz-review hidden">
-                    <p id="czReviewSummary" class="cz-review-summary"></p>
                     <h2 id="czReviewTitle" class="cz-review-title"></h2>
                     <ul id="czReviewList" class="cz-review-list"></ul>
                 </div>
@@ -406,6 +405,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=2026-10-01.1"></script>
+    <script src="script.js?v=2026-10-01.2"></script>
 </body>
 </html>

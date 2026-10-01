@@ -2462,14 +2462,6 @@ lang-fx.sr {
     margin-top: 4px;
 }
 
-.cz-review-summary {
-    padding: 8px 12px;
-    border-radius: var(--radius-sm);
-    background: var(--muted-bg);
-    color: var(--ink);
-    font-weight: 900;
-}
-
 .cz-review-title {
     color: var(--title-ink);
     font-size: 1.1rem;

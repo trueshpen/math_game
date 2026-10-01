@@ -1,5 +1,5 @@
 // Bump APP_VERSION together with the ?v= values in index.html whenever this file changes.
-const APP_VERSION = '2026-10-01.1';
+const APP_VERSION = '2026-10-01.2';
 
 // A page the browser cached from another version may still load this file (the
 // server keeps no old copies). The page asks for script.js?v=<its version>; if that
@@ -78,8 +78,6 @@ const translations = {
         'cz.correctIs': 'Correct:',
         'cz.next': 'Continue ▶',
         'cz.aria.blank': 'missing letter',
-        'cz.cat.pairs': 'paired consonants',
-        'cz.result.testTitle': 'Test result',
         'cz.review.title': 'Watch out for these:',
         'cz.review.allRight': 'All correct – great job! 🎉',
         'cz.review.chose': 'your choice: “{a}”',
@@ -293,8 +291,6 @@ const translations = {
         'cz.correctIs': 'Správně:',
         'cz.next': 'Pokračovat ▶',
         'cz.aria.blank': 'vynechané písmeno',
-        'cz.cat.pairs': 'párové souhlásky',
-        'cz.result.testTitle': 'Výsledek testu',
         'cz.review.title': 'Na tohle si dej pozor:',
         'cz.review.allRight': 'Všechno správně – skvělá práce! 🎉',
         'cz.review.chose': 'tvoje volba: „{a}“',
@@ -2643,7 +2639,7 @@ function recordRun() {
         best: Math.max(previousBest, score),
         session,
         czech: isCzechGame(selectedGame)
-            ? { cat: CZ_GAMES[selectedGame], mistakes: czMistakes.slice(), tally: JSON.parse(JSON.stringify(czTally)) }
+            ? { cat: CZ_GAMES[selectedGame], mistakes: czMistakes.slice() }
             : null,
     };
 }
@@ -2671,10 +2667,8 @@ function updateRunStats() {
 
 function renderResult(result) {
     const endless = result.mode === 'endless';
-    const czechTest = !!result.czech && result.czech.cat === 'test';
     resultTitle.textContent = endless ? t('result.endlessTitle')
-        : czechTest ? t('cz.result.testTitle')
-            : (result.mode === 'time' ? t('result.timeUp') : t('result.allDone'));
+        : (result.mode === 'time' ? t('result.timeUp') : t('result.allDone'));
     resultEmoji.textContent = ['💪', '👍', '🎉', '🏆'][result.stars];
     if (endless) {
         resultScore.textContent = `${result.run.correct} / ${result.run.answered}`;
@@ -3619,7 +3613,7 @@ const CZ_BY_ID = new Map(CZ_ITEMS.map(item => [item.id, item]));
 const CZ_PAIR_SETS = [['b', 'p'], ['d', 't'], ['ď', 'ť'], ['z', 's'], ['ž', 'š'], ['v', 'f'], ['h', 'ch']];
 const CZ_GAMES = { cz_iy: 'iy', cz_uu: 'uu', cz_pairs: 'pairs', cz_test: 'test' };
 const CZ_ROUND = 10;                             // questions in a practice round
-const CZ_TEST_MIX = { iy: 8, uu: 4, pairs: 8 };  // the test: 20 questions
+const CZ_TEST_SIZE = 20;                         // the test: every kind mixed, played like practice
 const CZ_MISSED_KEY = 'km_cz_missed';            // ids answered wrong (until answered right)
 const CZ_DECK_PREFIX = 'km_cz_deck_';            // + category: ids not asked yet in this pass
 const CZ_DECK_KEYS = { uu: 'km_cz_deck_uu2' };     // (u – ú – ů: a new pass with the short-u words)
@@ -3627,7 +3621,6 @@ const CZ_SOFT = ['ž', 'š', 'č', 'ř', 'c', 'j'];
 const CZ_HARD = ['h', 'ch', 'k', 'r'];
 const CZ_DTN_SOFT = { d: 'ď', t: 'ť', n: 'ň' };  // d, t, n: soft or hard by how they sound
 const CZ_RIGHT_ADVANCE_MS = 700;                 // the filled-in word stays a moment
-const CZ_TEST_WRONG_ADVANCE_MS = 900;
 const CZ_EXPLAIN_AFTER_MS = 450;                 // the wrong and the right button show first
 const CZECH_GAME_BUTTONS = [...document.querySelectorAll('.czech-game')];
 const homeTitle = document.getElementById('homeTitle');
@@ -3637,13 +3630,11 @@ const czExplainWord = document.getElementById('czExplainWord');
 const czExplainRule = document.getElementById('czExplainRule');
 const czNextBtn = document.getElementById('czNextBtn');
 const czReview = document.getElementById('czReview');
-const czReviewSummary = document.getElementById('czReviewSummary');
 const czReviewTitle = document.getElementById('czReviewTitle');
 const czReviewList = document.getElementById('czReviewList');
 let czRound = [];            // item ids of this run, in order
 let czItem = null;           // the item asked now
 let czMistakes = [];         // [{ id, chosen }] of this run
-let czTally = {};            // per category: { asked, right } (the test by kind of task)
 let czExplained = null;      // { item, chosen } while the explanation is shown
 let czExplainTimeout = null;
 
@@ -3719,9 +3710,6 @@ function czInstruction(item) {
     return tCzech(`cz.q.${item.cat}`, letters);
 }
 
-// The names of the two kinds that are just letters (Czech in both languages)
-const CZ_CAT_LETTERS = { iy: 'i/í – y/ý', uu: 'u – ú – ů' };
-
 // The phrase as nodes, the blank filled with a highlighted letter (or an empty slot)
 function czPhraseNodes(item, letter, slotClass) {
     const [before, after] = item.text.split('_');
@@ -3753,34 +3741,31 @@ function czSaveIds(key, ids) {
     saveChoice(key, JSON.stringify(ids));
 }
 
-function czMissedIn(cat) {
-    return czLoadIds(CZ_MISSED_KEY).filter(id => CZ_BY_ID.get(id).cat === cat);
+// (the test: every kind)
+function czOfKind(item, cat) {
+    return cat === 'test' || item.cat === cat;
 }
 
-// A practice round: first (up to half the round) words answered wrong before -
-// they come back until answered right - then the next words of a shuffled pass
-// through the whole category (saved, so the rounds go through every word)
+function czMissedIn(cat) {
+    return czLoadIds(CZ_MISSED_KEY).filter(id => CZ_BY_ID.has(id) && czOfKind(CZ_BY_ID.get(id), cat));
+}
+
+// A round: first (up to half the round) words answered wrong before - they
+// come back until answered right - then the next words of a shuffled pass
+// through the whole kind (saved, so the rounds go through every word). The
+// test is a round like that of every kind mixed, twice as long.
 function czPracticeRound(cat) {
-    const all = CZ_ITEMS.filter(item => item.cat === cat).map(item => item.id);
-    const size = Math.min(CZ_ROUND, all.length);
+    const all = CZ_ITEMS.filter(item => czOfKind(item, cat)).map(item => item.id);
+    const size = Math.min(cat === 'test' ? CZ_TEST_SIZE : CZ_ROUND, all.length);
     const round = czMissedIn(cat).slice(0, Math.ceil(size / 2));
     const deckKey = CZ_DECK_KEYS[cat] || CZ_DECK_PREFIX + cat;
-    let deck = czLoadIds(deckKey).filter(id => CZ_BY_ID.has(id) && CZ_BY_ID.get(id).cat === cat);
+    let deck = czLoadIds(deckKey).filter(id => CZ_BY_ID.has(id) && czOfKind(CZ_BY_ID.get(id), cat));
     while (round.length < size) {
         if (!deck.length) deck = shuffleInPlace(all.slice());
         const id = deck.shift();
         if (!round.includes(id)) round.push(id);
     }
     czSaveIds(deckKey, deck);
-    return shuffleInPlace(round);
-}
-
-// The test: a few words of each kind, all mixed
-function czTestRound() {
-    const round = [];
-    Object.entries(CZ_TEST_MIX).forEach(([cat, n]) => {
-        round.push(...shuffleInPlace(CZ_ITEMS.filter(item => item.cat === cat).map(item => item.id)).slice(0, n));
-    });
     return shuffleInPlace(round);
 }
 
@@ -3795,10 +3780,9 @@ function czNoteAnswer(item, right) {
 function startCzechRun() {
     const cat = CZ_GAMES[selectedGame];
     playMode = 'questions';
-    czRound = cat === 'test' ? czTestRound() : czPracticeRound(cat);
+    czRound = czPracticeRound(cat);
     questionTarget = czRound.length;
     czMistakes = [];
-    czTally = {};
     czExplained = null;
     updateGameTitles();
     startGame('click');
@@ -3833,14 +3817,10 @@ function czSetSlot(letter, state) {
 // An answer to a Czech question (checkAnswer has already counted it)
 function czAnswer(chosenLetter, isCorrect, chosen, rightBtn) {
     const item = czItem;
-    const test = CZ_GAMES[selectedGame] === 'test';
     showFeedback = true;
     czNoteAnswer(item, isCorrect);
-    const tally = czTally[item.cat] || (czTally[item.cat] = { asked: 0, right: 0 });
-    tally.asked++;
     czSetSlot(chosenLetter, isCorrect ? 'is-right' : 'is-wrong');
     if (isCorrect) {
-        tally.right++;
         playCorrectSound();
         score += 1;
         updateScore();
@@ -3851,12 +3831,7 @@ function czAnswer(chosenLetter, isCorrect, chosen, rightBtn) {
     playIncorrectSound();
     czMistakes.push({ id: item.id, chosen: chosenLetter });
     if (chosen) chosen.classList.add('is-wrong');
-    if (test) {
-        // The test tells right or wrong only; everything is explained at the end
-        scheduleNextQuestion(CZ_TEST_WRONG_ADVANCE_MS);
-        return;
-    }
-    // Practice: the right letter, then the right spelling and why, until the child goes on
+    // The right letter, then the right spelling and why, until the child goes on
     if (rightBtn) rightBtn.classList.add('is-correct');
     speakCzech(czFilled(item));
     czExplainTimeout = setTimeout(() => {
@@ -3896,22 +3871,8 @@ function speakCzech(text) {
     speakText(text, 'cs');
 }
 
-// Results: the test by kind of task, and every mistake with the right spelling and why
+// Results: every mistake with the right spelling and why
 function renderCzechReview(r) {
-    const test = r.cat === 'test';
-    czReviewSummary.classList.toggle('hidden', !test);
-    czReviewSummary.replaceChildren();
-    if (test) {
-        ['iy', 'uu', 'pairs'].filter(cat => r.tally[cat]).forEach((cat, k) => {
-            let name = t(`cz.cat.${cat}`);
-            if (CZ_CAT_LETTERS[cat]) {
-                name = document.createElement('span');
-                name.lang = 'cs';
-                name.textContent = CZ_CAT_LETTERS[cat];
-            }
-            czReviewSummary.append(k ? ' · ' : '', name, ` ${r.tally[cat].right}/${r.tally[cat].asked}`);
-        });
-    }
     czReviewTitle.textContent = r.mistakes.length ? t('cz.review.title') : t('cz.review.allRight');
     czReviewList.replaceChildren(...r.mistakes.map(({ id, chosen }) => {
         const item = CZ_BY_ID.get(id);
