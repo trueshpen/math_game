@@ -1946,6 +1946,12 @@ lang-fx.sr {
     max-width: 520px;
 }
 
+/* u ú ů: three in one row */
+.options-container[data-count="3"] {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 600px;
+}
+
 .cz-mode .option-btn {
     font-family: Georgia, "Times New Roman", serif;
     font-size: clamp(2rem, 6vw, 2.6rem);

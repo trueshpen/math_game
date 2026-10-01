@@ -1,5 +1,5 @@
 // Bump APP_VERSION together with the ?v= values in index.html whenever this file changes.
-const APP_VERSION = '2026-09-29.8';
+const APP_VERSION = '2026-10-01.1';
 
 // A page the browser cached from another version may still load this file (the
 // server keeps no old copies). The page asks for script.js?v=<its version>; if that
@@ -39,7 +39,7 @@ const translations = {
         'age.biggerKids.desc2': '🚀 Level Up Your Skills 🚀',
         'age.czech': 'Czech',
         'age.czech.ages': 'Ages 7–10',
-        'age.czech.desc1': 'i/y, ú/ů & paired consonants',
+        'age.czech.desc1': 'i/y, u/ú/ů & paired consonants',
         'age.czech.desc2': '✏️ 2nd grade review ✏️',
         'age.play': 'Play ▶',
         // Home
@@ -51,8 +51,8 @@ const translations = {
         'cz.home.welcome': 'Pick what to practice:',
         'game.cz_iy.name': 'i/í – y/ý',
         'game.cz_iy.desc': 'after soft and hard consonants',
-        'game.cz_uu.name': 'ú – ů',
-        'game.cz_uu.desc': 'at the start, inside and at the end of a word',
+        'game.cz_uu.name': 'u – ú – ů',
+        'game.cz_uu.desc': 'short u, or long ú/ů',
         'game.cz_pairs.name': 'Paired consonants',
         'game.cz_test.name': 'Test',
         'game.cz_test.desc': 'Everything mixed · 20 questions',
@@ -60,7 +60,7 @@ const translations = {
         'cz.review.other': '🔁 {n} words to practice again',
         // ({x}, {c}, {a}, {check}...: Czech letters and words, marked Czech on the page - see tCzech)
         'cz.q.iy': 'Fill in {x} or {y}',
-        'cz.q.uu': 'Fill in {x} or {y}',
+        'cz.q.uu': 'Fill in {x}, {y} or {z}',
         'cz.q.pairs': 'Fill in the paired consonant',
         'cz.why.soft': '“{c}” is a soft consonant → we write {letters}',
         'cz.why.hard': '“{c}” is a hard consonant → we write {letters}',
@@ -71,6 +71,9 @@ const translations = {
         'cz.why.uStart': 'At the start of a word we write {a}',
         'cz.why.uInside': 'Inside a word we write {a}',
         'cz.why.uEnd': 'At the end of a word we write {a}',
+        'cz.why.uLongStart': 'It is long here – at the start of a word we write {a}',
+        'cz.why.uLongInside': 'It is long here – inside a word we write {a}',
+        'cz.why.uLongEnd': 'It is long here – at the end of a word we write {a}',
         'cz.why.pair': 'Check with “{check}” – you can hear “{a}”',
         'cz.correctIs': 'Correct:',
         'cz.next': 'Continue ▶',
@@ -154,8 +157,8 @@ const translations = {
         'gameTitles.divide.numbers': 'Division: {list}',
         'gameTitles.cz_iy.long': 'i/í – y/ý',
         'gameTitles.cz_iy.short': 'i/í – y/ý',
-        'gameTitles.cz_uu.long': 'ú – ů',
-        'gameTitles.cz_uu.short': 'ú – ů',
+        'gameTitles.cz_uu.long': 'u – ú – ů',
+        'gameTitles.cz_uu.short': 'u – ú – ů',
         'gameTitles.cz_pairs.long': 'Paired consonants',
         'gameTitles.cz_pairs.short': 'Paired consonants',
         'gameTitles.cz_test.long': 'Czech test',
@@ -253,7 +256,7 @@ const translations = {
         'age.biggerKids.desc2': '🚀 Zlepši své dovednosti 🚀',
         'age.czech': 'Čeština',
         'age.czech.ages': 'Věk 7–10',
-        'age.czech.desc1': 'i/y, ú/ů a párové souhlásky',
+        'age.czech.desc1': 'i/y, u/ú/ů a párové souhlásky',
         'age.czech.desc2': '✏️ Opakování 2. třídy ✏️',
         'age.play': 'Hrát ▶',
         'home.title': '🍎 Dětská matematika 🍊',
@@ -263,8 +266,8 @@ const translations = {
         'cz.home.welcome': 'Vyber si, co chceš procvičit:',
         'game.cz_iy.name': 'i/í – y/ý',
         'game.cz_iy.desc': 'po měkkých a tvrdých souhláskách',
-        'game.cz_uu.name': 'ú – ů',
-        'game.cz_uu.desc': 'na začátku, uprostřed a na konci slova',
+        'game.cz_uu.name': 'u – ú – ů',
+        'game.cz_uu.desc': 'krátké u, nebo dlouhé ú/ů',
         'game.cz_pairs.name': 'Párové souhlásky',
         'game.cz_test.name': 'Test',
         'game.cz_test.desc': 'Všechno namíchané · 20 otázek',
@@ -272,7 +275,7 @@ const translations = {
         'cz.review.few': '🔁 {n} slova k opakování',
         'cz.review.many': '🔁 {n} slov k opakování',
         'cz.q.iy': 'Doplň {x} nebo {y}',
-        'cz.q.uu': 'Doplň {x} nebo {y}',
+        'cz.q.uu': 'Doplň {x}, {y} nebo {z}',
         'cz.q.pairs': 'Doplň párovou souhlásku',
         'cz.why.soft': '„{c}“ je měkká souhláska → píšeme {letters}',
         'cz.why.hard': '„{c}“ je tvrdá souhláska → píšeme {letters}',
@@ -283,6 +286,9 @@ const translations = {
         'cz.why.uStart': 'Na začátku slova píšeme {a}',
         'cz.why.uInside': 'Uprostřed slova píšeme {a}',
         'cz.why.uEnd': 'Na konci slova píšeme {a}',
+        'cz.why.uLongStart': 'Tady je dlouhé – na začátku slova píšeme {a}',
+        'cz.why.uLongInside': 'Tady je dlouhé – uprostřed slova píšeme {a}',
+        'cz.why.uLongEnd': 'Tady je dlouhé – na konci slova píšeme {a}',
         'cz.why.pair': 'Ověř si slovem „{check}“ – slyšíš „{a}“',
         'cz.correctIs': 'Správně:',
         'cz.next': 'Pokračovat ▶',
@@ -362,8 +368,8 @@ const translations = {
         'gameTitles.divide.numbers': 'Dělení: {list}',
         'gameTitles.cz_iy.long': 'i/í – y/ý',
         'gameTitles.cz_iy.short': 'i/í – y/ý',
-        'gameTitles.cz_uu.long': 'ú – ů',
-        'gameTitles.cz_uu.short': 'ú – ů',
+        'gameTitles.cz_uu.long': 'u – ú – ů',
+        'gameTitles.cz_uu.short': 'u – ú – ů',
         'gameTitles.cz_pairs.long': 'Párové souhlásky',
         'gameTitles.cz_pairs.short': 'Párové souhlásky',
         'gameTitles.cz_test.long': 'Test z češtiny',
@@ -2731,7 +2737,7 @@ function updateQuestion() {
 function updateOptions() {
     const optionButtons = optionsContainer.querySelectorAll('.option-btn');
     const czech = isCzechGame(selectedGame);
-    optionsContainer.dataset.count = String(options.length); // Czech: 4 (i í y ý) or 2 letters
+    optionsContainer.dataset.count = String(options.length); // Czech: 4 (i í y ý), 3 (u ú ů) or 2 letters
     optionButtons.forEach((btn, index) => {
         const shown = index < options.length;
         btn.classList.toggle('hidden', !shown);
@@ -3321,7 +3327,7 @@ function buildConsecutiveOptions(x, minBound, maxBound) {
 // Czech for bigger kids: the 2nd grade review worksheet ("opakování učiva
 // 2. ročníku"). Every blank of the worksheet is one question ("_" marks it; a
 // phrase with two blanks is two questions, each with the other blank filled
-// in): i/í or y/ý after soft and hard consonants, ú or ů, and paired
+// in): i/í or y/ý after soft and hard consonants, u, ú or ů, and paired
 // consonants at the end of words, with a check word in which the letter can be
 // heard. The words stay Czech in both languages; only the instructions and the
 // explanations follow the language switch. The answers were checked against an
@@ -3474,6 +3480,35 @@ const CZ_UU = [
     ['uu47', 'p_jčit knihu', 'ů'],
     ['uu48', 'dřevěná h_l', 'ů'],
     ['uu49', 'noční m_ra', 'ů'],
+    // Short u, where a child could put ú or ů: at the start (uklidit beside úklid,
+    // utíkat beside útěk), inside, and as an ending (k domu beside domů)
+    ['uu50', 'velké _cho', 'u'],
+    ['uu51', 'dlouhá _lice', 'u'],
+    ['uu52', 'pevný _zel', 'u'],
+    ['uu53', '_mýt si ruce', 'u'],
+    ['uu54', '_klidit pokoj', 'u'],
+    ['uu55', '_kázat cestu', 'u'],
+    ['uu56', 'paní _čitelka', 'u'],
+    ['uu57', '_tíkat před deštěm', 'u'],
+    ['uu58', '_vařit oběd', 'u'],
+    ['uu59', 'černé _hlí', 'u'],
+    ['uu60', 'bílý _brus', 'u'],
+    ['uu61', '_snout v posteli', 'u'],
+    ['uu62', 'nové br_sle', 'u'],
+    ['uu63', 'žlutý t_lipán', 'u'],
+    ['uu64', 'měsíc d_ben', 'u'],
+    ['uu65', 'teplá b_nda', 'u'],
+    ['uu66', 'bílá h_sa', 'u'],
+    ['uu67', 'barevná d_ha', 'u'],
+    ['uu68', 'hlasitý b_ben', 'u'],
+    ['uu69', 'mokrý r_čník', 'u'],
+    ['uu70', 'těžký k_fr', 'u'],
+    ['uu71', 'sk_pina dětí', 'u'],
+    ['uu72', 'hraje na tr_bku', 'u'],
+    ['uu73', 'k_kačka v lese', 'u'],
+    ['uu74', 'mořská m_šle', 'u'],
+    ['uu75', 'jdeme k dom_', 'u'],
+    ['uu76', 'sedneme si ke stol_', 'u'],
 ];
 // [id, phrase, answer, check word]
 const CZ_PAIRS = [
@@ -3587,6 +3622,7 @@ const CZ_ROUND = 10;                             // questions in a practice roun
 const CZ_TEST_MIX = { iy: 8, uu: 4, pairs: 8 };  // the test: 20 questions
 const CZ_MISSED_KEY = 'km_cz_missed';            // ids answered wrong (until answered right)
 const CZ_DECK_PREFIX = 'km_cz_deck_';            // + category: ids not asked yet in this pass
+const CZ_DECK_KEYS = { uu: 'km_cz_deck_uu2' };     // (u – ú – ů: a new pass with the short-u words)
 const CZ_SOFT = ['ž', 'š', 'č', 'ř', 'c', 'j'];
 const CZ_HARD = ['h', 'ch', 'k', 'r'];
 const CZ_DTN_SOFT = { d: 'ď', t: 'ť', n: 'ň' };  // d, t, n: soft or hard by how they sound
@@ -3617,7 +3653,7 @@ function isCzechGame(game) {
 
 function czOptions(item) {
     if (item.cat === 'iy') return ['i', 'í', 'y', 'ý'];
-    if (item.cat === 'uu') return ['ú', 'ů'];
+    if (item.cat === 'uu') return ['u', 'ú', 'ů'];
     return CZ_PAIR_SETS.find(pair => pair.includes(item.answer));
 }
 
@@ -3647,9 +3683,10 @@ function czWhy(item, chosen) {
             : ['cz.why.dtnHard', { cv: c + a, letters: 'y/ý' }];
     }
     if (item.cat === 'uu') {
+        if (a === 'u') return ['cz.why.short', { a }];
         const i = item.text.indexOf('_');
-        if (i === 0 || item.text[i - 1] === ' ') return ['cz.why.uStart', { a: 'ú' }];
-        return [i === item.text.length - 1 || item.text[i + 1] === ' ' ? 'cz.why.uEnd' : 'cz.why.uInside', { a: 'ů' }];
+        const place = i === 0 || item.text[i - 1] === ' ' ? 'Start' : i === item.text.length - 1 || item.text[i + 1] === ' ' ? 'End' : 'Inside';
+        return [chosen === 'u' ? `cz.why.uLong${place}` : `cz.why.u${place}`, { a }];
     }
     return ['cz.why.pair', { check: item.check, a }];
 }
@@ -3678,12 +3715,12 @@ function tCzech(key, vars) {
 
 // The instruction above the word
 function czInstruction(item) {
-    const letters = { iy: { x: 'i/í', y: 'y/ý' }, uu: { x: 'ú', y: 'ů' }, pairs: {} }[item.cat];
+    const letters = { iy: { x: 'i/í', y: 'y/ý' }, uu: { x: 'u', y: 'ú', z: 'ů' }, pairs: {} }[item.cat];
     return tCzech(`cz.q.${item.cat}`, letters);
 }
 
 // The names of the two kinds that are just letters (Czech in both languages)
-const CZ_CAT_LETTERS = { iy: 'i/í – y/ý', uu: 'ú – ů' };
+const CZ_CAT_LETTERS = { iy: 'i/í – y/ý', uu: 'u – ú – ů' };
 
 // The phrase as nodes, the blank filled with a highlighted letter (or an empty slot)
 function czPhraseNodes(item, letter, slotClass) {
@@ -3727,13 +3764,14 @@ function czPracticeRound(cat) {
     const all = CZ_ITEMS.filter(item => item.cat === cat).map(item => item.id);
     const size = Math.min(CZ_ROUND, all.length);
     const round = czMissedIn(cat).slice(0, Math.ceil(size / 2));
-    let deck = czLoadIds(CZ_DECK_PREFIX + cat).filter(id => CZ_BY_ID.get(id).cat === cat);
+    const deckKey = CZ_DECK_KEYS[cat] || CZ_DECK_PREFIX + cat;
+    let deck = czLoadIds(deckKey).filter(id => CZ_BY_ID.has(id) && CZ_BY_ID.get(id).cat === cat);
     while (round.length < size) {
         if (!deck.length) deck = shuffleInPlace(all.slice());
         const id = deck.shift();
         if (!round.includes(id)) round.push(id);
     }
-    czSaveIds(CZ_DECK_PREFIX + cat, deck);
+    czSaveIds(deckKey, deck);
     return shuffleInPlace(round);
 }
 
