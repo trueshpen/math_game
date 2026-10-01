@@ -1,6 +1,6 @@
 # Kids Math Game — Web Version
 
-A fun and educational math game for kids, featuring counting, arithmetic, comparisons, and matching games with gamification, sounds, and bilingual support.
+A fun and educational learning game for kids. The start screen offers three parts: **Matematika / Math** for little kids (3–6) and bigger kids (7–10) — counting, arithmetic, comparisons, and matching games — and **Čeština / Czech**, a spelling-practice section for bigger kids. It features gamification, sounds, deep-linkable pages, and full EN/CS bilingual support.
 
 ## Features
 
@@ -23,11 +23,20 @@ A fun and educational math game for kids, featuring counting, arithmetic, compar
 - HUD shows questions answered and the current success rate; a wrong answer reveals the right one and moves on
 - Stars need 10+ questions for 3; each run keeps its own record (saved after every answer, resilient across reloads, dropped tabs and multiple tabs)
 
-### Age-Based Selection
+### Start Screen & Age-Based Selection
+- The start screen presents three parts — **Matematika / Math** for little kids (3–6), **Matematika / Math** for bigger kids (7–10), and **Čeština / Czech** spelling for bigger kids — each with its age shown below and a title sized to the part's width (responsive from phones to big screens; portrait tablets stack the parts)
 - Game mode and difficulty adapt to the selected age group
 - Younger children get simpler counting games; older children get arithmetic with problem-only layouts
-- Animated age-choice screen: the chosen half takes over the screen with a smooth transform/opacity transition — little kids' side blooms into flowers, bigger kids' side dissolves into falling green code and numbers before the games appear
-- Age screen titles stay on a single line in both languages
+- Animated part-choice screen: the chosen part takes over the screen with a smooth transform/opacity transition — little kids' side blooms into flowers, bigger kids' side dissolves into falling green code and numbers, and the Czech part turns over like a page of a book while háčky/čárky letters fly out — before the games appear
+- A **☰ Menu** button (top left, across from the language switcher) returns to the start screen
+
+### Czech Spelling Practice (Čeština)
+- A dedicated section for bigger kids covering three kinds of spelling tasks: **i/í vs y/ý** after soft and hard consonants, **ú vs ů**, and **paired consonants**, plus a **mixed test** (20 questions)
+- **236 practice words** (107 from the source worksheet plus 129 more), each a blank to fill, presented in short everyday phrases
+- Practice rounds of 10 cycle through every word of a kind and bring back the ones answered wrong; a wrong answer shows the correct spelling and why (the applicable rule, or a check word in which the letter is heard)
+- The test explains every answer on the result screen, grouped by kind of task
+- The words stay Czech in both languages; instructions and explanations follow the language switch, with Czech fragments marked as Czech for screen readers
+- Answers verified against an independent worksheet fill-in and the Internetová jazyková příručka
 
 ### Gamification & Progress
 - **Streak tracking** — consecutive correct answer streaks (a day filled in late re-joins streaks)
@@ -48,6 +57,12 @@ A fun and educational math game for kids, featuring counting, arithmetic, compar
 ### Language Support
 - **EN / CS language switcher** — full i18n for all UI text and spoken prompts
 - Switching languages plays a "decode" animation as on-screen text resolves into the newly selected language
+
+### Navigation & Addresses
+- The pages a child returns to have their own hash addresses: `#/` (the three parts), `#/male-deti`, `#/vetsi-deti`, and `#/cestina`
+- A task (a game's level and mode, the game itself, its results, a Czech round) starts fresh anyway, so it keeps its part's address; reloading, reopening, or an addressless start shows that part's menu, and old task bookmarks lead to the part's menu
+- Browser **Back** goes up a level (task → its menu → start) and **Forward** does not restart a task; Back never leaves a running game
+- The last page is remembered on the device (only the foreground tab), so opening the game without an address returns there; `#/` always opens the three parts
 
 ### Deployment
 - GitHub Actions auto-deploy to Server 3 on push to `main`
@@ -96,7 +111,7 @@ Fruits are rendered as Unicode emoji (🍎🍌🍊🍉🍍) — no image assets 
 <!-- AUTO-GENERATED: START -->
 *Auto-maintained by the nightly README agent. This block is refreshed only when new commits land in the repo.*
 
-**Last reflected change:** 2026-09-25T23:12:49Z
+**Last reflected change:** 2026-09-29T23:15:08Z
 
 **Project status:** Active — git remote: https://github.com/trueshpen/math_game
 <!-- AUTO-GENERATED: END -->
