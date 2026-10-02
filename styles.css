@@ -48,7 +48,8 @@
     --fruit-ring: #bfe2b4;
 }
 
-body.bigger-kids-theme {
+body.bigger-kids-theme,
+html.booting[data-boot="bigger"] body {
     --bg: radial-gradient(circle at 85% 0%, rgba(120, 175, 255, 0.4) 0%, rgba(120, 175, 255, 0) 45%),
           linear-gradient(160deg, #1e3c72 0%, #2a5298 55%, #4a90e2 100%);
     --ink: #172033;
@@ -67,7 +68,8 @@ body.bigger-kids-theme {
 }
 
 /* Czech: ink purple, answers as yellow highlighter letters */
-body.czech-theme {
+body.czech-theme,
+html.booting[data-boot="czech"] body {
     --bg: radial-gradient(circle at 85% 0%, rgba(230, 170, 255, 0.32) 0%, rgba(230, 170, 255, 0) 45%),
           linear-gradient(160deg, #3f1a6b 0%, #5b2a91 55%, #7b3fb8 100%);
     --ink: #22163a;
@@ -100,12 +102,19 @@ body {
     -webkit-tap-highlight-color: transparent;
 }
 
-body.bigger-kids-theme {
+body.bigger-kids-theme,
+html.booting[data-boot="bigger"] body {
     background-color: #2a5298;
 }
 
-body.czech-theme {
+body.czech-theme,
+html.booting[data-boot="czech"] body {
     background-color: #5b2a91;
+}
+
+/* (booting towards the three parts: the start screen's own dark ground) */
+html.booting[data-boot="start"] body {
+    background: #2b2d42;
 }
 
 /* (input mode and difficulty belong to the math games) */
@@ -131,6 +140,16 @@ button:disabled {
 
 .hidden {
     display: none !important;
+}
+
+/* Until script.js has put up the language and the page (it then takes .booting
+   off <html>), nothing of the page shows - only the colour of the part it opens
+   (data-boot, set in index.html) - so a reload never flashes English words or
+   another page, however long the script takes. Should it fail to load or break
+   on the way, the page shows anyway (index.html); without JavaScript, at once. */
+html.booting .screen,
+html.booting .lang-switcher {
+    visibility: hidden;
 }
 
 /* Every screen fills the viewport and scrolls on its own */

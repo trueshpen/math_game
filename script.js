@@ -1,5 +1,5 @@
 // Bump APP_VERSION together with the ?v= values in index.html whenever this file changes.
-const APP_VERSION = '2026-10-01.2';
+const APP_VERSION = '2026-10-02.3';
 
 // A page the browser cached from another version may still load this file (the
 // server keeps no old copies). The page asks for script.js?v=<its version>; if that
@@ -7,6 +7,11 @@ const APP_VERSION = '2026-10-01.2';
 // never seen (?fresh=...), and if that already happened, offer a link instead.
 const requestedVersion = ((document.currentScript && document.currentScript.src) || '').match(/[?&]v=([^&#]+)/);
 if (!requestedVersion || requestedVersion[1] !== APP_VERSION) {
+    // Nothing of the outdated page shows meanwhile - whatever its HTML and styles
+    document.documentElement.classList.add('booting', 'stale');
+    const hide = document.createElement('style');
+    hide.textContent = '.screen, .lang-switcher { visibility: hidden !important; }';
+    document.head.appendChild(hide);
     const freshUrl = location.pathname + '?fresh=' + Date.now() + location.hash;
     if (!/[?&]fresh=/.test(location.search)) {
         location.replace(freshUrl);
@@ -242,7 +247,7 @@ const translations = {
         'fruit.pineapple': 'pineapples',
     },
     cs: {
-        'app.title': 'Dětská matematika',
+        'app.title': 'Dětská matematika', // (index.html puts this up while the page boots)
         'lang.label': 'Jazyk',
         'age.littleKids': 'Matematika',
         'age.littleKids.ages': 'Věk 3–6',
@@ -4075,30 +4080,36 @@ window.addEventListener('resize', () => {
 
 // Initialize the game
 function init() {
-    // Arrived from an outdated cached page (see the top of this file): tidy the address
-    if (/[?&]fresh=/.test(location.search)) {
-        try { history.replaceState(null, '', location.pathname + location.hash); } catch (_) {}
+    try {
+        // Arrived from an outdated cached page (see the top of this file): tidy the address
+        if (/[?&]fresh=/.test(location.search)) {
+            try { history.replaceState(null, '', location.pathname + location.hash); } catch (_) {}
+        }
+
+        // Apply language first so all subsequent text uses the right locale
+        currentLang = loadLang();
+        applyTranslations();
+
+        updateScore();
+        updateTimer();
+        updateSettingsUI();
+        updateProgressPanel();
+
+        // The page of the address, or where the child was last time on this device
+        const startRoute = startingRoute();
+        const state = history.state;
+        routeStep = state && typeof state.km === 'number' ? state.km : 0; // (a reload keeps its step)
+        applyingRoute = true;
+        showOnly(ageSelectionScreen);
+        applyingRoute = false;
+        openRoute(startRoute);
+        // The little kids' transition flowers, drawn while the page is idle
+        scheduleBloomSprites();
+    } finally {
+        // Ready (language, page, colours): the page shows - it stayed hidden till now,
+        // see .booting in styles.css
+        document.documentElement.classList.remove('booting');
     }
-
-    // Apply language first so all subsequent text uses the right locale
-    currentLang = loadLang();
-    applyTranslations();
-
-    updateScore();
-    updateTimer();
-    updateSettingsUI();
-    updateProgressPanel();
-
-    // The page of the address, or where the child was last time on this device
-    const startRoute = startingRoute();
-    const state = history.state;
-    routeStep = state && typeof state.km === 'number' ? state.km : 0; // (a reload keeps its step)
-    applyingRoute = true;
-    showOnly(ageSelectionScreen);
-    applyingRoute = false;
-    openRoute(startRoute);
-    // The little kids' transition flowers, drawn while the page is idle
-    scheduleBloomSprites();
 }
 
 // Start the app

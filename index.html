@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="booting">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -7,10 +7,41 @@
     <meta name="description" content="Fun learning games for kids: math (counting, adding, comparing, matching, multiplication and division) and Czech spelling (i/y, u/ú/ů, paired consonants).">
     <title>Kids Math Game</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍎</text></svg>">
+    <!-- Until script.js has put up the language and the page, nothing of the page shows
+         (.booting, see styles.css) - only the colour of the part it opens: the one in the
+         address, or the one remembered on this device. So a reload never flashes another
+         page or English words. The language and title follow script.js (loadLang, app.title). -->
+    <script>
+        (function () {
+            var root = document.documentElement;
+            var route = location.hash.replace(/^#\/?/, '');
+            var lang = null;
+            try {
+                if (!location.hash) route = localStorage.getItem('km_last_route') || '';
+                lang = localStorage.getItem('km_lang');
+            } catch (e) {}
+            var parts = { 'male-deti': 'little', 'vetsi-deti': 'bigger', 'cestina': 'czech' };
+            var first = route.split('/')[0];
+            var part = Object.prototype.hasOwnProperty.call(parts, first) ? parts[first] : 'start';
+            root.setAttribute('data-boot', part);
+            var colour = { bigger: '#2a5298', czech: '#5b2a91' }[part];
+            var meta = document.querySelector('meta[name="theme-color"]');
+            if (colour && meta) meta.setAttribute('content', colour);
+            if (lang !== 'en' && lang !== 'cs') lang = /^(cs|sk)/i.test(navigator.language || '') ? 'cs' : 'en';
+            root.lang = lang;
+            if (lang === 'cs') document.title = 'Dětská matematika';
+            // Should the script break before the page is ready, show what there is
+            // (not an outdated page: script.js marks that .stale while it loads the current one)
+            window.addEventListener('error', function () {
+                if (!root.classList.contains('stale')) root.classList.remove('booting');
+            });
+        })();
+    </script>
+    <noscript><style>html.booting .screen, html.booting .lang-switcher { visibility: visible !important; }</style></noscript>
     <!-- The server sends no cache headers, so browsers keep old copies for days.
          Bump ?v= whenever styles.css or script.js change (and APP_VERSION at the top of script.js), so new HTML never runs with old files
          (a cached page that gets a newer script.js loads the current page once, see its top). -->
-    <link rel="stylesheet" href="styles.css?v=2026-10-01.2">
+    <link rel="stylesheet" href="styles.css?v=2026-10-02.3">
 </head>
 <body class="little-kids-theme">
     <!-- Language switcher (fixed top-right; hidden during a game) -->
@@ -405,6 +436,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=2026-10-01.2"></script>
+    <script src="script.js?v=2026-10-02.3" onerror="document.documentElement.classList.remove('booting')"></script>
 </body>
 </html>
