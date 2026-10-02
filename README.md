@@ -31,10 +31,11 @@ A fun and educational learning game for kids. The start screen offers three part
 - A **☰ Menu** button (top left, across from the language switcher) returns to the start screen
 
 ### Czech Spelling Practice (Čeština)
-- A dedicated section for bigger kids covering three kinds of spelling tasks: **i/í vs y/ý** after soft and hard consonants, **ú vs ů**, and **paired consonants**, plus a **mixed test** (20 questions)
-- **236 practice words** (107 from the source worksheet plus 129 more), each a blank to fill, presented in short everyday phrases
+- A dedicated section for bigger kids covering three kinds of spelling tasks: **i/í vs y/ý** after soft and hard consonants, **u – ú – ů**, and **paired consonants**, plus a **mixed test** (20 questions)
+- **263 practice words**, each a blank to fill, presented in short everyday phrases
+- The **u – ú – ů** task offers all three letters, so a child first decides whether the sound is long and only then where it is; a wrong answer is explained by what was chosen (a long letter where the u is short, a short u where it is long, or the wrong place for ú vs ů)
 - Practice rounds of 10 cycle through every word of a kind and bring back the ones answered wrong; a wrong answer shows the correct spelling and why (the applicable rule, or a check word in which the letter is heard)
-- The test explains every answer on the result screen, grouped by kind of task
+- The mixed test now plays like a practice round: every kind is mixed, a wrong answer shows the right letter, the spelling and why before you continue, and the result screen shows stars by your share with every mistake explained (no longer a tally by kind)
 - The words stay Czech in both languages; instructions and explanations follow the language switch, with Czech fragments marked as Czech for screen readers
 - Answers verified against an independent worksheet fill-in and the Internetová jazyková příručka
 
@@ -63,6 +64,7 @@ A fun and educational learning game for kids. The start screen offers three part
 - A task (a game's level and mode, the game itself, its results, a Czech round) starts fresh anyway, so it keeps its part's address; reloading, reopening, or an addressless start shows that part's menu, and old task bookmarks lead to the part's menu
 - Browser **Back** goes up a level (task → its menu → start) and **Forward** does not restart a task; Back never leaves a running game
 - The last page is remembered on the device (only the foreground tab), so opening the game without an address returns there; `#/` always opens the three parts
+- **No flash on load** — the page stays hidden until the script is ready, showing only the colour of the part it opens (taken from the address or the remembered page by a small script in `<head>` that also sets the Czech tab title and the address-bar colour); if the script fails or JavaScript is off the page still shows, and a stale page from the browser cache hides and reloads to the current one
 
 ### Deployment
 - GitHub Actions auto-deploy to Server 3 on push to `main`
@@ -111,7 +113,7 @@ Fruits are rendered as Unicode emoji (🍎🍌🍊🍉🍍) — no image assets 
 <!-- AUTO-GENERATED: START -->
 *Auto-maintained by the nightly README agent. This block is refreshed only when new commits land in the repo.*
 
-**Last reflected change:** 2026-09-29T23:15:08Z
+**Last reflected change:** 2026-10-02T23:14:02Z
 
 **Project status:** Active — git remote: https://github.com/trueshpen/math_game
 <!-- AUTO-GENERATED: END -->
