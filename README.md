@@ -31,10 +31,10 @@ A fun and educational learning game for kids. The start screen offers three part
 - A **☰ Menu** button (top left, across from the language switcher) returns to the start screen
 
 ### Czech Spelling Practice (Čeština)
-- A dedicated section for bigger kids covering three kinds of spelling tasks: **i/í vs y/ý** after soft and hard consonants, **ú vs ů**, and **paired consonants**, plus a **mixed test** (20 questions)
-- **236 practice words** (107 from the source worksheet plus 129 more), each a blank to fill, presented in short everyday phrases
+- A dedicated section for bigger kids covering three kinds of spelling tasks: **i/í vs y/ý** after soft and hard consonants, **u / ú / ů** (three letters — decide first whether the u is short or a long ú/ů, then where it goes), and **paired consonants**, plus a **mixed test** (20 questions)
+- **263 practice words** (107 from the source worksheet plus 156 more), each a blank to fill, presented in short everyday phrases
 - Practice rounds of 10 cycle through every word of a kind and bring back the ones answered wrong; a wrong answer shows the correct spelling and why (the applicable rule, or a check word in which the letter is heard)
-- The test explains every answer on the result screen, grouped by kind of task
+- The **mixed test** plays like a practice round: all three kinds mixed, a wrong answer shows the correct spelling and why before you continue, and the result screen gives stars by your share of correct answers with every mistake explained — its 20 words are picked like practice (the ones missed before first, then a pass through the rest)
 - The words stay Czech in both languages; instructions and explanations follow the language switch, with Czech fragments marked as Czech for screen readers
 - Answers verified against an independent worksheet fill-in and the Internetová jazyková příručka
 
@@ -67,6 +67,7 @@ A fun and educational learning game for kids. The start screen offers three part
 ### Deployment
 - GitHub Actions auto-deploy to Server 3 on push to `main`
 - Versioned asset URLs (`styles.css?v=…`, `script.js?v=…`) and a stale-page guard so returning visitors always load a matching page and script after a deploy
+- No flash on load — the page stays hidden until the script has set the language and the right page, showing only the opening part's colour in the meantime; it reveals anyway if the script fails or is missing (and immediately when JavaScript is off), and a page from the browser cache is swapped for the current one as soon as the script loads
 
 ---
 
@@ -111,7 +112,7 @@ Fruits are rendered as Unicode emoji (🍎🍌🍊🍉🍍) — no image assets 
 <!-- AUTO-GENERATED: START -->
 *Auto-maintained by the nightly README agent. This block is refreshed only when new commits land in the repo.*
 
-**Last reflected change:** 2026-09-29T23:15:08Z
+**Last reflected change:** 2026-10-04T23:13:53Z
 
 **Project status:** Active — git remote: https://github.com/trueshpen/math_game
 <!-- AUTO-GENERATED: END -->
