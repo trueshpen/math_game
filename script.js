@@ -1,5 +1,5 @@
 // Bump APP_VERSION together with the ?v= values in index.html whenever this file changes.
-const APP_VERSION = '2026-10-07.1';
+const APP_VERSION = '2026-10-07.2';
 
 // A page the browser cached from another version may still load this file (the
 // server keeps no old copies). The page asks for script.js?v=<its version>; if that
@@ -3478,6 +3478,28 @@ const CZ_IY = [
     ['iy119', 'čern_ havran', 'ý'],
     ['iy120', 'chud_ pán', 'ý'],
     ['iy121', 'tenk_ papír', 'ý'],
+    // From Leon's September test (the ones he got wrong: týden is here already, připravuje, tílko,
+    // trenky) and the rest of its words; při- or pří- like připravuje
+    ['iy122', 'škola v př_rodě', 'í'],
+    ['iy123', 'př_pravuje si batoh', 'i'],
+    ['iy124', 'sbalit si věc_', 'i'],
+    ['iy125', 'J_zerské hory', 'i'],
+    ['iy126', 'malý kufř_k', 'í'],
+    ['iy127', 'dva provázk_', 'y'],
+    ['iy128', 'ostrý nož_k', 'í'],
+    ['iy129', 'teplé oblečen_', 'í'],
+    ['iy130', 'nasadit si čepic_', 'i'],
+    ['iy131', 'dvě mikin_', 'y'],
+    ['iy132', 'dlouhé kalhot_', 'y'],
+    ['iy133', 'bílé t_lko', 'í'],
+    ['iy134', 'nové trenk_', 'y'],
+    ['iy135', 'vlněné ponožk_', 'y'],
+    ['iy136', 'měkké bačkor_', 'y'],
+    ['iy137', 'oblíbené hračk_', 'y'],
+    ['iy138', 'malý Jen_k', 'í'],
+    ['iy139', 'př_jít domů', 'i'],
+    ['iy140', 'dobrý př_tel', 'í'],
+    ['iy141', 'počítat př_klad', 'í'],
 ];
 const CZ_UU = [
     ['uu01', 'zavřená _sta', 'ú'],
@@ -3559,6 +3581,22 @@ const CZ_UU = [
     ['uu74', 'mořská m_šle', 'u'],
     ['uu75', 'jdeme k dom_', 'u'],
     ['uu76', 'sedneme si ke stol_', 'u'],
+    // From Leon's September test (he wrote ú in strýcův and půjdu) and more -ův
+    ['uu77', 'st_j rovně', 'ů'],
+    ['uu78', '_dusat hlínu', 'u'],
+    ['uu79', 'položit otázk_', 'u'],
+    ['uu80', 'chytat _hoře', 'ú'],
+    ['uu81', '_klidové práce', 'ú'],
+    ['uu82', 'strýc_v statek', 'ů'],
+    ['uu83', 'kouzelná h_lka', 'ů'],
+    ['uu84', 'dlouhá šň_ra', 'ů'],
+    ['uu85', 'to je sm_la', 'ů'],
+    ['uu86', 'psát _hledně', 'ú'],
+    ['uu87', 'p_jdu nakoupit', 'ů'],
+    ['uu88', 'slova _těchy', 'ú'],
+    ['uu89', 'rychlá ch_ze', 'ů'],
+    ['uu90', 'tát_v klobouk', 'ů'],
+    ['uu91', 'bratr_v pokoj', 'ů'],
 ];
 // [id, phrase, answer, check word]
 const CZ_PAIRS = [
@@ -3679,6 +3717,17 @@ const CZ_PAIRS = [
     ['pc111', 'lá_ka přes potok', 'v', 'lávek'],
     ['pc112', 'hou_ka s máslem', 's', 'housek'],
     ['pc113', 'malá mu_ka', 'š', 'mušek'],
+    // From Leon's September test (he wrote p in hřib, š in tužka, d in pohovka) - where there is
+    // something to check: the consonant at the end of a word or before another consonant
+    ['pc114', 'jedlý hři_', 'b', 'hřiby'],
+    ['pc115', 'pohodlná poho_ka', 'v', 'pohovek'],
+    ['pc116', 'sladká broske_', 'v', 'broskve'],
+    ['pc117', 'chlupatý medvě_', 'd', 'medvěda'],
+    ['pc118', 'veselá sva_ba', 't', 'svatební'],
+    ['pc119', 'ilustrovaná kní_ka', 'ž', 'knížek'],
+    ['pc120', 'čokoládový dor_', 't', 'dorty'],
+    ['pc121', 'televizní pořa_', 'd', 'pořady'],
+    ['pc122', 'ohřívaný obě_', 'd', 'obědy'],
 ];
 // [id, phrase, answer, check]: bě, pě, vě, mě without j/n; bje, vje where a prefix (ob-, v-)
 // meets a word with j (check: the parts); mně where a related word has n (check: that word)
@@ -3717,6 +3766,12 @@ const CZ_BPVM = [
     ['bv32', 'tem_ modrá', 'ně', 'temný'],
     ['bv33', 'bydlí skrom_', 'ně', 'skromný'],
     ['bv34', 'tajem_ se usmál', 'ně', 'tajemný'],
+    // From Leon's September test (words he wrote whole)
+    ['bv35', 'buchty v troub_', 'ě'],
+    ['bv36', 'hráb_ na zahradě', 'ě'],
+    ['bv37', 'velký medv_d', 'ě'],
+    ['bv38', 'm_síc na obloze', 'ě'],
+    ['bv39', 'krásné kv_tiny', 'ě'],
 ];
 const CZ_ITEMS = [
     ...CZ_IY.map(([id, text, answer]) => ({ cat: 'iy', id, text, answer })),
@@ -3734,11 +3789,18 @@ const CZ_TEST_MIN_PER_KIND = 2;                  // (every kind in every test, h
 const CZ_STATS_KEY = 'km_cz_stats';              // per kind: the last answers, 1 right / 0 wrong
 const CZ_STATS_KEEP = 30;
 const CZ_STATS_SHOW_AFTER = 5;                   // (the menu shows a kind's share from this many answers)
-const CZ_MISSED_KEY = 'km_cz_missed';            // ids answered wrong (until answered right)
-const CZ_WAIT_KEY = 'km_cz_wait';                // ids left out of a round for a word they would give away: rounds waited
-const CZ_DECK_PREFIX = 'km_cz_deck_';            // + category: ids not asked yet in this pass
-// (a kind that got new words starts a new pass, so they come at once: u – ú – ů 1 Oct, i/y and paired 7 Oct)
+const CZ_MISSED_KEY = 'km_cz_missed2';           // ids answered wrong (until answered right): see czLoadMissed
+const CZ_OLD_MISSED_KEY = 'km_cz_missed';
+const CZ_WAIT_KEY = 'km_cz_wait2';               // ids left out of a round for a word they would give away: rounds waited
+const CZ_PASS_PREFIX = 'km_cz_pass_';            // + kind: the pass through its words (see czLoadPass)
+// Where versions before 2026-10-07.2 kept the pass (the words not asked yet, those waiting left out)
+// and the words waiting: read once per kind to carry the pass over - such a version never sees the
+// new records, nor do they see what it writes later
+const CZ_DECK_PREFIX = 'km_cz_deck_';
 const CZ_DECK_KEYS = { uu: 'km_cz_deck_uu2', iy: 'km_cz_deck_iy2', pairs: 'km_cz_deck_pairs2' };
+const CZ_OLD_WAIT_KEY = 'km_cz_wait';
+// ...and the highest word number of each kind such a pass knew
+const CZ_PASS_KNEW = { iy: 121, uu: 76, pairs: 113, bpvm: 34 };
 const CZ_SOFT = ['ž', 'š', 'č', 'ř', 'c', 'j'];
 const CZ_HARD = ['h', 'ch', 'k', 'r'];
 const CZ_DTN_SOFT = { d: 'ď', t: 'ť', n: 'ň' };  // d, t, n: soft or hard by how they sound
@@ -3871,13 +3933,46 @@ function czSaveIds(key, ids) {
     saveChoice(key, JSON.stringify(ids));
 }
 
+// A pass through a kind's words: every word of it not asked yet (those waiting for their
+// turn too) and, in the same record, the highest word number the pass knew - ["#141",
+// "iy07", ...] - so the two are always written together. With no record yet, the pass an
+// older version kept is carried over once (it knew CZ_PASS_KNEW), the words it had waiting
+// first.
+function czLoadPass(cat) {
+    const read = key => {
+        try {
+            return JSON.parse(lsGet(key));
+        } catch (_) {
+            return null;
+        }
+    };
+    const ofKind = raw => [...new Set(raw.filter(id => CZ_BY_ID.has(id) && CZ_BY_ID.get(id).cat === cat))];
+    const record = read(CZ_PASS_PREFIX + cat);
+    if (Array.isArray(record)) {
+        const mark = record.find(x => typeof x === 'string' && /^#\d+$/.test(x));
+        return { saved: true, knew: mark ? Number(mark.slice(1)) : Infinity, ids: ofKind(record) };
+    }
+    const older = read(CZ_DECK_KEYS[cat] || CZ_DECK_PREFIX + cat);
+    if (!Array.isArray(older)) return { saved: false, knew: 0, ids: [] };
+    const waited = read(CZ_OLD_WAIT_KEY);
+    const first = waited && typeof waited === 'object' && !Array.isArray(waited) ? Object.keys(waited) : [];
+    return { saved: true, knew: CZ_PASS_KNEW[cat] || 0, ids: ofKind([...first, ...older]) };
+}
+
 // (the test: every kind)
 function czOfKind(item, cat) {
     return cat === 'test' || item.cat === cat;
 }
 
+// The words answered wrong, until answered right. With no list of its own yet, the one an
+// older version kept is carried over; such a version keeps writing only its own (it drops
+// the words it does not know from any list it saves)
+function czLoadMissed() {
+    return czLoadIds(lsGet(CZ_MISSED_KEY) === null ? CZ_OLD_MISSED_KEY : CZ_MISSED_KEY);
+}
+
 function czMissedIn(cat) {
-    return czLoadIds(CZ_MISSED_KEY).filter(id => CZ_BY_ID.has(id) && czOfKind(CZ_BY_ID.get(id), cat));
+    return czLoadMissed().filter(id => CZ_BY_ID.has(id) && czOfKind(CZ_BY_ID.get(id), cat));
 }
 
 // Questions that give each other away: what one puts on the screen - its
@@ -3984,26 +4079,47 @@ function czBuildRound(sizes) {
 
 // A kind's share from its pass: a shuffled pass through all its words, saved,
 // so the rounds - practice and test alike - go through every word before any
-// comes again (words waiting come on their own). When the pass runs out, a new
-// one starts with the words of this round at its end, so none is left out of it.
+// comes again. The saved pass holds every word of it not asked yet, those
+// waiting for their turn too (the waiting list only says which come first), so
+// a word left out of a round is never lost from it. When the pass runs out, a
+// new one starts with the words of this round at its end, so none is left out.
 function czFillFromPass(cat, size, round, left, waiting) {
     const all = CZ_ITEMS.filter(item => item.cat === cat).map(item => item.id);
     const target = Math.min(size, all.length);
     const ofKind = () => round.filter(id => CZ_BY_ID.get(id).cat === cat).length;
-    const skip = id => round.includes(id) || left.includes(id) || waiting.includes(id);
-    const deckKey = CZ_DECK_KEYS[cat] || CZ_DECK_PREFIX + cat;
-    let deck = czLoadIds(deckKey).filter(id => CZ_BY_ID.get(id).cat === cat);
+    const pass = czLoadPass(cat);
+    let deck = pass.ids;
+    const number = id => Number(id.replace(/\D/g, ''));
+    if (pass.saved) {
+        // (words added to the game since the pass began join it at once, anywhere in it: the words
+        // are numbered in order, so those above the highest number the pass knew are new)
+        all.filter(id => number(id) > pass.knew && !deck.includes(id) && !round.includes(id))
+            .forEach(id => deck.splice(Math.floor(Math.random() * (deck.length + 1)), 0, id));
+        // (and a word waiting for its turn is in the pass, at its front)
+        waiting.filter(id => CZ_BY_ID.get(id).cat === cat && !deck.includes(id) && !round.includes(id))
+            .forEach(id => deck.unshift(id));
+    }
+    const kept = [], tail = [];
     for (let refills = 0; ofKind() < target;) {
         if (!deck.length) {
             if (refills++ === 2) break; // (only words that would give others away are left)
-            deck = shuffleInPlace(all.filter(id => !skip(id))).concat(all.filter(id => round.includes(id)));
+            tail.push(...all.filter(id => round.includes(id) && !tail.includes(id)));
+            deck = shuffleInPlace(all.filter(id => !round.includes(id) && !kept.includes(id))).concat(tail);
         }
         const id = deck.shift();
-        if (skip(id)) continue;
-        if (czClash(id, round)) left.push(id);
-        else round.push(id);
+        if (round.includes(id) || kept.includes(id)) continue;
+        if (left.includes(id) || waiting.includes(id) || czClash(id, round)) {
+            // (not now - it would give a word of this round away, or waits for its turn: it stays
+            // in the pass, at its front)
+            if (!left.includes(id) && !waiting.includes(id)) left.push(id);
+            kept.push(id);
+            continue;
+        }
+        round.push(id);
     }
-    czSaveIds(deckKey, deck);
+    // (a word asked in this round is done in this pass - unless the round began a new one)
+    deck = deck.filter(id => tail.includes(id) || !round.includes(id));
+    czSaveIds(CZ_PASS_PREFIX + cat, ['#' + Math.max(...all.map(number)), ...kept, ...deck]); // (the mark first: see czLoadPass)
 }
 
 // A practice round: words of its kind. The test: every kind mixed, more of the
@@ -4056,7 +4172,7 @@ function czNoteStats(cat, right) {
 
 // A word answered wrong comes back in practice until it is answered right
 function czNoteAnswer(item, right) {
-    const missed = czLoadIds(CZ_MISSED_KEY).filter(id => id !== item.id);
+    const missed = czLoadMissed().filter(id => id !== item.id);
     if (!right) missed.push(item.id);
     czSaveIds(CZ_MISSED_KEY, missed);
 }
