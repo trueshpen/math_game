@@ -1037,11 +1037,12 @@ lang-fx.sr {
 #czIyBtn { --tint: #f1e6ff; --edge: #9b6ad6; --name: #55268a; }
 #czUuBtn { --tint: #ffe6f1; --edge: #de6d9c; --name: #9c1f53; }
 #czPairsBtn { --tint: #e3f1ff; --edge: #5b9bd6; --name: #1c5690; }
+#czBpvmBtn { --tint: #e3f6e9; --edge: #4fae74; --name: #1d6b40; }
 #czTestBtn { --tint: #fff2cc; --edge: #e0a82e; --name: #7a4d00; }
 
-/* Czech: the three kinds of tasks side by side, the test across below them */
+/* Czech: the four kinds of tasks two by two, the test across below them */
 .game-selection[data-count="czech"] {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .cz-icon {
@@ -1050,6 +1051,18 @@ lang-fx.sr {
     font-weight: 700;
     letter-spacing: 3px;
     color: var(--name);
+    white-space: nowrap;
+}
+
+/* (a kind's share of right answers lately) */
+.cz-stats {
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: var(--tint);
+    color: var(--name);
+    font-size: 0.82rem;
+    font-weight: 900;
+    line-height: 1.35;
     white-space: nowrap;
 }
 
@@ -2641,11 +2654,14 @@ lang-fx.sr {
         padding-right: 0;
     }
 
-    /* (a Czech card may have a third line: words to practise again) */
+    /* (a Czech card may have two more lines: its share of right answers, words to practise again;
+       its letters closer together, so "d/t ž/š" fits the 92px column) */
     .game-selection[data-count="czech"] .game-icon {
-        grid-row: 1 / 4;
+        grid-row: 1 / 5;
+        letter-spacing: 1px;
     }
 
+    .game-selection[data-count="czech"] .cz-stats,
     .game-selection[data-count="czech"] .cz-review-badge {
         justify-self: start;
     }

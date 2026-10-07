@@ -1,5 +1,5 @@
 // Bump APP_VERSION together with the ?v= values in index.html whenever this file changes.
-const APP_VERSION = '2026-10-02.3';
+const APP_VERSION = '2026-10-07.1';
 
 // A page the browser cached from another version may still load this file (the
 // server keeps no old copies). The page asks for script.js?v=<its version>; if that
@@ -44,7 +44,7 @@ const translations = {
         'age.biggerKids.desc2': '🚀 Level Up Your Skills 🚀',
         'age.czech': 'Czech',
         'age.czech.ages': 'Ages 7–10',
-        'age.czech.desc1': 'i/y, u/ú/ů & paired consonants',
+        'age.czech.desc1': 'i/y, u/ú/ů, bě/pě/vě/mě & paired consonants',
         'age.czech.desc2': '✏️ 2nd grade review ✏️',
         'age.play': 'Play ▶',
         // Home
@@ -59,6 +59,9 @@ const translations = {
         'game.cz_uu.name': 'u – ú – ů',
         'game.cz_uu.desc': 'short u, or long ú/ů',
         'game.cz_pairs.name': 'Paired consonants',
+        'game.cz_bpvm.name': 'bě/pě/vě/mě',
+        'cz.stats': '✓ {p} % right',
+        'cz.stats.title': 'Right in the last {n} answers',
         'game.cz_test.name': 'Test',
         'game.cz_test.desc': 'Everything mixed · 20 questions',
         'cz.review.one': '🔁 {n} word to practice again',
@@ -67,6 +70,7 @@ const translations = {
         'cz.q.iy': 'Fill in {x} or {y}',
         'cz.q.uu': 'Fill in {x}, {y} or {z}',
         'cz.q.pairs': 'Fill in the paired consonant',
+        'cz.q.bpvm': 'Fill in {x} or {y}',
         'cz.why.soft': '“{c}” is a soft consonant → we write {letters}',
         'cz.why.hard': '“{c}” is a hard consonant → we write {letters}',
         'cz.why.dtnSoft': '“{cv}” sounds soft, like “{sv}” → we write {letters}',
@@ -80,6 +84,10 @@ const translations = {
         'cz.why.uLongInside': 'It is long here – inside a word we write {a}',
         'cz.why.uLongEnd': 'It is long here – at the end of a word we write {a}',
         'cz.why.pair': 'Check with “{check}” – you can hear “{a}”',
+        'cz.why.bpvE': 'In the syllable “{s}” there is no j',
+        'cz.why.prefixJ': 'A prefix and then j: {split} → we write “{s}”',
+        'cz.why.meE': 'There is no “{mn}” in this word → we write “{s}”',
+        'cz.why.mne': 'Check with “{check}” – it has an n → we write “{s}”',
         'cz.correctIs': 'Correct:',
         'cz.next': 'Continue ▶',
         'cz.aria.blank': 'missing letter',
@@ -162,6 +170,8 @@ const translations = {
         'gameTitles.cz_iy.short': 'i/í – y/ý',
         'gameTitles.cz_uu.long': 'u – ú – ů',
         'gameTitles.cz_uu.short': 'u – ú – ů',
+        'gameTitles.cz_bpvm.long': 'bě/pě/vě/mě',
+        'gameTitles.cz_bpvm.short': 'bě/pě/vě/mě',
         'gameTitles.cz_pairs.long': 'Paired consonants',
         'gameTitles.cz_pairs.short': 'Paired consonants',
         'gameTitles.cz_test.long': 'Czech test',
@@ -259,7 +269,7 @@ const translations = {
         'age.biggerKids.desc2': '🚀 Zlepši své dovednosti 🚀',
         'age.czech': 'Čeština',
         'age.czech.ages': 'Věk 7–10',
-        'age.czech.desc1': 'i/y, u/ú/ů a párové souhlásky',
+        'age.czech.desc1': 'i/y, u/ú/ů, bě/pě/vě/mě a párové souhlásky',
         'age.czech.desc2': '✏️ Opakování 2. třídy ✏️',
         'age.play': 'Hrát ▶',
         'home.title': '🍎 Dětská matematika 🍊',
@@ -272,6 +282,9 @@ const translations = {
         'game.cz_uu.name': 'u – ú – ů',
         'game.cz_uu.desc': 'krátké u, nebo dlouhé ú/ů',
         'game.cz_pairs.name': 'Párové souhlásky',
+        'game.cz_bpvm.name': 'bě/pě/vě/mě',
+        'cz.stats': '✓ {p} % správně',
+        'cz.stats.title': 'Správně v posledních {n} odpovědích',
         'game.cz_test.name': 'Test',
         'game.cz_test.desc': 'Všechno namíchané · 20 otázek',
         'cz.review.one': '🔁 {n} slovo k opakování',
@@ -280,6 +293,7 @@ const translations = {
         'cz.q.iy': 'Doplň {x} nebo {y}',
         'cz.q.uu': 'Doplň {x}, {y} nebo {z}',
         'cz.q.pairs': 'Doplň párovou souhlásku',
+        'cz.q.bpvm': 'Doplň {x} nebo {y}',
         'cz.why.soft': '„{c}“ je měkká souhláska → píšeme {letters}',
         'cz.why.hard': '„{c}“ je tvrdá souhláska → píšeme {letters}',
         'cz.why.dtnSoft': '„{cv}“ zní měkce, jako „{sv}“ → píšeme {letters}',
@@ -293,6 +307,10 @@ const translations = {
         'cz.why.uLongInside': 'Tady je dlouhé – uprostřed slova píšeme {a}',
         'cz.why.uLongEnd': 'Tady je dlouhé – na konci slova píšeme {a}',
         'cz.why.pair': 'Ověř si slovem „{check}“ – slyšíš „{a}“',
+        'cz.why.bpvE': 'Ve slabice „{s}“ se j nepíše',
+        'cz.why.prefixJ': 'Předpona a za ní j: {split} → píšeme „{s}“',
+        'cz.why.meE': 'Ve slově není „{mn}“ → píšeme „{s}“',
+        'cz.why.mne': 'Ověř si slovem „{check}“ – je tam n → píšeme „{s}“',
         'cz.correctIs': 'Správně:',
         'cz.next': 'Pokračovat ▶',
         'cz.aria.blank': 'vynechané písmeno',
@@ -371,6 +389,8 @@ const translations = {
         'gameTitles.cz_iy.short': 'i/í – y/ý',
         'gameTitles.cz_uu.long': 'u – ú – ů',
         'gameTitles.cz_uu.short': 'u – ú – ů',
+        'gameTitles.cz_bpvm.long': 'bě/pě/vě/mě',
+        'gameTitles.cz_bpvm.short': 'bě/pě/vě/mě',
         'gameTitles.cz_pairs.long': 'Párové souhlásky',
         'gameTitles.cz_pairs.short': 'Párové souhlásky',
         'gameTitles.cz_test.long': 'Test z češtiny',
@@ -1842,7 +1862,7 @@ function updateGameTitles() {
         gameHeaderTitle.textContent = t(`gameTitles.${selectedGame}.short`);
     }
     // (the Czech kinds named by their letters: said the Czech way)
-    if (selectedGame === 'cz_iy' || selectedGame === 'cz_uu') gameHeaderTitle.lang = 'cs';
+    if (selectedGame === 'cz_iy' || selectedGame === 'cz_uu' || selectedGame === 'cz_bpvm') gameHeaderTitle.lang = 'cs';
     else gameHeaderTitle.removeAttribute('lang');
 }
 
@@ -3427,6 +3447,37 @@ const CZ_IY = [
     ['iy90', 'siln_ vítr', 'ý'],
     ['iy91', 'zelen_ strom', 'ý'],
     ['iy92', 'děda čte novin_', 'y'],
+    // More after hard and soft consonants (and d, t, n by sound) - chosen so that no
+    // word shows another question's answer filled in (the test mixes them)
+    ['iy93', 'h_bat rukou', 'ý'],
+    ['iy94', 'ch_stat se na výlet', 'y'],
+    ['iy95', 'k_tice ve váze', 'y'],
+    ['iy96', 'k_vat hlavou', 'ý'],
+    ['iy97', 'r_tíř na koni', 'y'],
+    ['iy98', 'r_s v horách', 'y'],
+    ['iy99', 'd_rka v plotě', 'í'],
+    ['iy100', 'd_ky za dárek', 'í'],
+    ['iy101', 'd_vat se z okna', 'í'],
+    ['iy102', 't_kev na poli', 'y'],
+    ['iy103', 't_skárna u počítače', 'i'],
+    ['iy104', 'n_čeho se nebojí', 'i'],
+    ['iy105', 'podzimn_ listí', 'í'],
+    ['iy106', 'jarn_ den', 'í'],
+    ['iy107', 'ž_dle v kuchyni', 'i'],
+    ['iy108', 'ž_la na ruce', 'í'],
+    ['iy109', 'š_ška z borovice', 'i'],
+    ['iy110', 'š_roká řeka', 'i'],
+    ['iy111', 'učím se š_t jehlou', 'í'],
+    ['iy112', 'č_slo pokoje', 'í'],
+    ['iy113', 'ř_kat pravdu', 'í'],
+    ['iy114', 'ptačí kř_dlo', 'í'],
+    ['iy115', 'c_tit zimu', 'í'],
+    ['iy116', 'j_t do školy', 'í'],
+    ['iy117', 'malá j_zva', 'i'],
+    ['iy118', 'tvrd_ oříšek', 'ý'],
+    ['iy119', 'čern_ havran', 'ý'],
+    ['iy120', 'chud_ pán', 'ý'],
+    ['iy121', 'tenk_ papír', 'ý'],
 ];
 const CZ_UU = [
     ['uu01', 'zavřená _sta', 'ú'],
@@ -3459,7 +3510,7 @@ const CZ_UU = [
     ['uu27', 'rychlý _tok', 'ú'],
     ['uu28', 'nový _čes', 'ú'],
     ['uu29', '_těk z klece', 'ú'],
-    ['uu30', 'městský _řad', 'ú'],
+    ['uu30', 'obecní _řad', 'ú'],
     ['uu31', 'zaplatit _čet', 'ú'],
     ['uu32', 'rychlý k_ň', 'ů'],
     ['uu33', 'kuchyňský st_l', 'ů'],
@@ -3489,7 +3540,7 @@ const CZ_UU = [
     ['uu55', '_kázat cestu', 'u'],
     ['uu56', 'paní _čitelka', 'u'],
     ['uu57', '_tíkat před deštěm', 'u'],
-    ['uu58', '_vařit oběd', 'u'],
+    ['uu58', '_vařit polévku', 'u'],
     ['uu59', 'černé _hlí', 'u'],
     ['uu60', 'bílý _brus', 'u'],
     ['uu61', '_snout v posteli', 'u'],
@@ -3608,20 +3659,86 @@ const CZ_PAIRS = [
     ['pc93', 'velký kru_', 'h', 'kruhy'],
     ['pc94', 'dobrý slu_', 'ch', 'sluchu'],
     ['pc95', 'sladký tvaro_', 'h', 'tvarohu'],
+    // Inside a word: the consonant before another consonant, checked by a related
+    // word where a vowel follows it
+    ['pc96', 'ka_ka vody', 'p', 'kapat'],
+    ['pc97', 'le_ký batoh', 'h', 'lehoučký'],
+    ['pc98', 'há_ka dětí', 'd', 'hádat'],
+    ['pc99', 'dlouhá prochá_ka', 'z', 'procházet'],
+    ['pc100', 'tu_ka a papír', 'ž', 'tužek'],
+    ['pc101', 'lo_ka na řece', 'ď', 'lodička'],
+    ['pc102', 'malá no_ka', 'ž', 'nožička'],
+    ['pc103', 'ry_ka v potoce', 'b', 'rybička'],
+    ['pc104', 'červená stu_ka', 'ž', 'stužek'],
+    ['pc105', 'dí_ka s mašlí', 'v', 'dívenka'],
+    ['pc106', 'bu_ka pro ptáky', 'd', 'bouda'],
+    ['pc107', 'veselá lou_ka', 't', 'loutek'],
+    ['pc108', 'klu_ký led', 'z', 'klouzat'],
+    ['pc109', 'stará ba_ka', 'b', 'babička'],
+    ['pc110', 'ža_ka v rákosí', 'b', 'žabička'],
+    ['pc111', 'lá_ka přes potok', 'v', 'lávek'],
+    ['pc112', 'hou_ka s máslem', 's', 'housek'],
+    ['pc113', 'malá mu_ka', 'š', 'mušek'],
+];
+// [id, phrase, answer, check]: bě, pě, vě, mě without j/n; bje, vje where a prefix (ob-, v-)
+// meets a word with j (check: the parts); mně where a related word has n (check: that word)
+const CZ_BPVM = [
+    ['bv01', 'ob_d ve škole', 'ě'],
+    ['bv02', 'b_hat po hřišti', 'ě'],
+    ['bv03', 'b_žet do školy', 'ě'],
+    ['bv04', 'b_hem dne', 'ě'],
+    ['bv05', 'zab_hnout za kamarádem', 'ě'],
+    ['bv06', 'ob_t jezero', 'je', 'ob-jet'],
+    ['bv07', 'velký ob_m', 'je', 'ob-jem'],
+    ['bv08', 'ob_vit hnízdo', 'je', 'ob-jevit'],
+    ['bv09', 'ob_dnat lístky', 'je', 'ob-jednat'],
+    ['bv10', 'v_c na stole', 'ě'],
+    ['bv11', 'suchá v_tev', 'ě'],
+    ['bv12', 'v_řit pohádce', 'ě'],
+    ['bv13', 'zv_davý kluk', 'ě'],
+    ['bv14', 'v_trný den', 'ě'],
+    ['bv15', 'vlak může v_t do tunelu', 'je', 'v-jet'],
+    ['bv16', 'v_zd na dálnici', 'je', 'v-jezd'],
+    ['bv17', 'p_t prstů', 'ě'],
+    ['bv18', 'op_t prší', 'ě'],
+    ['bv19', 'do školy p_šky', 'ě'],
+    ['bv20', 'bílá p_na', 'ě'],
+    ['bv21', 'zavřená p_st', 'ě'],
+    ['bv22', 'velké m_sto', 'ě'],
+    ['bv23', 'm_řit délku', 'ě'],
+    ['bv24', 'velká zm_na', 'ě'],
+    ['bv25', 'staré nám_stí', 'ě'],
+    ['bv26', 'm_lká voda', 'ě'],
+    ['bv27', 'zapom_l klíče', 'ně', 'zapomenout'],
+    ['bv28', 'vzpom_l si', 'ně', 'vzpomenout'],
+    ['bv29', 'jem_ zpívat', 'ně', 'jemný'],
+    ['bv30', 'je tu příjem_ teplo', 'ně', 'příjemný'],
+    ['bv31', 'mluví rozum_', 'ně', 'rozumný'],
+    ['bv32', 'tem_ modrá', 'ně', 'temný'],
+    ['bv33', 'bydlí skrom_', 'ně', 'skromný'],
+    ['bv34', 'tajem_ se usmál', 'ně', 'tajemný'],
 ];
 const CZ_ITEMS = [
     ...CZ_IY.map(([id, text, answer]) => ({ cat: 'iy', id, text, answer })),
     ...CZ_UU.map(([id, text, answer]) => ({ cat: 'uu', id, text, answer })),
     ...CZ_PAIRS.map(([id, text, answer, check]) => ({ cat: 'pairs', id, text, answer, check })),
+    ...CZ_BPVM.map(([id, text, answer, check]) => ({ cat: 'bpvm', id, text, answer, check })),
 ];
 const CZ_BY_ID = new Map(CZ_ITEMS.map(item => [item.id, item]));
 const CZ_PAIR_SETS = [['b', 'p'], ['d', 't'], ['ď', 'ť'], ['z', 's'], ['ž', 'š'], ['v', 'f'], ['h', 'ch']];
-const CZ_GAMES = { cz_iy: 'iy', cz_uu: 'uu', cz_pairs: 'pairs', cz_test: 'test' };
+const CZ_GAMES = { cz_iy: 'iy', cz_uu: 'uu', cz_pairs: 'pairs', cz_bpvm: 'bpvm', cz_test: 'test' };
+const CZ_KINDS = ['iy', 'uu', 'pairs', 'bpvm'];
 const CZ_ROUND = 10;                             // questions in a practice round
 const CZ_TEST_SIZE = 20;                         // the test: every kind mixed, played like practice
+const CZ_TEST_MIN_PER_KIND = 2;                  // (every kind in every test, however well it goes)
+const CZ_STATS_KEY = 'km_cz_stats';              // per kind: the last answers, 1 right / 0 wrong
+const CZ_STATS_KEEP = 30;
+const CZ_STATS_SHOW_AFTER = 5;                   // (the menu shows a kind's share from this many answers)
 const CZ_MISSED_KEY = 'km_cz_missed';            // ids answered wrong (until answered right)
+const CZ_WAIT_KEY = 'km_cz_wait';                // ids left out of a round for a word they would give away: rounds waited
 const CZ_DECK_PREFIX = 'km_cz_deck_';            // + category: ids not asked yet in this pass
-const CZ_DECK_KEYS = { uu: 'km_cz_deck_uu2' };     // (u – ú – ů: a new pass with the short-u words)
+// (a kind that got new words starts a new pass, so they come at once: u – ú – ů 1 Oct, i/y and paired 7 Oct)
+const CZ_DECK_KEYS = { uu: 'km_cz_deck_uu2', iy: 'km_cz_deck_iy2', pairs: 'km_cz_deck_pairs2' };
 const CZ_SOFT = ['ž', 'š', 'č', 'ř', 'c', 'j'];
 const CZ_HARD = ['h', 'ch', 'k', 'r'];
 const CZ_DTN_SOFT = { d: 'ď', t: 'ť', n: 'ň' };  // d, t, n: soft or hard by how they sound
@@ -3650,6 +3767,7 @@ function isCzechGame(game) {
 function czOptions(item) {
     if (item.cat === 'iy') return ['i', 'í', 'y', 'ý'];
     if (item.cat === 'uu') return ['u', 'ú', 'ů'];
+    if (item.cat === 'bpvm') return czConsonantBefore(item) === 'm' ? ['ě', 'ně'] : ['ě', 'je'];
     return CZ_PAIR_SETS.find(pair => pair.includes(item.answer));
 }
 
@@ -3684,6 +3802,12 @@ function czWhy(item, chosen) {
         const place = i === 0 || item.text[i - 1] === ' ' ? 'Start' : i === item.text.length - 1 || item.text[i + 1] === ' ' ? 'End' : 'Inside';
         return [chosen === 'u' ? `cz.why.uLong${place}` : `cz.why.u${place}`, { a }];
     }
+    if (item.cat === 'bpvm') {
+        const c = czConsonantBefore(item);
+        if (a === 'je') return ['cz.why.prefixJ', { split: item.check, s: c + 'je' }];
+        if (a === 'ně') return ['cz.why.mne', { check: item.check, s: 'mně' }];
+        return c === 'm' ? ['cz.why.meE', { mn: 'mn', s: 'mě' }] : ['cz.why.bpvE', { s: c + 'ě' }];
+    }
     return ['cz.why.pair', { check: item.check, a }];
 }
 
@@ -3711,7 +3835,8 @@ function tCzech(key, vars) {
 
 // The instruction above the word
 function czInstruction(item) {
-    const letters = { iy: { x: 'i/í', y: 'y/ý' }, uu: { x: 'u', y: 'ú', z: 'ů' }, pairs: {} }[item.cat];
+    const [x, y] = czOptions(item);
+    const letters = { iy: { x: 'i/í', y: 'y/ý' }, uu: { x: 'u', y: 'ú', z: 'ů' }, pairs: {}, bpvm: { x, y } }[item.cat];
     return tCzech(`cz.q.${item.cat}`, letters);
 }
 
@@ -3755,23 +3880,178 @@ function czMissedIn(cat) {
     return czLoadIds(CZ_MISSED_KEY).filter(id => CZ_BY_ID.has(id) && czOfKind(CZ_BY_ID.get(id), cat));
 }
 
-// A round: first (up to half the round) words answered wrong before - they
-// come back until answered right - then the next words of a shuffled pass
-// through the whole kind (saved, so the rounds go through every word). The
-// test is a round like that of every kind mixed, twice as long.
-function czPracticeRound(cat) {
-    const all = CZ_ITEMS.filter(item => czOfKind(item, cat)).map(item => item.id);
-    const size = Math.min(cat === 'test' ? CZ_TEST_SIZE : CZ_ROUND, all.length);
-    const round = czMissedIn(cat).slice(0, Math.ceil(size / 2));
+// Questions that give each other away: what one puts on the screen - its
+// phrase, its filled word once answered, its check word after a mistake -
+// shows the other's answer with its neighbours in the word, vowel length aside
+// ("ry_ka" the y of "r_ba"; once answered, "kytice" the y of "k_tka" and "loď"
+// the ď of "lo_ka"; "chleba" the b of "chlé_"; the check word "sedí" the í of
+// "sed_"). They never come in the same round; the other one waits for a later
+// round. (Worked out once, when needed.)
+const CZ_SHORT = { 'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u', 'ů': 'u', 'ý': 'y' };
+const czShort = text => text.replace(/[áéíóúůý]/g, ch => CZ_SHORT[ch]);
+let czClues = null;
+function czGiveaways() {
+    if (czClues) return czClues;
+    const info = CZ_ITEMS.map(item => {
+        const blank = item.text.indexOf('_');
+        const filled = czFilled(item).toLowerCase();
+        const start = item.text.lastIndexOf(' ', blank) + 1;
+        const end = (filled + ' ').indexOf(' ', blank);
+        const word = filled.slice(start, end), at = blank - start, answer = item.answer.toLowerCase();
+        // (the answer with letters of its word around it: at least two of them)
+        const clues = [[2, 1], [1, 2], [3, 0], [0, 3]].map(([before, after]) => {
+            const from = Math.max(0, at - before);
+            return { text: czShort(word.slice(from, at + answer.length + after)), offset: at - from };
+        }).filter(clue => clue.text.length >= answer.length + 2);
+        // (and its word from the start up to the answer, at the start of a word: "vje" of vjet in "vjezd")
+        const head = czShort(word.slice(0, Math.max(3, at + answer.length)));
+        if (head.length >= 3) clues.push({ text: head, offset: at, wordStart: true });
+        return { id: item.id, answer, clues, shown: item.check ? `${filled} ${item.check.toLowerCase()}` : filled };
+    });
+    // (all of it in one text, searched once per clue: quick even on a phone)
+    const all = info.map(q => q.shown).join('\n');
+    const allShort = czShort(all);
+    const owner = [];
+    info.forEach((q, i) => {
+        for (let k = 0; k <= q.shown.length; k++) owner.push(i);
+    });
+    czClues = new Map(info.map(q => [q.id, new Set()]));
+    info.forEach((a, ai) => a.clues.forEach(clue => {
+        for (let p = allShort.indexOf(clue.text); p >= 0; p = allShort.indexOf(clue.text, p + 1)) {
+            const bi = owner[p], at = p + clue.offset;
+            if (bi === ai || all.slice(at, at + a.answer.length) !== a.answer) continue; // (its own; another letter there)
+            if (clue.wordStart && p > 0 && !/[\s-]/.test(all[p - 1])) continue;
+            czClues.get(a.id).add(info[bi].id);
+            czClues.get(info[bi].id).add(a.id);
+        }
+    }));
+    return czClues;
+}
+
+function czClash(id, round) {
+    return round.some(other => czGiveaways().get(id).has(other));
+}
+
+// Words left out of a round for a word they would give away, and how many
+// rounds each has waited
+function czLoadWaits() {
+    try {
+        const waits = JSON.parse(lsGet(CZ_WAIT_KEY) || '{}');
+        if (!waits || typeof waits !== 'object' || Array.isArray(waits)) return {};
+        return Object.fromEntries(Object.entries(waits).filter(([id, n]) => CZ_BY_ID.has(id) && Number.isFinite(n) && n > 0));
+    } catch (_) {
+        return {};
+    }
+}
+
+// A round: so many words of each kind (sizes: { kind: how many } - one kind in
+// practice, all four in the test). First the words that had to wait, the
+// longest waiting first; then the words answered wrong before, the oldest
+// first whatever their kind, up to half of each kind's share (one answered
+// wrong again goes to the back); then each kind's pass. A word that would give
+// away one already in the round waits for a later round, and each round it
+// waits it comes before more of the others - so none is left out for good:
+// two that give each other away take turns, however often one comes back wrong.
+function czBuildRound(sizes) {
+    const round = [], left = [];
+    const waits = czLoadWaits();
+    const waiting = Object.keys(waits);
+    const ofKind = cat => round.filter(id => CZ_BY_ID.get(id).cat === cat).length;
+    const offer = id => {
+        if (round.includes(id) || left.includes(id)) return false;
+        if (czClash(id, round)) left.push(id);
+        else round.push(id);
+        return round.includes(id);
+    };
+    waiting.slice().sort((a, b) => waits[b] - waits[a]).forEach(id => {
+        const cat = CZ_BY_ID.get(id).cat;
+        if (sizes[cat] && ofKind(cat) < sizes[cat]) offer(id);
+    });
+    const missedOf = {};
+    czMissedIn('test').forEach(id => {
+        const cat = CZ_BY_ID.get(id).cat;
+        if (!sizes[cat] || (missedOf[cat] || 0) >= Math.ceil(sizes[cat] / 2) || ofKind(cat) >= sizes[cat]) return;
+        if (offer(id)) missedOf[cat] = (missedOf[cat] || 0) + 1;
+    });
+    Object.keys(sizes).forEach(cat => czFillFromPass(cat, sizes[cat], round, left, waiting));
+    // (those left out wait a round more, those asked no more, the others keep their place)
+    const next = {};
+    left.forEach(id => { next[id] = (waits[id] || 0) + 1; });
+    waiting.forEach(id => { if (!round.includes(id) && !(id in next)) next[id] = waits[id]; });
+    saveChoice(CZ_WAIT_KEY, JSON.stringify(next));
+    return round;
+}
+
+// A kind's share from its pass: a shuffled pass through all its words, saved,
+// so the rounds - practice and test alike - go through every word before any
+// comes again (words waiting come on their own). When the pass runs out, a new
+// one starts with the words of this round at its end, so none is left out of it.
+function czFillFromPass(cat, size, round, left, waiting) {
+    const all = CZ_ITEMS.filter(item => item.cat === cat).map(item => item.id);
+    const target = Math.min(size, all.length);
+    const ofKind = () => round.filter(id => CZ_BY_ID.get(id).cat === cat).length;
+    const skip = id => round.includes(id) || left.includes(id) || waiting.includes(id);
     const deckKey = CZ_DECK_KEYS[cat] || CZ_DECK_PREFIX + cat;
-    let deck = czLoadIds(deckKey).filter(id => CZ_BY_ID.has(id) && czOfKind(CZ_BY_ID.get(id), cat));
-    while (round.length < size) {
-        if (!deck.length) deck = shuffleInPlace(all.slice());
+    let deck = czLoadIds(deckKey).filter(id => CZ_BY_ID.get(id).cat === cat);
+    for (let refills = 0; ofKind() < target;) {
+        if (!deck.length) {
+            if (refills++ === 2) break; // (only words that would give others away are left)
+            deck = shuffleInPlace(all.filter(id => !skip(id))).concat(all.filter(id => round.includes(id)));
+        }
         const id = deck.shift();
-        if (!round.includes(id)) round.push(id);
+        if (skip(id)) continue;
+        if (czClash(id, round)) left.push(id);
+        else round.push(id);
     }
     czSaveIds(deckKey, deck);
-    return shuffleInPlace(round);
+}
+
+// A practice round: words of its kind. The test: every kind mixed, more of the
+// kinds the child gets wrong more often (see czTestQuotas).
+function czPracticeRound(cat) {
+    return shuffleInPlace(czBuildRound(cat === 'test' ? czTestQuotas() : { [cat]: CZ_ROUND }));
+}
+
+// How many words of each kind the test asks: in proportion to how often the
+// child got that kind wrong lately (smoothed, so a kind not played yet counts
+// as average), every kind at least CZ_TEST_MIN_PER_KIND
+function czTestQuotas() {
+    const weights = CZ_KINDS.map(cat => {
+        const st = czStatsOf(cat);
+        return (st.answered - st.right + 1) / (st.answered + 3);
+    });
+    const sum = weights.reduce((a, b) => a + b, 0);
+    const quotas = weights.map(w => Math.max(CZ_TEST_MIN_PER_KIND, Math.round(CZ_TEST_SIZE * w / sum)));
+    let total = quotas.reduce((a, b) => a + b, 0);
+    while (total !== CZ_TEST_SIZE) {
+        // (rounding: the largest quota gives or takes the difference)
+        const largest = quotas.indexOf(Math.max(...quotas));
+        quotas[largest] += total < CZ_TEST_SIZE ? 1 : -1;
+        total += total < CZ_TEST_SIZE ? 1 : -1;
+    }
+    return Object.fromEntries(CZ_KINDS.map((cat, i) => [cat, quotas[i]]));
+}
+
+// The last answers of each kind (right or wrong), for the menu and the test
+function czLoadStats() {
+    try {
+        const all = JSON.parse(lsGet(CZ_STATS_KEY) || '{}');
+        return all && typeof all === 'object' && !Array.isArray(all) ? all : {};
+    } catch (_) {
+        return {};
+    }
+}
+
+function czStatsOf(cat) {
+    const marks = String(czLoadStats()[cat] || '').replace(/[^01]/g, '').slice(-CZ_STATS_KEEP);
+    return { answered: marks.length, right: marks.split('1').length - 1 };
+}
+
+function czNoteStats(cat, right) {
+    const all = czLoadStats();
+    const marks = String(all[cat] || '').replace(/[^01]/g, '');
+    all[cat] = (marks + (right ? '1' : '0')).slice(-CZ_STATS_KEEP);
+    saveChoice(CZ_STATS_KEY, JSON.stringify(all));
 }
 
 // A word answered wrong comes back in practice until it is answered right
@@ -3824,6 +4104,7 @@ function czAnswer(chosenLetter, isCorrect, chosen, rightBtn) {
     const item = czItem;
     showFeedback = true;
     czNoteAnswer(item, isCorrect);
+    czNoteStats(item.cat, isCorrect);
     czSetSlot(chosenLetter, isCorrect ? 'is-right' : 'is-wrong');
     if (isCorrect) {
         playCorrectSound();
@@ -3894,15 +4175,30 @@ function renderCzechReview(r) {
     }));
 }
 
-// The Czech menu: how many words of each kind wait to be practised again
+// The Czech menu: each kind's share of right answers lately, and how many of
+// its words wait to be practised again
 function renderCzechMenu() {
     CZECH_GAME_BUTTONS.forEach(btn => {
+        const cat = CZ_GAMES[btn.dataset.game];
+        const stats = btn.querySelector('.cz-stats');
+        if (stats) {
+            const st = czStatsOf(cat);
+            const shown = st.answered >= CZ_STATS_SHOW_AFTER;
+            stats.classList.toggle('hidden', !shown);
+            stats.textContent = shown ? t('cz.stats', { p: Math.round(100 * st.right / st.answered) }) : '';
+            if (shown) stats.title = t('cz.stats.title', { n: st.answered }); else stats.removeAttribute('title');
+        }
         const badge = btn.querySelector('.cz-review-badge');
         if (!badge) return;
-        const n = czMissedIn(CZ_GAMES[btn.dataset.game]).length;
+        const n = czMissedIn(cat).length;
         badge.classList.toggle('hidden', n === 0);
         badge.textContent = n ? tn('cz.review', n) : '';
     });
+    // (which words give each other away: worked out while the child chooses, not on the tap)
+    if (!czClues) {
+        if (window.requestIdleCallback) requestIdleCallback(czGiveaways, { timeout: 2000 });
+        else setTimeout(czGiveaways, 50);
+    }
 }
 
 CZECH_GAME_BUTTONS.forEach(btn => btn.addEventListener('click', () => chooseGame(btn.dataset.game)));
