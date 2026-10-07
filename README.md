@@ -31,10 +31,11 @@ A fun and educational learning game for kids. The start screen offers three part
 - A **☰ Menu** button (top left, across from the language switcher) returns to the start screen
 
 ### Czech Spelling Practice (Čeština)
-- A dedicated section for bigger kids covering three kinds of spelling tasks: **i/í vs y/ý** after soft and hard consonants, **u / ú / ů** (three letters — decide first whether the u is short or a long ú/ů, then where it goes), and **paired consonants**, plus a **mixed test** (20 questions)
-- **263 practice words** (107 from the source worksheet plus 156 more), each a blank to fill, presented in short everyday phrases
-- Practice rounds of 10 cycle through every word of a kind and bring back the ones answered wrong; a wrong answer shows the correct spelling and why (the applicable rule, or a check word in which the letter is heard)
-- The **mixed test** plays like a practice round: all three kinds mixed, a wrong answer shows the correct spelling and why before you continue, and the result screen gives stars by your share of correct answers with every mistake explained — its 20 words are picked like practice (the ones missed before first, then a pass through the rest)
+- A dedicated section for bigger kids covering four kinds of spelling tasks: **i/í vs y/ý** after soft and hard consonants, **u / ú / ů** (three letters — decide first whether the u is short or a long ú/ů, then where it goes), **paired consonants**, and **bě/pě/vě/mě** (including bje/vje where a prefix meets a word starting with j, and mně where a related word has an n), plus a **mixed test** (20 questions). The Czech menu lays the four topic cards out two by two with the test across the bottom
+- **393 practice words**, each a blank to fill, presented in short everyday phrases
+- Each topic card shows its share of right answers in the recent answers (up to the last 30, once at least 5 have been given) and which words are waiting to be practised again
+- Practice rounds of 10 cycle through every word of a kind and bring back the ones answered wrong; a wrong answer shows the correct spelling and why (the applicable rule, or a check word in which the letter is heard). Newly added words join the running pass at once. Questions that would give each other away (a phrase, filled word, or check word revealing another's answer) never fall in the same round
+- The **mixed test** plays like a practice round: all four kinds mixed, a wrong answer shows the correct spelling and why before you continue, and the result screen gives stars by your share of correct answers with every mistake explained — it asks more of the topics going worse lately and fewer of those going well (each topic at least 2 of the 20), and the words you missed before come first
 - The words stay Czech in both languages; instructions and explanations follow the language switch, with Czech fragments marked as Czech for screen readers
 - Answers verified against an independent worksheet fill-in and the Internetová jazyková příručka
 
@@ -112,7 +113,7 @@ Fruits are rendered as Unicode emoji (🍎🍌🍊🍉🍍) — no image assets 
 <!-- AUTO-GENERATED: START -->
 *Auto-maintained by the nightly README agent. This block is refreshed only when new commits land in the repo.*
 
-**Last reflected change:** 2026-10-04T23:13:53Z
+**Last reflected change:** 2026-10-07T23:16:22Z
 
 **Project status:** Active — git remote: https://github.com/trueshpen/math_game
 <!-- AUTO-GENERATED: END -->
