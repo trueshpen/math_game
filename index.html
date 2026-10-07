@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#3fae55">
-    <meta name="description" content="Fun learning games for kids: math (counting, adding, comparing, matching, multiplication and division) and Czech spelling (i/y, u/ú/ů, paired consonants).">
-    <title>Kids Math Game</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍎</text></svg>">
+    <meta name="description" content="School practice for kids: math (counting, adding, comparing, matching, multiplication and division) and Czech spelling (i/y, u/ú/ů, bě/pě/vě/mě, paired consonants).">
+    <title>School Practice</title>
+    <!-- (the icon: a fountain pen with a drop of ink) -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><g transform='rotate(45 50 50)'><rect x='32' y='-4' width='36' height='52' rx='13' fill='%232a3eb1'/><rect x='58' y='2' width='5' height='30' rx='2.5' fill='%23aab8ff'/><rect x='32' y='42' width='36' height='8' fill='%23f2b632'/><rect x='36' y='50' width='28' height='10' fill='%231b1b2f'/><path d='M36 60 H64 L50 97 Z' fill='%23f2b632'/><path d='M50 70 V93' stroke='%231b1b2f' stroke-width='3.5'/><circle cx='50' cy='69' r='4' fill='%231b1b2f'/></g><path d='M11 82 C4 92 7 97 12 97 C17 97 20 92 11 82 Z' fill='%231e6fe0'/></svg>">
     <!-- Until script.js has put up the language and the page, nothing of the page shows
          (.booting, see styles.css) - only the colour of the part it opens: the one in the
          address, or the one remembered on this device. So a reload never flashes another
@@ -29,7 +30,7 @@
             if (colour && meta) meta.setAttribute('content', colour);
             if (lang !== 'en' && lang !== 'cs') lang = /^(cs|sk)/i.test(navigator.language || '') ? 'cs' : 'en';
             root.lang = lang;
-            if (lang === 'cs') document.title = 'Dětská matematika';
+            if (lang === 'cs') document.title = 'Školní procvičování';
             // Should the script break before the page is ready, show what there is
             // (not an outdated page: script.js marks that .stale while it loads the current one)
             window.addEventListener('error', function () {
@@ -41,7 +42,7 @@
     <!-- The server sends no cache headers, so browsers keep old copies for days.
          Bump ?v= whenever styles.css or script.js change (and APP_VERSION at the top of script.js), so new HTML never runs with old files
          (a cached page that gets a newer script.js loads the current page once, see its top). -->
-    <link rel="stylesheet" href="styles.css?v=2026-10-07.2">
+    <link rel="stylesheet" href="styles.css?v=2026-10-07.3">
 </head>
 <body class="little-kids-theme">
     <!-- Language switcher (fixed top-right; hidden during a game) -->
@@ -125,7 +126,7 @@
             <!-- Back to the three parts: at the top left, across from the language switcher -->
             <button id="changeAgeGroupBtn" type="button" class="menu-btn" data-i18n="home.changeAge">☰ Menu</button>
             <header class="home-header">
-                <h1 class="game-title" id="homeTitle" data-i18n="home.title">🍎 Kids Math Game 🍊</h1>
+                <h1 class="game-title" id="homeTitle" data-i18n="home.title">🍎 Math 🍊</h1>
                 <p class="game-subtitle" id="homeWelcome" data-i18n="home.welcome">Welcome! Pick a game to play:</p>
             </header>
 
@@ -447,6 +448,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=2026-10-07.2" onerror="document.documentElement.classList.remove('booting')"></script>
+    <script src="script.js?v=2026-10-07.3" onerror="document.documentElement.classList.remove('booting')"></script>
 </body>
 </html>

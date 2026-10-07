@@ -1,5 +1,5 @@
 // Bump APP_VERSION together with the ?v= values in index.html whenever this file changes.
-const APP_VERSION = '2026-10-07.2';
+const APP_VERSION = '2026-10-07.3';
 
 // A page the browser cached from another version may still load this file (the
 // server keeps no old copies). The page asks for script.js?v=<its version>; if that
@@ -31,7 +31,7 @@ if (!requestedVersion || requestedVersion[1] !== APP_VERSION) {
 // ============================================================
 const translations = {
     en: {
-        'app.title': 'Kids Math Game',
+        'app.title': 'School Practice',
         'lang.label': 'Language',
         // Age selection
         'age.littleKids': 'Math',
@@ -48,7 +48,7 @@ const translations = {
         'age.czech.desc2': '✏️ 2nd grade review ✏️',
         'age.play': 'Play ▶',
         // Home
-        'home.title': '🍎 Kids Math Game 🍊',
+        'home.title': '🍎 Math 🍊',
         'home.welcome': 'Welcome! Pick a game to play:',
         'home.changeAge': '☰ Menu',
         // Czech (the words themselves are always Czech)
@@ -257,7 +257,7 @@ const translations = {
         'fruit.pineapple': 'pineapples',
     },
     cs: {
-        'app.title': 'Dětská matematika', // (index.html puts this up while the page boots)
+        'app.title': 'Školní procvičování', // (index.html puts this up while the page boots)
         'lang.label': 'Jazyk',
         'age.littleKids': 'Matematika',
         'age.littleKids.ages': 'Věk 3–6',
@@ -272,7 +272,7 @@ const translations = {
         'age.czech.desc1': 'i/y, u/ú/ů, bě/pě/vě/mě a párové souhlásky',
         'age.czech.desc2': '✏️ Opakování 2. třídy ✏️',
         'age.play': 'Hrát ▶',
-        'home.title': '🍎 Dětská matematika 🍊',
+        'home.title': '🍎 Matematika 🍊',
         'home.welcome': 'Vítej! Vyber si hru:',
         'home.changeAge': '☰ Menu',
         'cz.home.title': '📚 Čeština ✏️',
