@@ -12,10 +12,10 @@ A fun and educational learning game for kids. The start screen offers three part
 - **Match Number to Fruits** — match a number to the correct group of fruits
 
 ### Times-Table Picker (Multiplication & Division)
-- Play-mode screen offers "pick the numbers you want to practise" with checkboxes 2–9
-- Multiplication: each problem is a chosen number × 1..10 (either order), never the same problem twice in a row
-- Division: a chosen number is the divisor and the answer is 1..10 (division within the times tables)
-- Until anything is picked, all numbers 2–9 are ticked (or play by level if the choice is empty); choosing a level clears the picker
+- Play-mode screen offers "pick the numbers you want to practise" with checkboxes 1–9
+- Multiplication: each problem is a chosen number × 2..10 (either order), never the same problem twice in a row; × 1 appears only on Easy or when 1 is among the chosen numbers
+- Division: a chosen number is the divisor and the answer is 2..10 (division within the times tables); ÷ 1 never appears, and the answer 1 (n ÷ n) comes only on Easy or when 1 is chosen
+- Until anything is picked, numbers 2–9 are ticked (1 left unticked, so no × 1 / ÷ 1), or play by level if the choice is empty; choosing a level clears the picker
 - The choice is remembered, and best scores are kept per choice; the game header shows the chosen tables (e.g. "Times tables: 3, 7")
 
 ### Endless Mode
@@ -113,7 +113,7 @@ Fruits are rendered as Unicode emoji (🍎🍌🍊🍉🍍) — no image assets 
 <!-- AUTO-GENERATED: START -->
 *Auto-maintained by the nightly README agent. This block is refreshed only when new commits land in the repo.*
 
-**Last reflected change:** 2026-10-07T23:16:22Z
+**Last reflected change:** 2026-10-27T23:09:00Z
 
 **Project status:** Active — git remote: https://github.com/trueshpen/math_game
 <!-- AUTO-GENERATED: END -->
