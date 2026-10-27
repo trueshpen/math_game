@@ -1,5 +1,5 @@
 // Bump APP_VERSION together with the ?v= values in index.html whenever this file changes.
-const APP_VERSION = '2026-10-07.3';
+const APP_VERSION = '2026-10-27.1';
 
 // A page the browser cached from another version may still load this file (the
 // server keeps no old copies). The page asks for script.js?v=<its version>; if that
@@ -793,10 +793,12 @@ let matchRoundHadMistake = false;
 let svgLayer = null; // SVG overlay for connection lines
 let selectedNumberId = null;
 let selectedGroupId = null;
-// Multiplication and division can practise chosen numbers 2-9 instead of a level:
-// that number × 1..10, or a multiple of it ÷ that number. Stored per game.
+// Multiplication and division can practise chosen numbers 1-9 instead of a level:
+// that number × 2..10, or a multiple of it ÷ that number. Stored per game.
+// The ones (× 1, ÷ 1, and n ÷ n = 1) come only on Easy, or when 1 is chosen.
 const PRACTICE_NUMBER_KEYS = { multiply: 'km_multiply_numbers', divide: 'km_divide_numbers' };
-const PRACTICE_NUMBER_CHOICES = [2, 3, 4, 5, 6, 7, 8, 9];
+const PRACTICE_NUMBER_CHOICES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+const PRACTICE_NUMBER_DEFAULT = [2, 3, 4, 5, 6, 7, 8, 9]; // (until anything is chosen: 1 not ticked)
 let practiceNumbers = []; // numbers chosen for the current run; [] = use the level
 let lastMathProblem = '';
 // Endless mode (bigger kids): play until "Finish"; results kept per game
@@ -1026,15 +1028,20 @@ function practiceNumbersKey(game) {
     return Object.prototype.hasOwnProperty.call(PRACTICE_NUMBER_KEYS, game) ? PRACTICE_NUMBER_KEYS[game] : null;
 }
 
-// Numbers chosen for a game, e.g. [3, 7]; only 2-9 count. Until anything was
+// Numbers chosen for a game, e.g. [3, 7]; only 1-9 count. Until anything was
 // chosen, all of 2-9 are; an empty choice ('') means "play by level".
 function loadPracticeNumbers(game) {
     const key = practiceNumbersKey(game);
     if (!key) return [];
     const stored = lsGet(key);
-    if (stored === null) return [...PRACTICE_NUMBER_CHOICES];
+    if (stored === null) return [...PRACTICE_NUMBER_DEFAULT];
     const numbers = stored.split(',').map(Number);
     return PRACTICE_NUMBER_CHOICES.filter(n => numbers.includes(n));
+}
+
+// Whether a task may use 1 (× 1, ÷ 1, n ÷ n): on Easy, or with 1 among the chosen numbers
+function onesAllowed() {
+    return practiceNumbers.length ? practiceNumbers.includes(1) : selectedDifficulty === 'easy';
 }
 
 function savePracticeNumbers(game, numbers) {
@@ -1934,8 +1941,9 @@ function configureDifficulty(level) {
         else if (level === 'medium') { difficultyMin = 1; difficultyMax = 50; answerMin = 1; answerMax = 50; }
         else if (level === 'hard') { difficultyMin = 10; difficultyMax = 100; answerMin = 1; answerMax = 100; }
     } else if (selectedGame === 'multiply') {
-        // Multiplication: easy up to 5×5, medium up to 10×10, hard up to 12×12,
-        // or chosen times tables (2-9 × 1..10), which play like Medium
+        // Multiplication: easy up to 5×5, medium up to 10×10, hard up to 12×12 (× 1
+        // on Easy only), or chosen times tables (1-9 × 2..10, × 1 when 1 is chosen),
+        // which play like Medium
         if (practiceNumbers.length) {
             selectedDifficulty = 'medium';
             answerMin = 1;
@@ -1944,8 +1952,9 @@ function configureDifficulty(level) {
         else if (level === 'medium') { difficultyMin = 1; difficultyMax = 10; answerMin = 1; answerMax = 100; }
         else if (level === 'hard') { difficultyMin = 2; difficultyMax = 12; answerMin = 1; answerMax = 144; }
     } else if (selectedGame === 'divide') {
-        // Division: always clean (no remainders). Difficulty controls divisor/quotient,
-        // or chosen divisors 2-9 with answers 1..10, which play like Medium
+        // Division: always clean (no remainders). Difficulty controls divisor/quotient
+        // (never ÷ 1; the answer 1, n ÷ n, on Easy only), or chosen divisors 1-9 with
+        // answers 2..10 (1 too when 1 is chosen), which play like Medium
         if (practiceNumbers.length) {
             selectedDifficulty = 'medium';
             answerMin = 1;
@@ -2513,16 +2522,17 @@ function createQuestion() {
         }
     } else if (selectedGame === 'multiply') {
         addSubOperator = '×';
-        // A chosen table times 1..10 in either order, or two factors from the level;
-        // never the same problem twice in a row
+        // A chosen table times 2..10 in either order, or two factors from the level;
+        // × 1 only on Easy or with 1 chosen; never the same problem twice in a row
+        const lowest = onesAllowed() ? 1 : 2;
         for (let tries = 0; tries < 10; tries++) {
             if (practiceNumbers.length) {
                 const table = practiceNumbers[Math.floor(Math.random() * practiceNumbers.length)];
-                const other = getRandomIntInclusive(1, 10);
+                const other = getRandomIntInclusive(lowest, 10);
                 [addSubNum1, addSubNum2] = Math.random() < 0.5 ? [table, other] : [other, table];
             } else {
-                addSubNum1 = getRandomIntInclusive(difficultyMin, difficultyMax);
-                addSubNum2 = getRandomIntInclusive(difficultyMin, difficultyMax);
+                addSubNum1 = getRandomIntInclusive(Math.max(lowest, difficultyMin), difficultyMax);
+                addSubNum2 = getRandomIntInclusive(Math.max(lowest, difficultyMin), difficultyMax);
             }
             if (`${addSubNum1}×${addSubNum2}` !== lastMathProblem) break;
         }
@@ -2531,14 +2541,16 @@ function createQuestion() {
     } else if (selectedGame === 'divide') {
         addSubOperator = '÷';
         // Clean division: pick quotient and divisor (a chosen number, or from the
-        // level), compute the dividend; never the same problem twice in a row
+        // level), compute the dividend; ÷ 1 and n ÷ n only on Easy or with 1 chosen
+        // (a level never divides by 1); never the same problem twice in a row
+        const lowest = onesAllowed() ? 1 : 2;
         for (let tries = 0; tries < 10; tries++) {
             let quotient, divisor;
             if (practiceNumbers.length) {
                 divisor = practiceNumbers[Math.floor(Math.random() * practiceNumbers.length)];
-                quotient = getRandomIntInclusive(1, 10);
+                quotient = getRandomIntInclusive(lowest, 10);
             } else {
-                quotient = getRandomIntInclusive(Math.max(1, answerMin), answerMax);
+                quotient = getRandomIntInclusive(Math.max(lowest, answerMin), answerMax);
                 divisor = getRandomIntInclusive(Math.max(2, difficultyMin), difficultyMax);
             }
             addSubNum1 = quotient * divisor;

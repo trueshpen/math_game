@@ -42,7 +42,7 @@
     <!-- The server sends no cache headers, so browsers keep old copies for days.
          Bump ?v= whenever styles.css or script.js change (and APP_VERSION at the top of script.js), so new HTML never runs with old files
          (a cached page that gets a newer script.js loads the current page once, see its top). -->
-    <link rel="stylesheet" href="styles.css?v=2026-10-07.3">
+    <link rel="stylesheet" href="styles.css?v=2026-10-27.1">
 </head>
 <body class="little-kids-theme">
     <!-- Language switcher (fixed top-right; hidden during a game) -->
@@ -291,10 +291,11 @@
                         <button type="button" class="settings-btn level-btn" data-diff="hard" data-i18n="settings.hard">Hard</button>
                     </div>
                 </div>
-                <!-- Multiplication and division: practise chosen numbers (all of 2-9 until changed) instead of a level -->
+                <!-- Multiplication and division: practise chosen numbers (2-9 until changed; 1 = × 1 / ÷ 1) instead of a level -->
                 <fieldset class="number-picker hidden" id="numberPicker">
                     <legend class="picker-label" data-i18n="playMode.pickNumbers">or pick the numbers you want to practice</legend>
                     <div class="number-chips">
+                        <label class="number-chip"><input type="checkbox" value="1"><span>1</span></label>
                         <label class="number-chip"><input type="checkbox" value="2"><span>2</span></label>
                         <label class="number-chip"><input type="checkbox" value="3"><span>3</span></label>
                         <label class="number-chip"><input type="checkbox" value="4"><span>4</span></label>
@@ -448,6 +449,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=2026-10-07.3" onerror="document.documentElement.classList.remove('booting')"></script>
+    <script src="script.js?v=2026-10-27.1" onerror="document.documentElement.classList.remove('booting')"></script>
 </body>
 </html>

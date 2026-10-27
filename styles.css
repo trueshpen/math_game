@@ -1331,7 +1331,7 @@ lang-fx.sr {
 
 .number-chips {
     display: grid;
-    grid-template-columns: repeat(8, minmax(0, 1fr));
+    grid-template-columns: repeat(9, minmax(0, 1fr));
     gap: 6px;
     width: 100%;
     max-width: 440px;
@@ -2673,7 +2673,7 @@ lang-fx.sr {
 
 @media (max-width: 380px) {
     .number-chips {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-columns: repeat(5, minmax(0, 1fr)); /* (1-9: five and four) */
     }
 }
 
@@ -3026,7 +3026,7 @@ lang-fx.sr {
     .play-setup > .mode-buttons { grid-area: modes; }
 
     .number-chips {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-columns: repeat(5, minmax(0, 1fr)); /* (1-9: five and four) */
     }
 }
 
